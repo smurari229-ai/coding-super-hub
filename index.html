@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Converter</title>
+  <title>Coding Super Hub</title>
 
   <style>
     * {
@@ -12,240 +12,415 @@
 
     body {
       margin: 0;
-      padding: 20px;
-      background: #f3f6fb;
       font-family: Arial, sans-serif;
-      color: #172033;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.8;
     }
 
     .container {
-      max-width: 750px;
-      margin: 30px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+      width: 95%;
+      max-width: 900px;
+      margin: 20px auto;
     }
 
-    h1 {
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2 {
       margin-top: 0;
     }
 
-    input[type="text"] {
+    textarea,
+    input {
       width: 100%;
-      padding: 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       font-size: 16px;
     }
 
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
     button {
-      padding: 11px 16px;
-      margin: 10px 5px 5px 0;
+      padding: 10px 15px;
+      margin: 5px 5px 5px 0;
       border: none;
       border-radius: 8px;
       background: #2563eb;
       color: white;
+      font-size: 15px;
       cursor: pointer;
-      font-size: 14px;
     }
 
     button:hover {
-      background: #1d4ed8;
+      opacity: 0.9;
     }
 
-    .preview {
-      width: 100%;
-      height: 150px;
-      margin-top: 20px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-    }
-
-    .result {
-      margin-top: 18px;
-      padding: 15px;
-      background: #111827;
-      color: white;
-      border-radius: 10px;
-      font-family: monospace;
+    .output {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      min-height: 40px;
       white-space: pre-wrap;
       word-break: break-word;
     }
 
-    .error {
-      background: #fef2f2;
-      color: #dc2626;
+    .editor-tabs button {
+      background: #374151;
     }
 
-    .format {
-      margin-top: 12px;
-      font-size: 16px;
+    .editor-tabs button.active {
+      background: #2563eb;
+    }
+
+    .status {
+      font-weight: bold;
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
+  <header>
+    <h1>🚀 Coding Super Hub</h1>
+    <p>All-in-One Coding Tools</p>
+  </header>
 
-  <h1>🎨 Color Converter</h1>
+  <div class="container">
 
-  <p>
-    Enter a HEX color and convert it to RGB.
-  </p>
+    <!-- TEST 1 -->
+    <div class="card">
+      <h2>1. Online Code Editor</h2>
 
-  <input
-    type="text"
-    id="colorInput"
-    placeholder="Example: #ff0000"
-  >
+      <div class="editor-tabs">
+        <button onclick="showEditor('html')" id="htmlTab">HTML</button>
+        <button onclick="showEditor('css')" id="cssTab">CSS</button>
+        <button onclick="showEditor('js')" id="jsTab">JavaScript</button>
+      </div>
 
-  <br>
+      <textarea id="htmlCode"><h1>Hello Coding Super Hub!</h1>
+<p>This is my first live output.</p></textarea>
 
-  <button onclick="convertColor()">
-    🎨 Convert
-  </button>
+      <textarea id="cssCode" style="display:none;"><h1 {
+  color: blue;
+}</textarea>
 
-  <button onclick="copyResult()">
-    📋 Copy Result
-  </button>
+      <textarea id="jsCode" style="display:none;">document.body.innerHTML += "<p>JavaScript is working!</p>";</textarea>
 
-  <button onclick="clearAll()">
-    🗑️ Clear
-  </button>
+      <button onclick="runCode()">▶ Run Code</button>
+      <button onclick="copyCode()">📋 Copy</button>
+      <button onclick="clearCode()">🗑 Clear</button>
 
-  <div id="preview" class="preview"></div>
+      <h3>Live Output</h3>
+      <iframe id="liveOutput" style="width:100%;height:250px;border:1px solid #ccc;border-radius:8px;"></iframe>
+    </div>
 
-  <div id="result" class="result">
-    Result will appear here...
+
+    <!-- TEST 2 -->
+    <div class="card">
+      <h2>2. Text Case Converter</h2>
+
+      <textarea id="caseInput" placeholder="Enter your text here..."></textarea>
+
+      <button onclick="toUpper()">UPPERCASE</button>
+      <button onclick="toLower()">lowercase</button>
+      <button onclick="toTitle()">Title Case</button>
+      <button onclick="clearCase()">Clear</button>
+
+      <div class="output" id="caseOutput"></div>
+    </div>
+
+
+    <!-- TEST 3 -->
+    <div class="card">
+      <h2>3. Word & Character Counter</h2>
+
+      <textarea id="counterInput"
+        placeholder="Type or paste your text here..."
+        oninput="countText()"></textarea>
+
+      <div class="output">
+        Words: <strong id="wordCount">0</strong><br>
+        Characters: <strong id="charCount">0</strong><br>
+        Characters without spaces: <strong id="noSpaceCount">0</strong>
+      </div>
+    </div>
+
+
+    <!-- TEST 4 -->
+    <div class="card">
+      <h2>4. JSON Formatter</h2>
+
+      <textarea id="jsonInput"
+        placeholder='Example: {"name":"Murari","age":25}'></textarea>
+
+      <button onclick="formatJSON()">Format JSON</button>
+      <button onclick="minifyJSON()">Minify JSON</button>
+      <button onclick="clearJSON()">Clear</button>
+
+      <div class="output" id="jsonOutput"></div>
+    </div>
+
+
+    <!-- TEST 5 -->
+    <div class="card">
+      <h2>5. Base64 Encoder / Decoder</h2>
+
+      <textarea id="base64Input"
+        placeholder="Enter text here..."></textarea>
+
+      <button onclick="encodeBase64()">Encode</button>
+      <button onclick="decodeBase64()">Decode</button>
+      <button onclick="clearBase64()">Clear</button>
+
+      <div class="output" id="base64Output"></div>
+    </div>
+
   </div>
 
-</div>
 
-<script>
+  <script>
 
-function convertColor() {
+    /* =========================
+       TEST 1 - CODE EDITOR
+    ========================= */
 
-  const input =
-    document.getElementById("colorInput").value.trim();
+    function showEditor(type) {
+      document.getElementById("htmlCode").style.display =
+        type === "html" ? "block" : "none";
 
-  const result =
-    document.getElementById("result");
+      document.getElementById("cssCode").style.display =
+        type === "css" ? "block" : "none";
 
-  const preview =
-    document.getElementById("preview");
+      document.getElementById("jsCode").style.display =
+        type === "js" ? "block" : "none";
+    }
 
-  if (input === "") {
+    function runCode() {
+      const html = document.getElementById("htmlCode").value;
+      const css = document.getElementById("cssCode").value;
+      const js = document.getElementById("jsCode").value;
 
-    result.className = "result error";
-    result.textContent =
-      "❌ Please enter a HEX color.";
+      const output = document.getElementById("liveOutput");
 
-    return;
-  }
+      const doc = output.contentDocument || output.contentWindow.document;
 
-  let hex = input;
+      doc.open();
 
-  if (!hex.startsWith("#")) {
-    hex = "#" + hex;
-  }
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>${css}</style>
+        </head>
+        <body>
+          ${html}
+          <script>
+            ${js}
+          <\/script>
+        </body>
+        </html>
+      `);
 
-  const hexPattern =
-    /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      doc.close();
+    }
 
-  if (!hexPattern.test(hex)) {
+    function copyCode() {
+      const html = document.getElementById("htmlCode").value;
+      const css = document.getElementById("cssCode").value;
+      const js = document.getElementById("jsCode").value;
 
-    result.className = "result error";
-    result.textContent =
-      "❌ Invalid HEX color. Example: #ff0000";
+      const allCode =
+`HTML:
+${html}
 
-    preview.style.background = "#ffffff";
+CSS:
+${css}
 
-    return;
-  }
+JavaScript:
+${js}`;
 
-  let fullHex = hex;
+      navigator.clipboard.writeText(allCode);
 
-  if (hex.length === 4) {
+      alert("Code copied!");
+    }
 
-    fullHex =
-      "#" +
-      hex[1] + hex[1] +
-      hex[2] + hex[2] +
-      hex[3] + hex[3];
-  }
-
-  const r =
-    parseInt(fullHex.substring(1, 3), 16);
-
-  const g =
-    parseInt(fullHex.substring(3, 5), 16);
-
-  const b =
-    parseInt(fullHex.substring(5, 7), 16);
-
-  const rgb =
-    `rgb(${r}, ${g}, ${b})`;
-
-  preview.style.background = fullHex;
-
-  result.className = "result";
-
-  result.textContent =
-    "HEX: " + fullHex.toUpperCase() +
-    "\nRGB: " + rgb;
-}
+    function clearCode() {
+      document.getElementById("htmlCode").value = "";
+      document.getElementById("cssCode").value = "";
+      document.getElementById("jsCode").value = "";
+      document.getElementById("liveOutput").srcdoc = "";
+    }
 
 
-function copyResult() {
+    /* =========================
+       TEST 2 - CASE CONVERTER
+    ========================= */
 
-  const text =
-    document.getElementById("result").textContent;
+    function toUpper() {
+      const text = document.getElementById("caseInput").value;
+      document.getElementById("caseOutput").textContent =
+        text.toUpperCase();
+    }
 
-  const result =
-    document.getElementById("result");
+    function toLower() {
+      const text = document.getElementById("caseInput").value;
+      document.getElementById("caseOutput").textContent =
+        text.toLowerCase();
+    }
 
-  if (
-    text === "Result will appear here..." ||
-    text.startsWith("❌")
-  ) {
+    function toTitle() {
+      const text = document.getElementById("caseInput").value;
 
-    alert("❌ No valid result to copy.");
+      const result = text
+        .toLowerCase()
+        .split(" ")
+        .map(word => {
+          if (!word) return "";
+          return word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join(" ");
 
-    return;
-  }
+      document.getElementById("caseOutput").textContent = result;
+    }
 
-  navigator.clipboard.writeText(text)
-    .then(function() {
-
-      alert("✅ Result copied!");
-
-    })
-    .catch(function() {
-
-      alert("❌ Copy failed.");
-
-    });
-}
+    function clearCase() {
+      document.getElementById("caseInput").value = "";
+      document.getElementById("caseOutput").textContent = "";
+    }
 
 
-function clearAll() {
+    /* =========================
+       TEST 3 - WORD COUNTER
+    ========================= */
 
-  document.getElementById("colorInput").value = "";
+    function countText() {
+      const text = document.getElementById("counterInput").value;
 
-  document.getElementById("preview").style.background =
-    "#ffffff";
+      const words = text.trim()
+        ? text.trim().split(/\s+/).length
+        : 0;
 
-  document.getElementById("result").className =
-    "result";
+      const characters = text.length;
 
-  document.getElementById("result").textContent =
-    "Result will appear here...";
-}
+      const withoutSpaces = text.replace(/\s/g, "").length;
 
-</script>
+      document.getElementById("wordCount").textContent = words;
+      document.getElementById("charCount").textContent = characters;
+      document.getElementById("noSpaceCount").textContent =
+        withoutSpaces;
+    }
+
+
+    /* =========================
+       TEST 4 - JSON FORMATTER
+    ========================= */
+
+    function formatJSON() {
+      const input = document.getElementById("jsonInput").value;
+
+      try {
+        const obj = JSON.parse(input);
+
+        document.getElementById("jsonOutput").textContent =
+          JSON.stringify(obj, null, 2);
+
+      } catch (error) {
+        document.getElementById("jsonOutput").textContent =
+          "❌ Invalid JSON";
+      }
+    }
+
+    function minifyJSON() {
+      const input = document.getElementById("jsonInput").value;
+
+      try {
+        const obj = JSON.parse(input);
+
+        document.getElementById("jsonOutput").textContent =
+          JSON.stringify(obj);
+
+      } catch (error) {
+        document.getElementById("jsonOutput").textContent =
+          "❌ Invalid JSON";
+      }
+    }
+
+    function clearJSON() {
+      document.getElementById("jsonInput").value = "";
+      document.getElementById("jsonOutput").textContent = "";
+    }
+
+
+    /* =========================
+       TEST 5 - BASE64
+    ========================= */
+
+    function encodeBase64() {
+      const text = document.getElementById("base64Input").value;
+
+      try {
+        const encoded = btoa(unescape(encodeURIComponent(text)));
+
+        document.getElementById("base64Output").textContent =
+          encoded;
+
+      } catch (error) {
+        document.getElementById("base64Output").textContent =
+          "❌ Encoding error";
+      }
+    }
+
+    function decodeBase64() {
+      const text = document.getElementById("base64Input").value;
+
+      try {
+        const decoded = decodeURIComponent(
+          escape(atob(text))
+        );
+
+        document.getElementById("base64Output").textContent =
+          decoded;
+
+      } catch (error) {
+        document.getElementById("base64Output").textContent =
+          "❌ Invalid Base64";
+      }
+    }
+
+    function clearBase64() {
+      document.getElementById("base64Input").value = "";
+      document.getElementById("base64Output").textContent = "";
+    }
+
+  </script>
 
 </body>
 </html>
