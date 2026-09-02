@@ -204,7 +204,116 @@
     </div>
 
   </div>
+<!-- TEST 6 - URL ENCODER / DECODER -->
 
+<div class="card">
+  <h2>6. URL Encoder / Decoder</h2>
+
+  <textarea id="urlInput"
+    placeholder="Enter URL or text..."></textarea>
+
+  <button onclick="encodeURL()">Encode URL</button>
+  <button onclick="decodeURL()">Decode URL</button>
+  <button onclick="clearURL()">Clear</button>
+
+  <div class="output" id="urlOutput"></div>
+</div>
+
+
+<!-- TEST 7 - PASSWORD GENERATOR -->
+
+<div class="card">
+  <h2>7. Password Generator</h2>
+
+  <input
+    type="number"
+    id="passwordLength"
+    value="12"
+    min="4"
+    max="100"
+    placeholder="Password length">
+
+  <button onclick="generatePassword()">
+    Generate Password
+  </button>
+
+  <div class="output" id="passwordOutput"></div>
+</div>
+
+
+<!-- TEST 8 - COLOR CONVERTER -->
+
+<div class="card">
+  <h2>8. Color Converter</h2>
+
+  <input
+    type="color"
+    id="colorPicker"
+    value="#2563eb">
+
+  <input
+    type="text"
+    id="hexColor"
+    value="#2563eb"
+    placeholder="#2563eb">
+
+  <button onclick="convertColor()">
+    Convert Color
+  </button>
+
+  <div class="output" id="colorOutput"></div>
+</div>
+
+
+<!-- TEST 9 - TIMESTAMP CONVERTER -->
+
+<div class="card">
+  <h2>9. Timestamp Converter</h2>
+
+  <input
+    type="text"
+    id="timestampInput"
+    placeholder="Unix timestamp e.g. 1750000000">
+
+  <button onclick="timestampToDate()">
+    Timestamp → Date
+  </button>
+
+  <input
+    type="datetime-local"
+    id="dateInput">
+
+  <button onclick="dateToTimestamp()">
+    Date → Timestamp
+  </button>
+
+  <div class="output" id="timestampOutput"></div>
+</div>
+
+
+<!-- TEST 10 - HTML ENTITY ENCODER / DECODER -->
+
+<div class="card">
+  <h2>10. HTML Entity Encoder / Decoder</h2>
+
+  <textarea
+    id="entityInput"
+    placeholder="Enter HTML text..."></textarea>
+
+  <button onclick="encodeHTML()">
+    Encode HTML
+  </button>
+
+  <button onclick="decodeHTML()">
+    Decode HTML
+  </button>
+
+  <button onclick="clearHTML()">
+    Clear
+  </button>
+
+  <div class="output" id="entityOutput"></div>
+</div>
 
   <script>
 
@@ -419,7 +528,167 @@ ${js}`;
       document.getElementById("base64Input").value = "";
       document.getElementById("base64Output").textContent = "";
     }
+/* =========================
+   TEST 6 - URL ENCODER / DECODER
+========================= */
 
+function encodeURL() {
+  const text = document.getElementById("urlInput").value;
+  document.getElementById("urlOutput").textContent =
+    encodeURIComponent(text);
+}
+
+function decodeURL() {
+  const text = document.getElementById("urlInput").value;
+
+  try {
+    document.getElementById("urlOutput").textContent =
+      decodeURIComponent(text);
+  } catch (error) {
+    document.getElementById("urlOutput").textContent =
+      "❌ Invalid encoded URL";
+  }
+}
+
+function clearURL() {
+  document.getElementById("urlInput").value = "";
+  document.getElementById("urlOutput").textContent = "";
+}
+
+
+/* =========================
+   TEST 7 - PASSWORD GENERATOR
+========================= */
+
+function generatePassword() {
+  const length =
+    parseInt(document.getElementById("passwordLength").value) || 12;
+
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+
+  let password = "";
+
+  for (let i = 0; i < length; i++) {
+    password += characters.charAt(
+      Math.floor(Math.random() * characters.length)
+    );
+  }
+
+  document.getElementById("passwordOutput").textContent =
+    password;
+}
+
+
+/* =========================
+   TEST 8 - COLOR CONVERTER
+========================= */
+
+function convertColor() {
+  const hex =
+    document.getElementById("hexColor").value.trim();
+
+  if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+    document.getElementById("colorOutput").textContent =
+      "❌ Enter a valid HEX color like #2563eb";
+    return;
+  }
+
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+
+  document.getElementById("colorOutput").textContent =
+    "HEX: " + hex +
+    "\nRGB: rgb(" + r + ", " + g + ", " + b + ")";
+}
+
+document.getElementById("colorPicker").addEventListener(
+  "input",
+  function() {
+    document.getElementById("hexColor").value = this.value;
+  }
+);
+
+
+/* =========================
+   TEST 9 - TIMESTAMP CONVERTER
+========================= */
+
+function timestampToDate() {
+  const value =
+    document.getElementById("timestampInput").value.trim();
+
+  const timestamp = Number(value);
+
+  if (!Number.isFinite(timestamp)) {
+    document.getElementById("timestampOutput").textContent =
+      "❌ Enter a valid Unix timestamp";
+    return;
+  }
+
+  const milliseconds =
+    value.length <= 10 ? timestamp * 1000 : timestamp;
+
+  const date = new Date(milliseconds);
+
+  if (isNaN(date.getTime())) {
+    document.getElementById("timestampOutput").textContent =
+      "❌ Invalid timestamp";
+    return;
+  }
+
+  document.getElementById("timestampOutput").textContent =
+    date.toLocaleString();
+}
+
+function dateToTimestamp() {
+  const value =
+    document.getElementById("dateInput").value;
+
+  if (!value) {
+    document.getElementById("timestampOutput").textContent =
+      "❌ Select a date and time";
+    return;
+  }
+
+  const date = new Date(value);
+
+  document.getElementById("timestampOutput").textContent =
+    Math.floor(date.getTime() / 1000);
+}
+
+
+/* =========================
+   TEST 10 - HTML ENTITY
+========================= */
+
+function encodeHTML() {
+  const text =
+    document.getElementById("entityInput").value;
+
+  const div = document.createElement("div");
+  div.textContent = text;
+
+  document.getElementById("entityOutput").textContent =
+    div.innerHTML;
+}
+
+function decodeHTML() {
+  const text =
+    document.getElementById("entityInput").value;
+
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+
+  document.getElementById("entityOutput").textContent =
+    textarea.value;
+}
+
+function clearHTML() {
+  document.getElementById("entityInput").value = "";
+  document.getElementById("entityOutput").textContent = "";
+}
   </script>
 
 </body>
