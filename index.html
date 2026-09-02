@@ -606,6 +606,237 @@
   </button>
 
   <div class="output" id="randomOutput"></div>
+</div><!-- =========================
+     TEST 26 - TEMPERATURE CONVERTER
+========================= -->
+<div class="tool">
+  <h2>26. Temperature Converter</h2>
+  <input id="tempInput" type="number" placeholder="Enter temperature">
+  <select id="tempFrom">
+    <option value="c">Celsius</option>
+    <option value="f">Fahrenheit</option>
+    <option value="k">Kelvin</option>
+  </select>
+  <select id="tempTo">
+    <option value="c">Celsius</option>
+    <option value="f">Fahrenheit</option>
+    <option value="k">Kelvin</option>
+  </select>
+  <button onclick="convertTemperature()">Convert</button>
+  <p id="tempOutput"></p>
+</div>
+
+<!-- TEST 27 -->
+<div class="tool">
+  <h2>27. BMI Calculator</h2>
+  <input id="bmiWeight" type="number" placeholder="Weight (kg)">
+  <input id="bmiHeight" type="number" placeholder="Height (cm)">
+  <button onclick="calculateBMI()">Calculate BMI</button>
+  <p id="bmiOutput"></p>
+</div>
+
+<!-- TEST 28 -->
+<div class="tool">
+  <h2>28. Percentage Calculator</h2>
+  <input id="percentValue" type="number" placeholder="Value">
+  <input id="percentTotal" type="number" placeholder="Total">
+  <button onclick="calculatePercentage()">Calculate</button>
+  <p id="percentOutput"></p>
+</div>
+
+<!-- TEST 29 -->
+<div class="tool">
+  <h2>29. Tip Calculator</h2>
+  <input id="tipBill" type="number" placeholder="Bill amount">
+  <input id="tipPercent" type="number" placeholder="Tip %">
+  <button onclick="calculateTip()">Calculate Tip</button>
+  <p id="tipOutput"></p>
+</div>
+
+<!-- TEST 30 -->
+<div class="tool">
+  <h2>30. Discount Calculator</h2>
+  <input id="discountPrice" type="number" placeholder="Original price">
+  <input id="discountPercent" type="number" placeholder="Discount %">
+  <button onclick="calculateDiscount()">Calculate</button>
+  <p id="discountOutput"></p>
+</div>
+
+<!-- TEST 31 -->
+<div class="tool">
+  <h2>31. EMI Calculator</h2>
+  <input id="emiPrincipal" type="number" placeholder="Loan amount">
+  <input id="emiRate" type="number" placeholder="Annual interest %">
+  <input id="emiMonths" type="number" placeholder="Months">
+  <button onclick="calculateEMI()">Calculate EMI</button>
+  <p id="emiOutput"></p>
+</div>
+
+<!-- TEST 32 -->
+<div class="tool">
+  <h2>32. Compound Interest Calculator</h2>
+  <input id="ciPrincipal" type="number" placeholder="Principal">
+  <input id="ciRate" type="number" placeholder="Annual rate %">
+  <input id="ciYears" type="number" placeholder="Years">
+  <button onclick="calculateCompound()">Calculate</button>
+  <p id="ciOutput"></p>
+</div>
+
+<!-- TEST 33 -->
+<div class="tool">
+  <h2>33. Simple Interest Calculator</h2>
+  <input id="siPrincipal" type="number" placeholder="Principal">
+  <input id="siRate" type="number" placeholder="Rate %">
+  <input id="siTime" type="number" placeholder="Time">
+  <button onclick="calculateSimpleInterest()">Calculate</button>
+  <p id="siOutput"></p>
+</div>
+
+<!-- TEST 34 -->
+<div class="tool">
+  <h2>34. Average Calculator</h2>
+  <input id="averageInput" placeholder="Numbers: 10,20,30">
+  <button onclick="calculateAverage()">Calculate Average</button>
+  <p id="averageOutput"></p>
+</div>
+
+<!-- TEST 35 -->
+<div class="tool">
+  <h2>35. Sum Calculator</h2>
+  <input id="sumInput" placeholder="Numbers: 10,20,30">
+  <button onclick="calculateSum()">Calculate Sum</button>
+  <p id="sumOutput"></p>
+</div>
+
+<!-- TEST 36 -->
+<div class="tool">
+  <h2>36. Unit Converter</h2>
+  <input id="unitInput" type="number" placeholder="Enter value">
+  <select id="unitType">
+    <option value="km-mi">Kilometers → Miles</option>
+    <option value="mi-km">Miles → Kilometers</option>
+    <option value="m-ft">Meters → Feet</option>
+    <option value="ft-m">Feet → Meters</option>
+    <option value="kg-lb">Kg → Pounds</option>
+    <option value="lb-kg">Pounds → Kg</option>
+  </select>
+  <button onclick="convertUnit()">Convert</button>
+  <p id="unitOutput"></p>
+</div>
+
+<!-- TEST 37 -->
+<div class="tool">
+  <h2>37. Time Converter</h2>
+  <input id="timeInput" type="number" placeholder="Enter minutes">
+  <button onclick="convertTime()">Convert</button>
+  <p id="timeOutput"></p>
+</div>
+
+<!-- TEST 38 -->
+<div class="tool">
+  <h2>38. Seconds Converter</h2>
+  <input id="secondsInput" type="number" placeholder="Enter seconds">
+  <button onclick="convertSeconds()">Convert</button>
+  <p id="secondsOutput"></p>
+</div>
+
+<!-- TEST 39 -->
+<div class="tool">
+  <h2>39. Days Calculator</h2>
+  <input id="daysStart" type="date">
+  <input id="daysEnd" type="date">
+  <button onclick="calculateDays()">Calculate Days</button>
+  <p id="daysOutput"></p>
+</div>
+
+<!-- TEST 40 -->
+<div class="tool">
+  <h2>40. Leap Year Checker</h2>
+  <input id="leapYearInput" type="number" placeholder="Enter year">
+  <button onclick="checkLeapYear()">Check</button>
+  <p id="leapYearOutput"></p>
+</div>
+
+<!-- TEST 41 -->
+<div class="tool">
+  <h2>41. Prime Number Checker</h2>
+  <input id="primeInput" type="number" placeholder="Enter number">
+  <button onclick="checkPrime()">Check Prime</button>
+  <p id="primeOutput"></p>
+</div>
+
+<!-- TEST 42 -->
+<div class="tool">
+  <h2>42. Even / Odd Checker</h2>
+  <input id="evenOddInput" type="number" placeholder="Enter number">
+  <button onclick="checkEvenOdd()">Check</button>
+  <p id="evenOddOutput"></p>
+</div>
+
+<!-- TEST 43 -->
+<div class="tool">
+  <h2>43. Factorial Calculator</h2>
+  <input id="factorialInput" type="number" placeholder="Enter number">
+  <button onclick="calculateFactorial()">Calculate</button>
+  <p id="factorialOutput"></p>
+</div>
+
+<!-- TEST 44 -->
+<div class="tool">
+  <h2>44. Fibonacci Generator</h2>
+  <input id="fibInput" type="number" placeholder="How many numbers?">
+  <button onclick="generateFibonacci()">Generate</button>
+  <p id="fibOutput"></p>
+</div>
+
+<!-- TEST 45 -->
+<div class="tool">
+  <h2>45. GCD Calculator</h2>
+  <input id="gcdA" type="number" placeholder="First number">
+  <input id="gcdB" type="number" placeholder="Second number">
+  <button onclick="calculateGCD()">Calculate GCD</button>
+  <p id="gcdOutput"></p>
+</div>
+
+<!-- TEST 46 -->
+<div class="tool">
+  <h2>46. LCM Calculator</h2>
+  <input id="lcmA" type="number" placeholder="First number">
+  <input id="lcmB" type="number" placeholder="Second number">
+  <button onclick="calculateLCM()">Calculate LCM</button>
+  <p id="lcmOutput"></p>
+</div>
+
+<!-- TEST 47 -->
+<div class="tool">
+  <h2>47. Binary Calculator</h2>
+  <input id="binaryInput" placeholder="Enter binary number">
+  <button onclick="convertBinary()">Convert</button>
+  <p id="binaryOutput"></p>
+</div>
+
+<!-- TEST 48 -->
+<div class="tool">
+  <h2>48. Hexadecimal Calculator</h2>
+  <input id="hexInput" placeholder="Enter hexadecimal">
+  <button onclick="convertHex()">Convert</button>
+  <p id="hexOutput"></p>
+</div>
+
+<!-- TEST 49 -->
+<div class="tool">
+  <h2>49. Random Password Generator</h2>
+  <input id="randomPasswordLength" type="number" value="16" placeholder="Length">
+  <button onclick="generateRandomPassword()">Generate Password</button>
+  <p id="randomPasswordOutput"></p>
+</div>
+
+<!-- TEST 50 -->
+<div class="tool">
+  <h2>50. Strong Password Checker</h2>
+  <input id="strongPasswordInput" type="password" placeholder="Enter password">
+  <button onclick="checkStrongPassword()">Check Password</button>
+  <p id="strongPasswordOutput"></p>
 </div>
   <script>
 
@@ -1457,7 +1688,722 @@ function generateRandomNumber() {
 
   output.textContent =
     "Random Number: " + random;
-                        }
+        /* =========================
+   TEST 26 - TEMPERATURE CONVERTER
+========================= */
+
+function convertTemperature() {
+  const value = Number(document.getElementById("tempInput").value);
+  const from = document.getElementById("tempFrom").value;
+  const to = document.getElementById("tempTo").value;
+  const output = document.getElementById("tempOutput");
+
+  if (!Number.isFinite(value)) {
+    output.textContent = "❌ Enter a valid temperature";
+    return;
+  }
+
+  let celsius;
+
+  if (from === "c") celsius = value;
+  if (from === "f") celsius = (value - 32) * 5 / 9;
+  if (from === "k") celsius = value - 273.15;
+
+  let result;
+
+  if (to === "c") result = celsius;
+  if (to === "f") result = (celsius * 9 / 5) + 32;
+  if (to === "k") result = celsius + 273.15;
+
+  output.textContent = "Result: " + result.toFixed(2);
+}
+
+
+/* =========================
+   TEST 27 - BMI CALCULATOR
+========================= */
+
+function calculateBMI() {
+  const weight = Number(document.getElementById("bmiWeight").value);
+  const heightCm = Number(document.getElementById("bmiHeight").value);
+  const output = document.getElementById("bmiOutput");
+
+  if (weight <= 0 || heightCm <= 0) {
+    output.textContent = "❌ Enter valid weight and height";
+    return;
+  }
+
+  const height = heightCm / 100;
+  const bmi = weight / (height * height);
+
+  output.textContent = "BMI: " + bmi.toFixed(2);
+}
+
+
+/* =========================
+   TEST 28 - PERCENTAGE
+========================= */
+
+function calculatePercentage() {
+  const value = Number(document.getElementById("percentValue").value);
+  const total = Number(document.getElementById("percentTotal").value);
+  const output = document.getElementById("percentOutput");
+
+  if (!Number.isFinite(value) || !Number.isFinite(total) || total === 0) {
+    output.textContent = "❌ Enter valid numbers";
+    return;
+  }
+
+  const result = (value / total) * 100;
+
+  output.textContent = "Percentage: " + result.toFixed(2) + "%";
+}
+
+
+/* =========================
+   TEST 29 - TIP CALCULATOR
+========================= */
+
+function calculateTip() {
+  const bill = Number(document.getElementById("tipBill").value);
+  const percent = Number(document.getElementById("tipPercent").value);
+  const output = document.getElementById("tipOutput");
+
+  if (bill < 0 || percent < 0) {
+    output.textContent = "❌ Enter valid numbers";
+    return;
+  }
+
+  const tip = bill * percent / 100;
+  const total = bill + tip;
+
+  output.textContent =
+    "Tip: " + tip.toFixed(2) +
+    "\nTotal: " + total.toFixed(2);
+}
+
+
+/* =========================
+   TEST 30 - DISCOUNT CALCULATOR
+========================= */
+
+function calculateDiscount() {
+  const price = Number(document.getElementById("discountPrice").value);
+  const percent = Number(document.getElementById("discountPercent").value);
+  const output = document.getElementById("discountOutput");
+
+  if (price < 0 || percent < 0 || percent > 100) {
+    output.textContent = "❌ Enter valid price and discount";
+    return;
+  }
+
+  const discount = price * percent / 100;
+  const finalPrice = price - discount;
+
+  output.textContent =
+    "Discount: " + discount.toFixed(2) +
+    "\nFinal Price: " + finalPrice.toFixed(2);
+}
+
+
+/* =========================
+   TEST 31 - EMI CALCULATOR
+========================= */
+
+function calculateEMI() {
+  const principal = Number(document.getElementById("emiPrincipal").value);
+  const annualRate = Number(document.getElementById("emiRate").value);
+  const months = Number(document.getElementById("emiMonths").value);
+  const output = document.getElementById("emiOutput");
+
+  if (principal <= 0 || annualRate < 0 || months <= 0) {
+    output.textContent = "❌ Enter valid loan details";
+    return;
+  }
+
+  const monthlyRate = annualRate / 12 / 100;
+
+  let emi;
+
+  if (monthlyRate === 0) {
+    emi = principal / months;
+  } else {
+    emi =
+      principal *
+      monthlyRate *
+      Math.pow(1 + monthlyRate, months) /
+      (Math.pow(1 + monthlyRate, months) - 1);
+  }
+
+  output.textContent = "Monthly EMI: " + emi.toFixed(2);
+}
+
+
+/* =========================
+   TEST 32 - COMPOUND INTEREST
+========================= */
+
+function calculateCompound() {
+  const principal = Number(document.getElementById("ciPrincipal").value);
+  const rate = Number(document.getElementById("ciRate").value);
+  const years = Number(document.getElementById("ciYears").value);
+  const output = document.getElementById("ciOutput");
+
+  if (principal < 0 || rate < 0 || years < 0) {
+    output.textContent = "❌ Enter valid values";
+    return;
+  }
+
+  const amount =
+    principal * Math.pow(1 + rate / 100, years);
+
+  const interest = amount - principal;
+
+  output.textContent =
+    "Total Amount: " + amount.toFixed(2) +
+    "\nInterest: " + interest.toFixed(2);
+}
+
+
+/* =========================
+   TEST 33 - SIMPLE INTEREST
+========================= */
+
+function calculateSimpleInterest() {
+  const principal = Number(document.getElementById("siPrincipal").value);
+  const rate = Number(document.getElementById("siRate").value);
+  const time = Number(document.getElementById("siTime").value);
+  const output = document.getElementById("siOutput");
+
+  if (principal < 0 || rate < 0 || time < 0) {
+    output.textContent = "❌ Enter valid values";
+    return;
+  }
+
+  const interest = principal * rate * time / 100;
+  const total = principal + interest;
+
+  output.textContent =
+    "Simple Interest: " + interest.toFixed(2) +
+    "\nTotal: " + total.toFixed(2);
+}
+
+
+/* =========================
+   TEST 34 - AVERAGE
+========================= */
+
+function calculateAverage() {
+  const input = document.getElementById("averageInput").value.trim();
+  const output = document.getElementById("averageOutput");
+
+  if (!input) {
+    output.textContent = "❌ Enter numbers";
+    return;
+  }
+
+  const numbers = input
+    .split(",")
+    .map(Number);
+
+  if (numbers.some(n => !Number.isFinite(n))) {
+    output.textContent = "❌ Use numbers separated by commas";
+    return;
+  }
+
+  const sum = numbers.reduce((a, b) => a + b, 0);
+  const average = sum / numbers.length;
+
+  output.textContent = "Average: " + average.toFixed(2);
+}
+
+
+/* =========================
+   TEST 35 - SUM
+========================= */
+
+function calculateSum() {
+  const input = document.getElementById("sumInput").value.trim();
+  const output = document.getElementById("sumOutput");
+
+  if (!input) {
+    output.textContent = "❌ Enter numbers";
+    return;
+  }
+
+  const numbers = input
+    .split(",")
+    .map(Number);
+
+  if (numbers.some(n => !Number.isFinite(n))) {
+    output.textContent = "❌ Use numbers separated by commas";
+    return;
+  }
+
+  const sum = numbers.reduce((a, b) => a + b, 0);
+
+  output.textContent = "Sum: " + sum;
+}
+
+
+/* =========================
+   TEST 36 - UNIT CONVERTER
+========================= */
+
+function convertUnit() {
+  const value = Number(document.getElementById("unitInput").value);
+  const type = document.getElementById("unitType").value;
+  const output = document.getElementById("unitOutput");
+
+  if (!Number.isFinite(value)) {
+    output.textContent = "❌ Enter a valid value";
+    return;
+  }
+
+  let result;
+  let unit;
+
+  if (type === "km-mi") {
+    result = value * 0.621371;
+    unit = "miles";
+  }
+
+  if (type === "mi-km") {
+    result = value * 1.60934;
+    unit = "km";
+  }
+
+  if (type === "m-ft") {
+    result = value * 3.28084;
+    unit = "feet";
+  }
+
+  if (type === "ft-m") {
+    result = value * 0.3048;
+    unit = "meters";
+  }
+
+  if (type === "kg-lb") {
+    result = value * 2.20462;
+    unit = "pounds";
+  }
+
+  if (type === "lb-kg") {
+    result = value * 0.453592;
+    unit = "kg";
+  }
+
+  output.textContent =
+    "Result: " + result.toFixed(4) + " " + unit;
+}
+
+
+/* =========================
+   TEST 37 - TIME CONVERTER
+========================= */
+
+function convertTime() {
+  const minutes = Number(document.getElementById("timeInput").value);
+  const output = document.getElementById("timeOutput");
+
+  if (!Number.isFinite(minutes) || minutes < 0) {
+    output.textContent = "❌ Enter valid minutes";
+    return;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remaining = minutes % 60;
+
+  output.textContent =
+    hours + " hours " + remaining + " minutes";
+}
+
+
+/* =========================
+   TEST 38 - SECONDS CONVERTER
+========================= */
+
+function convertSeconds() {
+  const seconds = Number(document.getElementById("secondsInput").value);
+  const output = document.getElementById("secondsOutput");
+
+  if (!Number.isFinite(seconds) || seconds < 0) {
+    output.textContent = "❌ Enter valid seconds";
+    return;
+  }
+
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remaining = seconds % 60;
+
+  output.textContent =
+    hours + " hours " +
+    minutes + " minutes " +
+    remaining + " seconds";
+}
+
+
+/* =========================
+   TEST 39 - DAYS CALCULATOR
+========================= */
+
+function calculateDays() {
+  const start = document.getElementById("daysStart").value;
+  const end = document.getElementById("daysEnd").value;
+  const output = document.getElementById("daysOutput");
+
+  if (!start || !end) {
+    output.textContent = "❌ Select both dates";
+    return;
+  }
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  const difference =
+    Math.abs(endDate - startDate);
+
+  const days =
+    Math.round(difference / (1000 * 60 * 60 * 24));
+
+  output.textContent = "Difference: " + days + " days";
+}
+
+
+/* =========================
+   TEST 40 - LEAP YEAR
+========================= */
+
+function checkLeapYear() {
+  const year =
+    Number(document.getElementById("leapYearInput").value);
+
+  const output =
+    document.getElementById("leapYearOutput");
+
+  if (!Number.isInteger(year) || year <= 0) {
+    output.textContent = "❌ Enter a valid year";
+    return;
+  }
+
+  const leap =
+    (year % 4 === 0 && year % 100 !== 0) ||
+    year % 400 === 0;
+
+  output.textContent =
+    leap
+      ? "✅ " + year + " is a Leap Year"
+      : "❌ " + year + " is not a Leap Year";
+}
+
+
+/* =========================
+   TEST 41 - PRIME CHECKER
+========================= */
+
+function checkPrime() {
+  const n =
+    Number(document.getElementById("primeInput").value);
+
+  const output =
+    document.getElementById("primeOutput");
+
+  if (!Number.isInteger(n) || n < 2) {
+    output.textContent = "❌ Enter an integer greater than 1";
+    return;
+  }
+
+  let prime = true;
+
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) {
+      prime = false;
+      break;
+    }
+  }
+
+  output.textContent =
+    prime
+      ? "✅ " + n + " is Prime"
+      : "❌ " + n + " is not Prime";
+}
+
+
+/* =========================
+   TEST 42 - EVEN / ODD
+========================= */
+
+function checkEvenOdd() {
+  const n =
+    Number(document.getElementById("evenOddInput").value);
+
+  const output =
+    document.getElementById("evenOddOutput");
+
+  if (!Number.isInteger(n)) {
+    output.textContent = "❌ Enter an integer";
+    return;
+  }
+
+  output.textContent =
+    n % 2 === 0
+      ? "✅ " + n + " is Even"
+      : "✅ " + n + " is Odd";
+}
+
+
+/* =========================
+   TEST 43 - FACTORIAL
+========================= */
+
+function calculateFactorial() {
+  const n =
+    Number(document.getElementById("factorialInput").value);
+
+  const output =
+    document.getElementById("factorialOutput");
+
+  if (!Number.isInteger(n) || n < 0 || n > 170) {
+    output.textContent =
+      "❌ Enter an integer from 0 to 170";
+    return;
+  }
+
+  let result = 1;
+
+  for (let i = 2; i <= n; i++) {
+    result *= i;
+  }
+
+  output.textContent =
+    "Factorial: " + result;
+}
+
+
+/* =========================
+   TEST 44 - FIBONACCI
+========================= */
+
+function generateFibonacci() {
+  const count =
+    Number(document.getElementById("fibInput").value);
+
+  const output =
+    document.getElementById("fibOutput");
+
+  if (!Number.isInteger(count) || count <= 0 || count > 100) {
+    output.textContent =
+      "❌ Enter a number from 1 to 100";
+    return;
+  }
+
+  const numbers = [];
+
+  let a = 0;
+  let b = 1;
+
+  for (let i = 0; i < count; i++) {
+    numbers.push(a);
+
+    const next = a + b;
+    a = b;
+    b = next;
+  }
+
+  output.textContent =
+    "Fibonacci:\n" + numbers.join(", ");
+}
+
+
+/* =========================
+   TEST 45 - GCD
+========================= */
+
+function calculateGCD() {
+  let a =
+    Math.abs(Number(document.getElementById("gcdA").value));
+
+  let b =
+    Math.abs(Number(document.getElementById("gcdB").value));
+
+  const output =
+    document.getElementById("gcdOutput");
+
+  if (!Number.isInteger(a) || !Number.isInteger(b)) {
+    output.textContent = "❌ Enter integers";
+    return;
+  }
+
+  while (b !== 0) {
+    const temp = b;
+    b = a % b;
+    a = temp;
+  }
+
+  output.textContent = "GCD: " + a;
+}
+
+
+/* =========================
+   TEST 46 - LCM
+========================= */
+
+function calculateLCM() {
+  let a =
+    Math.abs(Number(document.getElementById("lcmA").value));
+
+  let b =
+    Math.abs(Number(document.getElementById("lcmB").value));
+
+  const output =
+    document.getElementById("lcmOutput");
+
+  if (!Number.isInteger(a) || !Number.isInteger(b)) {
+    output.textContent = "❌ Enter integers";
+    return;
+  }
+
+  if (a === 0 || b === 0) {
+    output.textContent = "LCM: 0";
+    return;
+  }
+
+  function gcd(x, y) {
+    while (y !== 0) {
+      const temp = y;
+      y = x % y;
+      x = temp;
+    }
+    return x;
+  }
+
+  const lcm =
+    Math.abs(a * b) / gcd(a, b);
+
+  output.textContent = "LCM: " + lcm;
+}
+
+
+/* =========================
+   TEST 47 - BINARY
+========================= */
+
+function convertBinary() {
+  const input =
+    document.getElementById("binaryInput").value.trim();
+
+  const output =
+    document.getElementById("binaryOutput");
+
+  if (!/^[01]+$/.test(input)) {
+    output.textContent =
+      "❌ Enter a valid binary number";
+    return;
+  }
+
+  const decimal =
+    parseInt(input, 2);
+
+  output.textContent =
+    "Decimal: " + decimal;
+}
+
+
+/* =========================
+   TEST 48 - HEXADECIMAL
+========================= */
+
+function convertHex() {
+  const input =
+    document.getElementById("hexInput").value.trim();
+
+  const output =
+    document.getElementById("hexOutput");
+
+  if (!/^[0-9a-fA-F]+$/.test(input)) {
+    output.textContent =
+      "❌ Enter a valid hexadecimal number";
+    return;
+  }
+
+  const decimal =
+    parseInt(input, 16);
+
+  output.textContent =
+    "Decimal: " + decimal;
+}
+
+
+/* =========================
+   TEST 49 - RANDOM PASSWORD
+========================= */
+
+function generateRandomPassword() {
+  let length =
+    Number(document.getElementById("randomPasswordLength").value);
+
+  const output =
+    document.getElementById("randomPasswordOutput");
+
+  if (!Number.isInteger(length) || length < 4 || length > 100) {
+    output.textContent =
+      "❌ Length must be between 4 and 100";
+    return;
+  }
+
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
+
+  let password = "";
+
+  for (let i = 0; i < length; i++) {
+    password +=
+      characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+  }
+
+  output.textContent =
+    "Password: " + password;
+}
+
+
+/* =========================
+   TEST 50 - STRONG PASSWORD
+========================= */
+
+function checkStrongPassword() {
+  const password =
+    document.getElementById("strongPasswordInput").value;
+
+  const output =
+    document.getElementById("strongPasswordOutput");
+
+  if (!password) {
+    output.textContent =
+      "❌ Enter a password";
+    return;
+  }
+
+  let score = 0;
+
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 2) {
+    output.textContent =
+      "🔴 Weak Password";
+  } else if (score <= 4) {
+    output.textContent =
+      "🟡 Medium Password";
+  } else {
+    output.textContent =
+      "🟢 Strong Password";
+  }
+}                }
   </script>
 
 </body>
