@@ -13,7 +13,7 @@
 
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:#f3f6fb;
   color:#172033;
 }
@@ -32,21 +32,21 @@ header h1{
 
 header p{
   margin:7px 0 0;
-  font-size:12px;
-  color:#d1d5db;
+  font-size:13px;
 }
 
 .container{
-  width:95%;
-  max-width:1000px;
-  margin:18px auto;
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  padding:10px;
 }
 
 .section{
   background:white;
-  border-radius:14px;
+  margin:14px 0;
   padding:16px;
-  margin-bottom:18px;
+  border-radius:14px;
   box-shadow:0 3px 12px rgba(0,0,0,.08);
 }
 
@@ -55,161 +55,123 @@ header p{
   font-size:19px;
 }
 
-.section > p{
+.section p{
   font-size:13px;
-  color:#555;
-}
-
-button{
-  background:#2563eb;
-  color:white;
-  border:0;
-  border-radius:7px;
-  padding:9px 13px;
-  margin:4px 3px 4px 0;
-  cursor:pointer;
-  font-size:12px;
-}
-
-button:hover{
-  background:#1d4ed8;
 }
 
 textarea,
 input,
 select{
   width:100%;
-  border:1px solid #d1d5db;
-  border-radius:8px;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
   padding:12px;
-  font-size:13px;
+  font-size:14px;
   outline:none;
-}
-
-textarea:focus,
-input:focus{
-  border-color:#2563eb;
+  margin:6px 0;
 }
 
 textarea{
-  resize:vertical;
   min-height:120px;
+  resize:vertical;
 }
 
-/* EDITOR */
-
-.editor-tabs{
-  display:flex;
-  gap:7px;
-  margin:10px 0;
+button{
+  border:0;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  padding:10px 14px;
+  margin:4px 3px 4px 0;
+  cursor:pointer;
+  font-size:13px;
 }
 
-.editor-tabs button{
+button:hover{
+  background:#1d4ed8;
+}
+
+.tabs button{
   background:#e5e7eb;
   color:#111827;
 }
 
-.editor-tabs button.active{
+.tabs button.active{
   background:#2563eb;
   color:white;
 }
 
-#codeEditor{
-  min-height:180px;
-  font-family:monospace;
+.output{
+  background:#f8fafc;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
+  padding:12px;
+  min-height:80px;
+  overflow:auto;
 }
 
-.output-title{
-  margin-top:15px;
-  font-weight:bold;
-}
-
-#liveOutput{
+iframe{
   width:100%;
-  min-height:210px;
-  border:1px solid #d1d5db;
-  border-radius:8px;
+  height:300px;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
   background:white;
 }
 
-/* SNIPPETS */
-
-.search{
-  margin:12px 0;
-}
-
 .snippet{
-  border:1px solid #e5e7eb;
+  border:1px solid #e1e5eb;
   border-radius:10px;
   padding:12px;
   margin:10px 0;
-  background:#fafafa;
+  background:#f8fafc;
 }
 
-.snippet h3{
-  margin:0 0 8px;
-  font-size:14px;
-}
-
-.code-box{
+.code{
   background:#111827;
-  color:#e5e7eb;
+  color:#fff;
   padding:12px;
-  border-radius:7px;
-  overflow:auto;
-  white-space:pre-wrap;
-  font-family:monospace;
-  font-size:12px;
-}
-
-/* TOOLS */
-
-.tool{
-  border:1px solid #e5e7eb;
-  border-radius:10px;
-  padding:13px;
-  margin:12px 0;
-}
-
-.tool h3{
-  font-size:15px;
-  margin:0 0 10px;
-}
-
-.result{
-  background:#f3f4f6;
   border-radius:8px;
-  padding:10px;
-  margin-top:8px;
-  min-height:35px;
   white-space:pre-wrap;
-  word-break:break-word;
+  overflow:auto;
+  font-family:monospace;
   font-size:13px;
 }
 
-/* LEARN */
-
-.lesson{
+.learn-card{
+  padding:15px;
   border:1px solid #e5e7eb;
   border-radius:10px;
-  padding:14px;
   margin:10px 0;
+  background:#fff;
 }
 
-.lesson h3{
-  margin:0 0 8px;
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px;
 }
 
-.lesson p{
+.small{
+  font-size:12px;
+  color:#64748b;
+}
+
+.success{
+  color:#15803d;
+}
+
+.error{
+  color:#dc2626;
+}
+
+footer{
+  text-align:center;
+  padding:25px 10px;
+  color:#64748b;
   font-size:13px;
-  color:#555;
-  margin:0 0 8px;
 }
-
-/* RESPONSIVE */
 
 @media(max-width:600px){
-
   header h1{
     font-size:21px;
   }
@@ -218,12 +180,9 @@ textarea{
     padding:13px;
   }
 
-  .section h2{
-    font-size:17px;
-  }
-
   button{
-    font-size:11px;
+    font-size:12px;
+    padding:9px 11px;
   }
 }
 </style>
@@ -238,238 +197,156 @@ textarea{
 
 <div class="container">
 
-<!-- ================= ONLINE CODE EDITOR ================= -->
+<!-- ================= CODE EDITOR ================= -->
 
-<section class="section">
+<div class="section">
 
 <h2>💻 Online Code Editor</h2>
 
-<div class="editor-tabs">
-
-<button class="active" onclick="switchLanguage('html',this)">
-HTML
-</button>
-
-<button onclick="switchLanguage('css',this)">
-CSS
-</button>
-
-<button onclick="switchLanguage('js',this)">
-JavaScript
-</button>
-
+<div class="tabs">
+  <button id="htmlTab" class="active" onclick="showEditor('html')">HTML</button>
+  <button id="cssTab" onclick="showEditor('css')">CSS</button>
+  <button id="jsTab" onclick="showEditor('js')">JavaScript</button>
 </div>
 
-<textarea id="codeEditor"></textarea>
+<textarea id="codeEditor"><h1>Hello Coding Super Hub!</h1>
+<p>Start coding here 🚀</p>
+<button onclick="hello()">Click Me</button></textarea>
 
 <div>
-<button onclick="runCode()">▶️ Run Code</button>
-<button onclick="copyCode()">📋 Copy</button>
-<button onclick="clearCode()">🗑️ Clear</button>
+  <button onclick="runCode()">▶️ Run Code</button>
+  <button onclick="copyCode()">📋 Copy</button>
+  <button onclick="clearCode()">🗑️ Clear</button>
 </div>
 
-<div class="output-title">
-🌐 Live Output
-</div>
+<h3>🌐 Live Output</h3>
 
 <iframe id="liveOutput"></iframe>
 
-</section>
+</div>
 
 
-<!-- ================= CODE SNIPPETS ================= -->
+<!-- ================= SNIPPETS ================= -->
 
-<section class="section">
+<div class="section">
 
 <h2>🧩 Code Snippets Library</h2>
 
-<p>Ready-made useful code for developers.</p>
-
 <input
-  class="search"
+  type="text"
   id="snippetSearch"
   placeholder="Search snippets..."
   oninput="searchSnippets()"
 >
 
-<div id="snippets">
-
-<div class="snippet">
-<h3>HTML Button</h3>
-
-<div class="code-box" id="snippet1">
-&lt;button&gt;Click Me&lt;/button&gt;
-</div>
-
-<button onclick="copySnippet('snippet1')">
-📋 Copy
-</button>
-
-<button onclick="useSnippet('&lt;button&gt;Click Me&lt;/button&gt;')">
-🧩 Use in Editor
-</button>
-</div>
-
-
-<div class="snippet">
-<h3>CSS Center Content</h3>
-
-<div class="code-box" id="snippet2">
-body{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-</div>
-
-<button onclick="copySnippet('snippet2')">
-📋 Copy
-</button>
-
-<button onclick="useSnippet('body{\n  display:flex;\n  justify-content:center;\n  align-items:center;\n}')">
-🧩 Use in Editor
-</button>
-</div>
-
-
-<div class="snippet">
-<h3>JavaScript Alert</h3>
-
-<div class="code-box" id="snippet3">
-alert("Hello World!");
-</div>
-
-<button onclick="copySnippet('snippet3')">
-📋 Copy
-</button>
-
-<button onclick="useSnippet('alert(&quot;Hello World!&quot;);')">
-🧩 Use in Editor
-</button>
-</div>
+<div id="snippetList"></div>
 
 </div>
-
-</section>
 
 
 <!-- ================= DEVELOPER TOOLS ================= -->
 
-<section class="section">
+<div class="section">
 
 <h2>🛠️ Developer Tools</h2>
 
 <p>Useful browser-based developer utilities.</p>
 
+<div class="tool-grid">
 
 <!-- TEXT CASE -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>🔤 Text Case Converter</h3>
 
 <textarea
-id="caseInput"
-placeholder="Enter text..."
+  id="caseInput"
+  placeholder="Enter text..."
 ></textarea>
 
-<button onclick="upperCase()">
-UPPERCASE
-</button>
-
-<button onclick="lowerCase()">
-lowercase
-</button>
-
-<button onclick="titleCase()">
-Title Case
-</button>
+<button onclick="upperCase()">UPPERCASE</button>
+<button onclick="lowerCase()">lowercase</button>
+<button onclick="titleCase()">Title Case</button>
 
 </div>
 
 
 <!-- WORD COUNTER -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>🔢 Word & Character Counter</h3>
 
 <textarea
-id="counterInput"
-placeholder="Type text here..."
-oninput="countText()"
+  id="counterInput"
+  placeholder="Type text here..."
+  oninput="countText()"
 ></textarea>
 
-<div class="result" id="counterResult">
-Words: 0 | Characters: 0
-</div>
+<p>
+Words: <b id="wordCount">0</b>
+|
+Characters: <b id="charCount">0</b>
+</p>
 
 </div>
 
 
 <!-- JSON -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>📝 JSON Formatter</h3>
 
 <textarea
-id="jsonInput"
-placeholder='{"name":"Coding Super Hub"}'
+  id="jsonInput"
+  placeholder='{"name":"Coding Super Hub"}'
 ></textarea>
 
-<button onclick="formatJSON()">
-✨ Format JSON
-</button>
+<button onclick="formatJSON()">✨ Format JSON</button>
 
-<div class="result" id="jsonResult">
-Result will appear here
-</div>
+<div id="jsonResult" class="output"></div>
 
 </div>
 
 
 <!-- URL -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>🔗 URL Encoder / Decoder</h3>
 
 <textarea
-id="urlInput"
-placeholder="Enter URL or text..."
+  id="urlInput"
+  placeholder="Enter URL or text..."
 ></textarea>
 
-<button onclick="encodeURL()">
-Encode
-</button>
-
-<button onclick="decodeURL()">
-Decode
-</button>
+<button onclick="encodeURL()">Encode</button>
+<button onclick="decodeURL()">Decode</button>
 
 </div>
 
 
 <!-- PASSWORD -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>🔐 Password Generator</h3>
 
 <input
-type="number"
-id="passwordLength"
-value="16"
-min="6"
-max="50"
+  type="number"
+  id="passwordLength"
+  value="16"
+  min="6"
+  max="50"
 >
 
 <button onclick="generatePassword()">
 🔑 Generate Password
 </button>
 
-<div class="result" id="generatedPassword">
+<div id="generatedPassword" class="output">
 Your password will appear here
 </div>
 
@@ -478,202 +355,270 @@ Your password will appear here
 
 <!-- COLOR -->
 
-<div class="tool">
+<div class="snippet">
 
 <h3>🎨 Color Converter</h3>
 
 <input
-type="color"
-id="colorPicker"
-value="#2563eb"
-oninput="convertColor()"
+  type="color"
+  id="colorPicker"
+  value="#2563eb"
+  onchange="convertColor()"
 >
 
-<div class="result" id="colorResult">
-HEX: #2563eb
-</div>
+<p id="colorResult">HEX: #2563eb</p>
 
 </div>
 
-</section>
+
+<!-- BASE64 -->
+
+<div class="snippet">
+
+<h3>🔐 Base64 Encoder / Decoder</h3>
+
+<textarea
+  id="base64Input"
+  placeholder="Enter text..."
+></textarea>
+
+<button onclick="encodeBase64()">Encode</button>
+<button onclick="decodeBase64()">Decode</button>
+
+</div>
+
+
+<!-- TIMESTAMP -->
+
+<div class="snippet">
+
+<h3>⏱️ Timestamp Generator</h3>
+
+<button onclick="generateTimestamp()">Generate Timestamp</button>
+
+<div id="timestampResult" class="output"></div>
+
+</div>
+
+
+<!-- RANDOM NUMBER -->
+
+<div class="snippet">
+
+<h3>🎲 Random Number</h3>
+
+<input
+  type="number"
+  id="minNumber"
+  value="1"
+  placeholder="Minimum"
+>
+
+<input
+  type="number"
+  id="maxNumber"
+  value="100"
+  placeholder="Maximum"
+>
+
+<button onclick="randomNumber()">Generate</button>
+
+<div id="randomResult" class="output"></div>
+
+</div>
+
+</div>
+</div>
 
 
 <!-- ================= LEARN PROGRAMMING ================= -->
 
-<section class="section">
+<div class="section">
 
 <h2>📚 Learn Programming</h2>
 
 <p>HTML, CSS, JavaScript, Python and more.</p>
 
 
-<div class="lesson">
+<div class="learn-card">
 
 <h3>🌐 HTML</h3>
 
-<p>
-Learn how websites are structured.
-</p>
+<p>Learn how websites are structured.</p>
 
-<button onclick="showLesson('HTML')">
+<button onclick="showLesson('html')">
 Learn HTML
 </button>
 
 </div>
 
 
-<div class="lesson">
+<div class="learn-card">
 
 <h3>🎨 CSS</h3>
 
-<p>
-Learn how to design beautiful websites.
-</p>
+<p>Learn how to design beautiful websites.</p>
 
-<button onclick="showLesson('CSS')">
+<button onclick="showLesson('css')">
 Learn CSS
 </button>
 
 </div>
 
 
-<div class="lesson">
+<div class="learn-card">
 
 <h3>⚡ JavaScript</h3>
 
-<p>
-Learn programming and website interactions.
-</p>
+<p>Learn programming and website interactions.</p>
 
-<button onclick="showLesson('JavaScript')">
+<button onclick="showLesson('javascript')">
 Learn JavaScript
 </button>
 
 </div>
 
 
-<div class="lesson">
+<div class="learn-card">
 
 <h3>🐍 Python</h3>
 
-<p>
-Learn Python programming from basics.
-</p>
+<p>Learn one of the most popular programming languages.</p>
 
-<button onclick="showLesson('Python')">
+<button onclick="showLesson('python')">
 Learn Python
 </button>
 
 </div>
 
 
-<div class="result" id="lessonResult">
+<div id="lessonResult" class="output">
 Select a language to start learning.
 </div>
 
-</section>
+</div>
 
 
-<!-- ================= FOOTER ================= -->
+<!-- ================= QUICK TOOLS ================= -->
 
-<section class="section">
+<div class="section">
 
-<h2>🚀 Coding Super Hub</h2>
+<h2>⚡ Quick Coding Helpers</h2>
 
-<p>
-More coding tools, snippets, tutorials and AI features will be added here.
-</p>
+<button onclick="showTip('html')">HTML Tip</button>
+<button onclick="showTip('css')">CSS Tip</button>
+<button onclick="showTip('js')">JavaScript Tip</button>
+<button onclick="showTip('python')">Python Tip</button>
 
-</section>
+<div id="tipResult" class="output">
+Choose a tip.
+</div>
 
 </div>
+
+</div>
+
+
+<footer>
+🚀 Coding Super Hub — Built for developers
+</footer>
 
 
 <script>
 
 /* =====================================================
-   ONLINE CODE EDITOR
+   CODE EDITOR
 ===================================================== */
 
-let currentLanguage = "html";
+let currentEditor = "html";
 
-let codes = {
-
-html:
-`<h1>Hello Coding Super Hub!</h1>
+let editors = {
+  html: `<h1>Hello Coding Super Hub!</h1>
 <p>Start coding here 🚀</p>
 <button onclick="hello()">Click Me</button>`,
 
-css:
-`body{
-  font-family:Arial;
-  text-align:center;
-  padding:40px;
+  css: `body {
+  font-family: Arial;
+  text-align: center;
+  padding: 30px;
 }
 
-h1{
-  color:#2563eb;
+h1 {
+  color: blue;
 }`,
 
-js:
-`function hello(){
+  js: `function hello() {
   alert("Hello from Coding Super Hub!");
 }`
 };
 
 
-function switchLanguage(language,button){
+function showEditor(type){
 
-  currentLanguage = language;
+  editors[currentEditor] =
+    document.getElementById("codeEditor").value;
 
-  document
-  .querySelectorAll(".editor-tabs button")
-  .forEach(btn => btn.classList.remove("active"));
-
-  button.classList.add("active");
+  currentEditor = type;
 
   document.getElementById("codeEditor").value =
-  codes[language];
+    editors[type];
+
+  document.getElementById("htmlTab").classList.remove("active");
+  document.getElementById("cssTab").classList.remove("active");
+  document.getElementById("jsTab").classList.remove("active");
+
+  document.getElementById(type + "Tab")
+    .classList.add("active");
 }
 
 
 function runCode(){
 
-  codes[currentLanguage] =
-  document.getElementById("codeEditor").value;
+  editors[currentEditor] =
+    document.getElementById("codeEditor").value;
 
-  let html = codes.html;
-  let css = codes.css;
-  let js = codes.js;
+  let html = editors.html;
+  let css = editors.css;
+  let js = editors.js;
 
   let output =
-  "<!DOCTYPE html>" +
-  "<html>" +
-  "<head>" +
-  "<style>" + css + "</style>" +
-  "</head>" +
-  "<body>" +
-  html +
-  "<script>" +
-  js +
-  "<\/script>" +
-  "</body>" +
-  "</html>";
+    document.getElementById("liveOutput");
 
-  document
-  .getElementById("liveOutput")
-  .srcdoc = output;
+  let documentContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+${css}
+</style>
+</head>
+
+<body>
+
+${html}
+
+<script>
+
+${js}
+
+<\/script>
+
+</body>
+</html>
+`;
+
+  output.srcdoc = documentContent;
 }
 
 
 function copyCode(){
 
   let code =
-  document.getElementById("codeEditor").value;
+    document.getElementById("codeEditor").value;
 
   navigator.clipboard.writeText(code);
 
-  alert("Code copied!");
+  alert("✅ Code copied!");
 }
 
 
@@ -681,101 +626,203 @@ function clearCode(){
 
   document.getElementById("codeEditor").value = "";
 
+  editors[currentEditor] = "";
+
 }
 
 
 /* =====================================================
-   SNIPPETS
+   SNIPPETS LIBRARY
 ===================================================== */
 
-function copySnippet(id){
+const snippets = [
 
-  let text =
-  document.getElementById(id).innerText;
+{
+ title:"HTML Button",
+ code:`<button>Click Me</button>`
+},
 
-  navigator.clipboard.writeText(text);
+{
+ title:"CSS Center Content",
+ code:`body {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}`
+},
 
-  alert("Snippet copied!");
+{
+ title:"JavaScript Alert",
+ code:`alert("Hello World!");`
+},
+
+{
+ title:"HTML Input",
+ code:`<input type="text" placeholder="Enter text">`
+},
+
+{
+ title:"CSS Card",
+ code:`.card {
+  padding:20px;
+  border-radius:10px;
+  background:white;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}`
+},
+
+{
+ title:"JavaScript Function",
+ code:`function hello() {
+  console.log("Hello World!");
+}`
+},
+
+{
+ title:"HTML Image",
+ code:`<img src="image.jpg" alt="My Image">`
+},
+
+{
+ title:"CSS Button",
+ code:`button {
+  background:#2563eb;
+  color:white;
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+}`
+}
+
+];
+
+
+function displaySnippets(list = snippets){
+
+  let container =
+    document.getElementById("snippetList");
+
+  container.innerHTML = "";
+
+  list.forEach((item,index)=>{
+
+    let div = document.createElement("div");
+
+    div.className = "snippet";
+
+    div.innerHTML = `
+
+      <h3>${item.title}</h3>
+
+      <div class="code">${escapeHTML(item.code)}</div>
+
+      <button onclick="copySnippet(${index})">
+      📋 Copy
+      </button>
+
+      <button onclick="useSnippet(${index})">
+      🧩 Use in Editor
+      </button>
+
+    `;
+
+    container.appendChild(div);
+
+  });
+
 }
 
 
-function useSnippet(code){
+function copySnippet(index){
 
-  currentLanguage = "html";
+  navigator.clipboard.writeText(
+    snippets[index].code
+  );
+
+  alert("✅ Snippet copied!");
+}
+
+
+function useSnippet(index){
+
+  currentEditor = "html";
 
   document.getElementById("codeEditor").value =
-  code;
-
-  document
-  .querySelectorAll(".editor-tabs button")
-  .forEach(btn => btn.classList.remove("active"));
-
-  document
-  .querySelector(".editor-tabs button")
-  .classList.add("active");
+    snippets[index].code;
 
   window.scrollTo({
     top:0,
     behavior:"smooth"
   });
+
 }
 
 
 function searchSnippets(){
 
-  let search =
-  document.getElementById("snippetSearch")
-  .value
-  .toLowerCase();
+  let query =
+    document.getElementById("snippetSearch")
+    .value
+    .toLowerCase();
 
-  document
-  .querySelectorAll(".snippet")
-  .forEach(snippet => {
+  let filtered =
+    snippets.filter(item =>
+      item.title.toLowerCase().includes(query) ||
+      item.code.toLowerCase().includes(query)
+    );
 
-    let text =
-    snippet.innerText.toLowerCase();
+  displaySnippets(filtered);
 
-    snippet.style.display =
-    text.includes(search) ? "block" : "none";
+}
 
-  });
+
+function escapeHTML(text){
+
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
 }
 
 
 /* =====================================================
-   TEXT CASE
+   TEXT CASE CONVERTER
 ===================================================== */
 
 function upperCase(){
 
   let input =
-  document.getElementById("caseInput");
+    document.getElementById("caseInput");
 
   input.value =
-  input.value.toUpperCase();
+    input.value.toUpperCase();
+
 }
 
 
 function lowerCase(){
 
   let input =
-  document.getElementById("caseInput");
+    document.getElementById("caseInput");
 
   input.value =
-  input.value.toLowerCase();
+    input.value.toLowerCase();
+
 }
 
 
 function titleCase(){
 
   let input =
-  document.getElementById("caseInput");
+    document.getElementById("caseInput");
 
   input.value =
-  input.value
-  .toLowerCase()
-  .replace(/\b\w/g,
-  char => char.toUpperCase());
+    input.value
+      .toLowerCase()
+      .replace(/\b\w/g,
+        char => char.toUpperCase()
+      );
 
 }
 
@@ -787,23 +834,22 @@ function titleCase(){
 function countText(){
 
   let text =
-  document.getElementById("counterInput")
-  .value;
+    document.getElementById("counterInput").value;
 
   let words =
-  text.trim()
-  ? text.trim().split(/\s+/).length
-  : 0;
+    text.trim()
+      ? text.trim().split(/\s+/).length
+      : 0;
 
-  let characters =
-  text.length;
+  let chars =
+    text.length;
 
-  document.getElementById("counterResult")
-  .innerText =
-  "Words: " +
-  words +
-  " | Characters: " +
-  characters;
+  document.getElementById("wordCount")
+    .textContent = words;
+
+  document.getElementById("charCount")
+    .textContent = chars;
+
 }
 
 
@@ -814,27 +860,33 @@ function countText(){
 function formatJSON(){
 
   let input =
-  document.getElementById("jsonInput")
-  .value;
+    document.getElementById("jsonInput").value;
 
-  let result =
-  document.getElementById("jsonResult");
+  let output =
+    document.getElementById("jsonResult");
 
   try{
 
     let parsed =
-    JSON.parse(input);
+      JSON.parse(input);
 
-    result.innerText =
-    JSON.stringify(parsed,null,2);
+    output.textContent =
+      JSON.stringify(parsed,null,2);
+
+    output.className =
+      "output success";
 
   }
   catch(error){
 
-    result.innerText =
-    "❌ Invalid JSON";
+    output.textContent =
+      "❌ Invalid JSON";
+
+    output.className =
+      "output error";
 
   }
+
 }
 
 
@@ -845,22 +897,23 @@ function formatJSON(){
 function encodeURL(){
 
   let input =
-  document.getElementById("urlInput");
+    document.getElementById("urlInput");
 
   input.value =
-  encodeURIComponent(input.value);
+    encodeURIComponent(input.value);
+
 }
 
 
 function decodeURL(){
 
   let input =
-  document.getElementById("urlInput");
+    document.getElementById("urlInput");
 
   try{
 
     input.value =
-    decodeURIComponent(input.value);
+      decodeURIComponent(input.value);
 
   }
   catch(error){
@@ -868,6 +921,7 @@ function decodeURL(){
     alert("❌ Invalid encoded URL");
 
   }
+
 }
 
 
@@ -878,9 +932,9 @@ function decodeURL(){
 function generatePassword(){
 
   let length =
-  parseInt(
-    document.getElementById("passwordLength").value
-  ) || 16;
+    parseInt(
+      document.getElementById("passwordLength").value
+    ) || 16;
 
   if(length < 6){
     length = 6;
@@ -891,87 +945,235 @@ function generatePassword(){
   }
 
   let chars =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-  "abcdefghijklmnopqrstuvwxyz" +
-  "0123456789!@#$%^&*()";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789!@#$%^&*()";
 
   let password = "";
 
-  for(let i = 0; i < length; i++){
+  for(let i=0;i<length;i++){
 
     let randomIndex =
-    Math.floor(Math.random() * chars.length);
+      Math.floor(
+        Math.random() * chars.length
+      );
 
-    password +=
-    chars[randomIndex];
+    password += chars[randomIndex];
 
   }
 
-  document.getElementById(
-    "generatedPassword"
-  ).innerText = password;
+  document.getElementById("generatedPassword")
+    .textContent = password;
+
 }
 
 
 /* =====================================================
-   COLOR CONVERTER
+   COLOR
 ===================================================== */
 
 function convertColor(){
 
   let color =
-  document.getElementById("colorPicker").value;
+    document.getElementById("colorPicker").value;
 
-  document.getElementById(
-    "colorResult"
-  ).innerText =
-  "HEX: " + color;
+  document.getElementById("colorResult")
+    .textContent = "HEX: " + color;
+
 }
 
 
 /* =====================================================
-   LEARN PROGRAMMING
+   BASE64
+===================================================== */
+
+function encodeBase64(){
+
+  let input =
+    document.getElementById("base64Input");
+
+  try{
+
+    input.value =
+      btoa(unescape(encodeURIComponent(input.value)));
+
+  }
+  catch(error){
+
+    alert("❌ Cannot encode text");
+
+  }
+
+}
+
+
+function decodeBase64(){
+
+  let input =
+    document.getElementById("base64Input");
+
+  try{
+
+    input.value =
+      decodeURIComponent(
+        escape(atob(input.value))
+      );
+
+  }
+  catch(error){
+
+    alert("❌ Invalid Base64");
+
+  }
+
+}
+
+
+/* =====================================================
+   TIMESTAMP
+===================================================== */
+
+function generateTimestamp(){
+
+  let timestamp =
+    Math.floor(Date.now()/1000);
+
+  document.getElementById("timestampResult")
+    .textContent =
+      "Unix Timestamp: " + timestamp;
+
+}
+
+
+/* =====================================================
+   RANDOM NUMBER
+===================================================== */
+
+function randomNumber(){
+
+  let min =
+    parseInt(
+      document.getElementById("minNumber").value
+    );
+
+  let max =
+    parseInt(
+      document.getElementById("maxNumber").value
+    );
+
+  if(isNaN(min) || isNaN(max)){
+
+    alert("Please enter valid numbers");
+
+    return;
+
+  }
+
+  if(min > max){
+
+    let temp = min;
+    min = max;
+    max = temp;
+
+  }
+
+  let number =
+    Math.floor(
+      Math.random() * (max-min+1)
+    ) + min;
+
+  document.getElementById("randomResult")
+    .textContent =
+      "🎲 Result: " + number;
+
+}
+
+
+/* =====================================================
+   LEARNING
 ===================================================== */
 
 function showLesson(language){
 
-  let text = "";
+  let result =
+    document.getElementById("lessonResult");
 
-  if(language === "HTML"){
+  let lessons = {
 
-    text =
-    "HTML creates the structure of a webpage. " +
-    "Start with headings, paragraphs, buttons, links and images.";
+    html: `
+      <h3>🌐 HTML Basics</h3>
+      <p>HTML creates the structure of a website.</p>
+      <div class="code">
+&lt;h1&gt;Hello World&lt;/h1&gt;
+&lt;p&gt;My website&lt;/p&gt;
+      </div>
+    `,
 
-  }
+    css: `
+      <h3>🎨 CSS Basics</h3>
+      <p>CSS is used to style websites.</p>
+      <div class="code">
+body {
+  background:white;
+  color:black;
+}
+      </div>
+    `,
 
-  else if(language === "CSS"){
+    javascript: `
+      <h3>⚡ JavaScript Basics</h3>
+      <p>JavaScript adds logic and interaction.</p>
+      <div class="code">
+function hello(){
+  alert("Hello World!");
+}
+      </div>
+    `,
 
-    text =
-    "CSS is used to design webpages. " +
-    "You can change colors, fonts, spacing, layouts and more.";
+    python: `
+      <h3>🐍 Python Basics</h3>
+      <p>Python is a popular general-purpose programming language.</p>
+      <div class="code">
+print("Hello World!")
+      </div>
+    `
 
-  }
+  };
 
-  else if(language === "JavaScript"){
+  result.innerHTML =
+    lessons[language];
 
-    text =
-    "JavaScript makes websites interactive. " +
-    "You can create buttons, calculators, games and web apps.";
+}
 
-  }
 
-  else if(language === "Python"){
+/* =====================================================
+   QUICK TIPS
+===================================================== */
 
-    text =
-    "Python is a beginner-friendly programming language " +
-    "used for automation, AI, data and many other projects.";
+function showTip(language){
 
-  }
+  let result =
+    document.getElementById("tipResult");
 
-  document.getElementById(
-    "lessonResult"
-  ).innerText = text;
+  let tips = {
+
+    html:
+      "💡 HTML tip: Use semantic elements such as header, nav, main and footer.",
+
+    css:
+      "💡 CSS tip: Use flexbox and grid to create responsive layouts.",
+
+    js:
+      "💡 JavaScript tip: Use const and let instead of var for modern code.",
+
+    python:
+      "💡 Python tip: Keep functions small and give variables meaningful names."
+
+  };
+
+  result.textContent =
+    tips[language];
+
 }
 
 
@@ -979,10 +1181,11 @@ function showLesson(language){
    START
 ===================================================== */
 
-document.getElementById("codeEditor").value =
-codes.html;
+displaySnippets();
 
 runCode();
+
+convertColor();
 
 </script>
 
