@@ -1,119 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text Case Converter Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Counter Test</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 25px;
-      background: #f3f6fb;
-    }
+<style>
+body{
+  font-family:Arial;
+  background:#f3f6fb;
+  padding:25px;
+}
 
-    .box {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-    }
+.box{
+  max-width:600px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+}
 
-    textarea {
-      width: 100%;
-      min-height: 140px;
-      padding: 12px;
-      box-sizing: border-box;
-      font-size: 16px;
-      margin: 10px 0;
-    }
+textarea{
+  width:100%;
+  min-height:160px;
+  padding:12px;
+  box-sizing:border-box;
+  font-size:16px;
+}
 
-    button {
-      padding: 10px 14px;
-      margin: 4px;
-      border: 0;
-      border-radius: 7px;
-      background: #2563eb;
-      color: white;
-    }
-
-    #result {
-      margin-top: 15px;
-      padding: 12px;
-      background: #f8fafc;
-      border: 1px solid #ddd;
-      min-height: 50px;
-      white-space: pre-wrap;
-    }
-  </style>
+.stats{
+  margin-top:15px;
+  padding:15px;
+  background:#f8fafc;
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="box">
 
-  <h1>🔤 Text Case Converter</h1>
+<h1>🔢 Word & Character Counter</h1>
 
-  <textarea id="textInput"
-    placeholder="Type your text here..."></textarea>
+<textarea
+id="textInput"
+placeholder="Type your text here..."
+oninput="countText()"></textarea>
 
-  <br>
-
-  <button onclick="makeUppercase()">
-    UPPERCASE
-  </button>
-
-  <button onclick="makeLowercase()">
-    lowercase
-  </button>
-
-  <button onclick="makeTitleCase()">
-    Title Case
-  </button>
-
-  <button onclick="clearText()">
-    Clear
-  </button>
-
-  <div id="result">
-    Result will appear here...
-  </div>
+<div class="stats">
+  <p>Words: <b id="wordCount">0</b></p>
+  <p>Characters: <b id="charCount">0</b></p>
+  <p>Characters (without spaces): <b id="noSpaceCount">0</b></p>
+</div>
 
 </div>
 
 <script>
 
-function makeUppercase() {
-  const text = document.getElementById("textInput").value;
+function countText(){
 
-  document.getElementById("result").textContent =
-    text.toUpperCase();
-}
+  const text =
+    document.getElementById("textInput").value;
 
-function makeLowercase() {
-  const text = document.getElementById("textInput").value;
+  const words =
+    text.trim()
+      ? text.trim().split(/\s+/).length
+      : 0;
 
-  document.getElementById("result").textContent =
-    text.toLowerCase();
-}
+  const characters =
+    text.length;
 
-function makeTitleCase() {
-  const text = document.getElementById("textInput").value;
+  const withoutSpaces =
+    text.replace(/\s/g,"").length;
 
-  const result = text
-    .toLowerCase()
-    .replace(/\b\w/g, function(letter) {
-      return letter.toUpperCase();
-    });
+  document.getElementById("wordCount")
+    .textContent = words;
 
-  document.getElementById("result").textContent = result;
-}
+  document.getElementById("charCount")
+    .textContent = characters;
 
-function clearText() {
-  document.getElementById("textInput").value = "";
-  document.getElementById("result").textContent =
-    "Result will appear here...";
+  document.getElementById("noSpaceCount")
+    .textContent = withoutSpaces;
 }
 
 </script>
