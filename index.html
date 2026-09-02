@@ -1,273 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Coding Super Hub - JSON Formatter</title>
+  <title>Word & Character Counter</title>
 
-<style>
-*{
-  box-sizing:border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f3f6fb;
-  color:#172033;
-}
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f1f5f9;
+      font-family: Arial, sans-serif;
+      color: #111827;
+    }
 
-header{
-  background:#111827;
-  color:white;
-  text-align:center;
-  padding:22px 10px;
-}
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
 
-header h1{
-  margin:0;
-  font-size:24px;
-}
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
 
-header p{
-  margin:8px 0 0;
-  font-size:13px;
-}
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 15px;
+      border: 1px solid #999;
+      border-radius: 8px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+    }
 
-.container{
-  width:100%;
-  max-width:800px;
-  margin:auto;
-  padding:15px;
-}
+    textarea:focus {
+      border-color: #2563eb;
+    }
 
-.card{
-  background:white;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
+    .stats {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f8fafc;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
 
-h2{
-  margin-top:0;
-}
+    .stat {
+      font-size: 18px;
+      margin: 10px 0;
+    }
 
-textarea{
-  width:100%;
-  min-height:180px;
-  padding:14px;
-  border:1px solid #cbd5e1;
-  border-radius:10px;
-  font-family:monospace;
-  font-size:14px;
-  resize:vertical;
-}
+    .number {
+      font-weight: bold;
+      color: #2563eb;
+    }
 
-button{
-  border:0;
-  border-radius:8px;
-  background:#2563eb;
-  color:white;
-  padding:11px 15px;
-  margin:8px 5px 8px 0;
-  cursor:pointer;
-}
+    button {
+      margin-top: 15px;
+      padding: 11px 18px;
+      border: none;
+      border-radius: 7px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
 
-button:hover{
-  background:#1d4ed8;
-}
-
-.output{
-  margin-top:12px;
-  padding:15px;
-  min-height:100px;
-  border:1px solid #d5dbe5;
-  border-radius:10px;
-  background:#111827;
-  color:white;
-  white-space:pre-wrap;
-  overflow:auto;
-  font-family:monospace;
-}
-
-.valid{
-  background:#ecfdf5;
-  color:#15803d;
-}
-
-.invalid{
-  background:#fef2f2;
-  color:#dc2626;
-}
-
-footer{
-  text-align:center;
-  padding:25px;
-  color:#64748b;
-  font-size:13px;
-}
-
-@media(max-width:600px){
-  .card{
-    padding:15px;
-  }
-
-  header h1{
-    font-size:21px;
-  }
-}
-</style>
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <h1>🚀 Coding Super Hub</h1>
-  <p>Developer Tools</p>
-</header>
+  <div class="container">
 
-<div class="container">
+    <h1>🔢 Word & Character Counter</h1>
 
-<div class="card">
+    <textarea
+      id="textInput"
+      placeholder="Type or paste your text here..."
+    ></textarea>
 
-<h2>📝 JSON Formatter & Validator</h2>
+    <button onclick="clearText()">🗑️ Clear</button>
 
-<p>
-Paste JSON below and use the buttons to test it.
-</p>
+    <div class="stats">
 
-<textarea
-id="jsonInput"
-placeholder='{"name":"Coding Super Hub","version":1,"active":true}'
-></textarea>
+      <div class="stat">
+        Words:
+        <span class="number" id="wordCount">0</span>
+      </div>
 
-<div>
+      <div class="stat">
+        Characters:
+        <span class="number" id="characterCount">0</span>
+      </div>
 
-<button onclick="formatJSON()">
-✨ Format JSON
-</button>
+      <div class="stat">
+        Characters (without spaces):
+        <span class="number" id="characterNoSpaceCount">0</span>
+      </div>
 
-<button onclick="validateJSON()">
-✅ Validate
-</button>
+      <div class="stat">
+        Lines:
+        <span class="number" id="lineCount">0</span>
+      </div>
 
-<button onclick="clearJSON()">
-🗑️ Clear
-</button>
+    </div>
 
-</div>
+  </div>
 
-<h3>Result</h3>
+  <script>
 
-<div id="result" class="output">
-Result will appear here...
-</div>
+    const textInput = document.getElementById("textInput");
 
-</div>
+    function updateCounter() {
 
-</div>
+      const text = textInput.value;
 
-<footer>
-🚀 Coding Super Hub — Test 4
-</footer>
+      // Character count
+      const characters = text.length;
 
-<script>
+      // Character count without spaces
+      const charactersWithoutSpaces =
+        text.replace(/\s/g, "").length;
 
-function formatJSON(){
+      // Word count
+      const trimmedText = text.trim();
 
-  const input =
-    document.getElementById("jsonInput").value.trim();
+      const words = trimmedText === ""
+        ? 0
+        : trimmedText.split(/\s+/).length;
 
-  const result =
-    document.getElementById("result");
+      // Line count
+      const lines = text === ""
+        ? 0
+        : text.split("\n").length;
 
-  if(input === ""){
+      document.getElementById("wordCount").textContent = words;
 
-    result.className = "output invalid";
+      document.getElementById("characterCount").textContent =
+        characters;
 
-    result.textContent =
-      "❌ Please enter JSON first.";
+      document.getElementById("characterNoSpaceCount").textContent =
+        charactersWithoutSpaces;
 
-    return;
-  }
+      document.getElementById("lineCount").textContent =
+        lines;
+    }
 
-  try{
+    function clearText() {
 
-    const parsed =
-      JSON.parse(input);
+      textInput.value = "";
 
-    result.className = "output valid";
+      updateCounter();
 
-    result.textContent =
-      JSON.stringify(parsed,null,2);
+      textInput.focus();
+    }
 
-  }catch(error){
+    // Live counter
+    textInput.addEventListener("input", updateCounter);
 
-    result.className = "output invalid";
+    // Initial count
+    updateCounter();
 
-    result.textContent =
-      "❌ Invalid JSON";
-
-  }
-
-}
-
-
-function validateJSON(){
-
-  const input =
-    document.getElementById("jsonInput").value.trim();
-
-  const result =
-    document.getElementById("result");
-
-  if(input === ""){
-
-    result.className = "output invalid";
-
-    result.textContent =
-      "❌ Please enter JSON first.";
-
-    return;
-  }
-
-  try{
-
-    JSON.parse(input);
-
-    result.className = "output valid";
-
-    result.textContent =
-      "✅ Valid JSON";
-
-  }catch(error){
-
-    result.className = "output invalid";
-
-    result.textContent =
-      "❌ Invalid JSON";
-
-  }
-
-}
-
-
-function clearJSON(){
-
-  document.getElementById("jsonInput").value = "";
-
-  const result =
-    document.getElementById("result");
-
-  result.className = "output";
-
-  result.textContent =
-    "Result will appear here...";
-
-}
-
-</script>
+  </script>
 
 </body>
 </html>
