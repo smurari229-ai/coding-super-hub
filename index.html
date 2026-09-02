@@ -1,3 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Coding Super Hub</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f6fb;
+  color:#172033;
+}
+
+header{
+  background:#111827;
+  color:white;
+  text-align:center;
+  padding:20px 10px;
+}
+
+header h1{
+  margin:0;
+  font-size:24px;
+}
+
+header p{
+  margin:7px 0 0;
+  font-size:13px;
+}
+
+.container{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  padding:10px;
+}
+
+.section{
+  background:white;
+  margin:14px 0;
+  padding:16px;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.section h2{
+  margin:0 0 8px;
+  font-size:19px;
+}
+
+.section p{
+  font-size:13px;
+}
+
+textarea,
+input,
+select{
+  width:100%;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
+  padding:12px;
+  font-size:14px;
+  outline:none;
+  margin:6px 0;
+}
+
+textarea{
+  min-height:120px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  padding:10px 14px;
+  margin:4px 3px 4px 0;
+  cursor:pointer;
+  font-size:13px;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.tabs button{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.tabs button.active{
+  background:#2563eb;
+  color:white;
+}
+
+.output{
+  background:#f8fafc;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
+  padding:12px;
+  min-height:80px;
+  overflow:auto;
+  white-space:pre-wrap;
+}
+
+iframe{
+  width:100%;
+  height:300px;
+  border:1px solid #d5dbe5;
+  border-radius:9px;
+  background:white;
+}
+
+.snippet{
+  border:1px solid #e1e5eb;
+  border-radius:10px;
+  padding:12px;
+  margin:10px 0;
+  background:#f8fafc;
+}
+
+.code{
+  background:#111827;
+  color:#fff;
+  padding:12px;
+  border-radius:8px;
+  white-space:pre-wrap;
+  overflow:auto;
+  font-family:monospace;
+  font-size:13px;
+}
+
+.learn-card{
+  padding:15px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  margin:10px 0;
+  background:#fff;
+}
+
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px;
+}
+
+.small{
+  font-size:12px;
+  color:#64748b;
+}
+
+.success{
+  color:#15803d;
+}
+
+.error{
+  color:#dc2626;
+}
+
+footer{
+  text-align:center;
+  padding:25px 10px;
+  color:#64748b;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+
+  header h1{
+    font-size:21px;
+  }
+
+  .section{
+    padding:13px;
+  }
+
+  button{
+    font-size:12px;
+    padding:9px 11px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🚀 Coding Super Hub</h1>
+  <p>All-in-one coding tools for developers</p>
+</header>
+
+<div class="container">
+
+<!-- ================= CODE EDITOR ================= -->
+
+<div class="section">
+
+<h2>💻 Online Code Editor</h2>
+
+<div class="tabs">
+
+<button id="htmlTab"
+class="active"
+onclick="showEditor('html')">
+HTML
+</button>
+
+<button id="cssTab"
+onclick="showEditor('css')">
+CSS
+</button>
+
+<button id="jsTab"
+onclick="showEditor('js')">
+JavaScript
+</button>
+
+</div>
+
+<textarea id="codeEditor"><h1>Hello Coding Super Hub!</h1>
+<p>Start coding here 🚀</p>
+<button onclick="hello()">Click Me</button></textarea>
+
+<div>
+
+<button onclick="runCode()">
+▶️ Run Code
+</button>
+
+<button onclick="copyCode()">
+📋 Copy
+</button>
+
+<button onclick="clearCode()">
+🗑️ Clear
+</button>
+
+</div>
+
+<h3>🌐 Live Output</h3>
+
+<iframe id="liveOutput"></iframe>
+
+</div>
+
+
+<!-- ================= SNIPPETS ================= -->
+
+<div class="section">
+
+<h2>🧩 Code Snippets Library</h2>
+
+<input
+type="text"
+id="snippetSearch"
+placeholder="Search snippets..."
+oninput="searchSnippets()"
+>
+
+<div id="snippetList"></div>
+
+</div>
+
+
+<!-- ================= DEVELOPER TOOLS ================= -->
+
+<div class="section">
+
+<h2>🛠️ Developer Tools</h2>
+
+<p>Useful browser-based developer utilities.</p>
+
+<div class="tool-grid">
+
+
+<!-- TEXT CASE -->
+
+<div class="snippet">
+
+<h3>🔤 Text Case Converter</h3>
+
+<textarea
+id="caseInput"
+placeholder="Enter text..."
+></textarea>
+
+<button onclick="upperCase()">
+UPPERCASE
+</button>
+
+<button onclick="lowerCase()">
+lowercase
+</button>
+
+<button onclick="titleCase()">
+Title Case
+</button>
+
+</div>
+
+
+<!-- WORD COUNTER -->
+
+<div class="snippet">
+
+<h3>🔢 Word & Character Counter</h3>
+
+<textarea
+id="counterInput"
+placeholder="Type text here..."
+oninput="countText()"
+></textarea>
+
+<p>
+Words:
+<b id="wordCount">0</b>
+|
+Characters:
+<b id="charCount">0</b>
+</p>
+
+</div>
+
+
+<!-- JSON -->
+
+<div class="snippet">
+
+<h3>📝 JSON Formatter</h3>
+
+<textarea
+id="jsonInput"
+placeholder='{"name":"Coding Super Hub"}'
+></textarea>
+
+<button onclick="formatJSON()">
+✨ Format JSON
+</button>
+
+<div id="jsonResult" class="output"></div>
+
+</div>
+
+
+<!-- URL -->
+
+<div class="snippet">
+
+<h3>🔗 URL Encoder / Decoder</h3>
+
+<textarea
+id="urlInput"
+placeholder="Enter URL or text..."
+></textarea>
+
+<button onclick="encodeURL()">
+Encode
+</button>
+
+<button onclick="decodeURL()">
+Decode
+</button>
+
+</div>
+
+
+<!-- PASSWORD -->
+
+<div class="snippet">
+
+<h3>🔐 Password Generator</h3>
+
+<input
+type="number"
+id="passwordLength"
+value="16"
+min="6"
+max="50"
+>
+
+<button onclick="generatePassword()">
+🔑 Generate Password
+</button>
+
+<div
+id="generatedPassword"
+class="output">
+Your password will appear here
+</div>
+
+</div>
+
+
+<!-- COLOR -->
+
+<div class="snippet">
+
+<h3>🎨 Color Converter</h3>
+
+<input
+type="color"
+id="colorPicker"
+value="#2563eb"
+onchange="convertColor()"
+>
+
+<p id="colorResult">
+HEX: #2563eb
+</p>
+
+</div>
+
+
+<!-- BASE64 -->
+
+<div class="snippet">
+
+<h3>🔐 Base64 Encoder / Decoder</h3>
+
+<textarea
+id="base64Input"
+placeholder="Enter text..."
+></textarea>
+
+<button onclick="encodeBase64()">
+Encode
+</button>
+
+<button onclick="decodeBase64()">
+Decode
+</button>
+
+</div>
+
+
+<!-- TIMESTAMP -->
+
+<div class="snippet">
+
+<h3>⏱️ Timestamp Generator</h3>
+
+<button onclick="generateTimestamp()">
+Generate Timestamp
+</button>
+
+<div
+id="timestampResult"
+class="output">
+</div>
+
+</div>
+
+
+<!-- RANDOM NUMBER -->
+
+<div class="snippet">
+
+<h3>🎲 Random Number</h3>
+
+<input
+type="number"
+id="minNumber"
+value="1"
+placeholder="Minimum"
+>
+
+<input
+type="number"
+id="maxNumber"
+value="100"
+placeholder="Maximum"
+>
+
+<button onclick="randomNumber()">
+Generate
+</button>
+
+<div
+id="randomResult"
+class="output">
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- ================= LEARN PROGRAMMING ================= -->
+
+<div class="section">
+
+<h2>📚 Learn Programming</h2>
+
+<p>
+HTML, CSS, JavaScript, Python and more.
+</p>
+
+
+<div class="learn-card">
+
+<h3>🌐 HTML</h3>
+
+<p>
+Learn how websites are structured.
+</p>
+
+<button onclick="showLesson('html')">
+Learn HTML
+</button>
+
+</div>
+
+
+<div class="learn-card">
+
+<h3>🎨 CSS</h3>
+
+<p>
+Learn how to design beautiful websites.
+</p>
+
+<button onclick="showLesson('css')">
+Learn CSS
+</button>
+
+</div>
+
+
+<div class="learn-card">
+
+<h3>⚡ JavaScript</h3>
+
+<p>
+Learn programming and website interactions.
+</p>
+
+<button onclick="showLesson('javascript')">
+Learn JavaScript
+</button>
+
+</div>
+
+
+<div class="learn-card">
+
+<h3>🐍 Python</h3>
+
+<p>
+Learn one of the most popular programming languages.
+</p>
+
+<button onclick="showLesson('python')">
+Learn Python
+</button>
+
+</div>
+
+
+<div
+id="lessonResult"
+class="output">
+Select a language to start learning.
+</div>
+
+</div>
+
+
+<!-- ================= QUICK TOOLS ================= -->
+
+<div class="section">
+
+<h2>⚡ Quick Coding Helpers</h2>
+
+<button onclick="showTip('html')">
+HTML Tip
+</button>
+
+<button onclick="showTip('css')">
+CSS Tip
+</button>
+
+<button onclick="showTip('js')">
+JavaScript Tip
+</button>
+
+<button onclick="showTip('python')">
+Python Tip
+</button>
+
+<div
+id="tipResult"
+class="output">
+Choose a tip.
+</div>
+
+</div>
+
+</div>
+
+
+<footer>
+🚀 Coding Super Hub — Built for developers
+</footer>
+
+
+<script>
+
+/* =====================================================
+   CODE EDITOR
+===================================================== */
+
+let currentEditor = "html";
+
+let editors = {
+
+html:
+`<h1>Hello Coding Super Hub!</h1>
+<p>Start coding here 🚀</p>
+<button onclick="hello()">Click Me</button>`,
+
+css:
+`body {
+  font-family: Arial;
+  text-align: center;
+  padding: 30px;
+}
+
+h1 {
+  color: blue;
+}`,
+
+js:
+`function hello() {
+  alert("Hello from Coding Super Hub!");
+}`
+
+};
+
+
+function showEditor(type){
+
+  editors[currentEditor] =
+    document.getElementById("codeEditor").value;
+
+  currentEditor = type;
+
+  document.getElementById("codeEditor").value =
+    editors[type];
+
+  document.getElementById("htmlTab")
+    .classList.remove("active");
+
+  document.getElementById("cssTab")
+    .classList.remove("active");
+
+  document.getElementById("jsTab")
+    .classList.remove("active");
+
+  document.getElementById(type + "Tab")
+    .classList.add("active");
+
+}
+
+
+function runCode(){
+
+  editors[currentEditor] =
+    document.getElementById("codeEditor").value;
+
+  let html = editors.html;
+  let css = editors.css;
+  let js = editors.js;
+
+  let output =
+    document.getElementById("liveOutput");
+
+  let documentContent =
+`
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<style>
+
+${css}
+
+</style>
+
+</head>
+
+<body>
+
+${html}
+
+<script>
+
+${js}
+
+<\/script>
+
+</body>
+
+</html>
+`;
+
+  output.srcdoc =
+    documentContent;
+
+}
+
+
+function copyCode(){
+
+  let code =
+    document.getElementById("codeEditor").value;
+
+  if(navigator.clipboard){
+
+    navigator.clipboard.writeText(code);
+
+    alert("✅ Code copied!");
+
+  }else{
+
+    alert("❌ Copy not supported");
+
+  }
+
+}
+
+
+function clearCode(){
+
+  document.getElementById("codeEditor").value = "";
+
+  editors[currentEditor] = "";
+
+}
+
+
+/* =====================================================
+   SNIPPETS LIBRARY
+===================================================== */
+
+const snippets = [
+
+{
+title:"HTML Button",
+code:`<button>Click Me</button>`
+},
+
+{
+title:"CSS Center Content",
+code:`body {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}`
+},
+
+{
+title:"JavaScript Alert",
+code:`alert("Hello World!");`
+},
+
+{
+title:"HTML Input",
+code:`<input type="text" placeholder="Enter text">`
+},
+
+{
+title:"CSS Card",
+code:`.card {
+  padding:20px;
+  border-radius:10px;
+  background:white;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}`
+},
+
+{
+title:"JavaScript Function",
+code:`function hello() {
+  console.log("Hello World!");
+}`
+},
+
+{
+title:"HTML Image",
+code:`<img src="image.jpg" alt="My Image">`
+},
+
+{
+title:"CSS Button",
+code:`button {
+  background:#2563eb;
+  color:white;
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+}`
+
+}
+
+];
+
+
+function displaySnippets(list = snippets){
+
+  let container =
+    document.getElementById("snippetList");
+
+  container.innerHTML = "";
+
+  list.forEach((item)=>{
+
+    let originalIndex =
+      snippets.indexOf(item);
+
+    let div =
+      document.createElement("div");
+
+    div.className =
+      "snippet";
+
+    div.innerHTML =
+`
+<h3>${escapeHTML(item.title)}</h3>
+
+<div class="code">
+${escapeHTML(item.code)}
+</div>
+
+<button onclick="copySnippet(${originalIndex})">
+📋 Copy
+</button>
+
+<button onclick="useSnippet(${originalIndex})">
+🧩 Use in Editor
+</button>
+`;
+
+    container.appendChild(div);
+
+  });
+
+}
+
+
+function copySnippet(index){
+
+  if(navigator.clipboard){
+
+    navigator.clipboard.writeText(
+      snippets[index].code
+    );
+
+    alert("✅ Snippet copied!");
+
+  }
+
+}
+
+
+function useSnippet(index){
+
+  currentEditor =
+    "html";
+
+  document.getElementById("codeEditor").value =
+    snippets[index].code;
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+function searchSnippets(){
+
+  let query =
+    document.getElementById("snippetSearch")
+    .value
+    .toLowerCase()
+    .trim();
+
+  let filtered =
+    snippets.filter(item =>
+
+      item.title
+        .toLowerCase()
+        .includes(query)
+
+      ||
+
+      item.code
+        .toLowerCase()
+        .includes(query)
+
+    );
+
+  displaySnippets(filtered);
+
+}
+
+
+function escapeHTML(text){
+
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
+}
+
+
+/* =====================================================
+   TEXT CASE CONVERTER
+===================================================== */
+
+function upperCase(){
+
+  let input =
+    document.getElementById("caseInput");
+
+  input.value =
+    input.value.toUpperCase();
+
+}
+
+
+function lowerCase(){
+
+  let input =
+    document.getElementById("caseInput");
+
+  input.value =
+    input.value.toLowerCase();
+
+}
+
+
+function titleCase(){
+
+  let input =
+    document.getElementById("caseInput");
+
+  input.value =
+    input.value
+      .toLowerCase()
+      .replace(
+        /\b\w/g,
+        char => char.toUpperCase()
+      );
+
+}
+
+
+/* =====================================================
+   WORD COUNTER
+===================================================== */
+
+function countText(){
+
+  let text =
+    document.getElementById("counterInput").value;
+
+  let words =
+    text.trim()
+      ? text.trim().split(/\s+/).length
+      : 0;
+
+  let chars =
+    text.length;
+
+  document.getElementById("wordCount")
+    .textContent =
+    words;
+
+  document.getElementById("charCount")
+    .textContent =
+    chars;
+
+}
+
+
+/* =====================================================
+   JSON FORMATTER
+===================================================== */
+
+function formatJSON(){
+
+  let input =
+    document.getElementById("jsonInput").value;
+
+  let output =
+    document.getElementById("jsonResult");
+
+  try{
+
+    let parsed =
+      JSON.parse(input);
+
+    output.textContent =
+      JSON.stringify(
+        parsed,
+        null,
+        2
+      );
+
+    output.className =
+      "output success";
+
+  }
+
+  catch(error){
+
+    output.textContent =
+      "❌ Invalid JSON";
+
+    output.className =
+      "output error";
+
+  }
+
+}
+
+
+/* =====================================================
+   URL ENCODER / DECODER
+===================================================== */
+
+function encodeURL(){
+
+  let input =
+    document.getElementById("urlInput");
+
+  input.value =
+    encodeURIComponent(
+      input.value
+    );
+
+}
+
+
+function decodeURL(){
+
+  let input =
+    document.getElementById("urlInput");
+
+  try{
+
+    input.value =
+      decodeURIComponent(
+        input.value
+      );
+
+  }
+
+  catch(error){
+
+    alert(
+      "❌ Invalid encoded URL"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PASSWORD GENERATOR
+===================================================== */
+
+function generatePassword(){
+
+  let length =
+    parseInt(
+      document.getElementById(
+        "passwordLength"
+      ).value
+    ) || 16;
+
+  if(length < 6){
+    length = 6;
+  }
+
+  if(length > 50){
+    length = 50;
+  }
+
+  let chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789!@#$%^&*()";
+
+  let password = "";
+
+  for(
+    let i = 0;
+    i < length;
+    i++
+  ){
+
+    let randomIndex =
+      Math.floor(
+        Math.random() *
+        chars.length
+      );
+
+    password +=
+      chars[randomIndex];
+
+  }
+
+  document.getElementById(
+    "generatedPassword"
+  ).textContent =
+    password;
+
+}
+
+
+/* =====================================================
+   COLOR
+===================================================== */
+
+function convertColor(){
+
+  let color =
+    document.getElementById(
+      "colorPicker"
+    ).value;
+
+  document.getElementById(
+    "colorResult"
+  ).textContent =
+    "HEX: " + color;
+
+}
+
+
+/* =====================================================
+   BASE64
+===================================================== */
+
+function encodeBase64(){
+
+  let input =
+    document.getElementById(
+      "base64Input"
+    );
+
+  try{
+
+    input.value =
+      btoa(
+        unescape(
+          encodeURIComponent(
+            input.value
+          )
+        )
+      );
+
+  }
+
+  catch(error){
+
+    alert(
+      "❌ Cannot encode text"
+    );
+
+  }
+
+}
+
+
+function decodeBase64(){
+
+  let input =
+    document.getElementById(
+      "base64Input"
+    );
+
+  try{
+
+    input.value =
+      decodeURIComponent(
+        escape(
+          atob(input.value)
+        )
+      );
+
+  }
+
+  catch(error){
+
+    alert(
+      "❌ Invalid Base64"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   TIMESTAMP
+===================================================== */
+
+function generateTimestamp(){
+
+  let timestamp =
+    Math.floor(
+      Date.now() / 1000
+    );
+
+  document.getElementById(
+    "timestampResult"
+  ).textContent =
+    "Unix Timestamp: " +
+    timestamp;
+
+}
+
+
+/* =====================================================
+   RANDOM NUMBER
+===================================================== */
+
+function randomNumber(){
+
+  let min =
+    parseInt(
+      document.getElementById(
+        "minNumber"
+      ).value
+    );
+
+  let max =
+    parseInt(
+      document.getElementById(
+        "maxNumber"
+      ).value
+    );
+
+  if(
+    isNaN(min) ||
+    isNaN(max)
+  ){
+
+    alert(
+      "Please enter valid numbers"
+    );
+
+    return;
+
+  }
+
+  if(min > max){
+
+    let temp =
+      min;
+
+    min =
+      max;
+
+    max =
+      temp;
+
+  }
+
+  let number =
+    Math.floor(
+      Math.random() *
+      (max - min + 1)
+    ) + min;
+
+  document.getElementById(
+    "randomResult"
+  ).textContent =
+    "🎲 Result: " +
+    number;
+
+}
+
+
+/* =====================================================
+   LEARNING
+===================================================== */
+
+function showLesson(language){
+
+  let result =
+    document.getElementById(
+      "lessonResult"
+    );
+
+  let lessons = {
+
+html:
+`
+<h3>🌐 HTML Basics</h3>
+
+<p>
+HTML creates the structure of a website.
+</p>
+
+<div class="code">
+&lt;h1&gt;Hello World&lt;/h1&gt;
+&lt;p&gt;My website&lt;/p&gt;
+</div>
+`,
+
+css:
+`
+<h3>🎨 CSS Basics</h3>
+
+<p>
+CSS is used to style websites.
+</p>
+
+<div class="code">
+body {
+  background:white;
+  color:black;
+}
+</div>
+`,
+
+javascript:
+`
+<h3>⚡ JavaScript Basics</h3>
+
+<p>
+JavaScript adds logic and interaction.
+</p>
+
+<div class="code">
+function hello(){
+  alert("Hello World!");
+}
+</div>
+`,
+
+python:
+`
+<h3>🐍 Python Basics</h3>
+
+<p>
+Python is a popular general-purpose
+programming language.
+</p>
+
+<div class="code">
+print("Hello World!")
+</div>
+`
+
+  };
+
+  result.innerHTML =
+    lessons[language];
+
+}
+
+
+/* =====================================================
+   QUICK TIPS
+===================================================== */
+
+function showTip(language){
+
+  let result =
+    document.getElementById(
+      "tipResult"
+    );
+
+  let tips = {
+
+html:
+"💡 HTML tip: Use semantic elements such as header, nav, main and footer.",
+
+css:
+"💡 CSS tip: Use flexbox and grid to create responsive layouts.",
+
+js:
+"💡 JavaScript tip: Use const and let instead of var for modern code.",
+
+python:
+"💡 Python tip: Keep functions small and give variables meaningful names."
+
+  };
+
+  result.textContent =
+    tips[language];
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
 displaySnippets();
 
 runCode();
