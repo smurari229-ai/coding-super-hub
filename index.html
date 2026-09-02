@@ -3,77 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JSON Formatter Test</title>
+
+<title>Coding Super Hub - JSON Formatter</title>
 
 <style>
-body{
-  font-family:Arial;
-  background:#f3f6fb;
-  padding:25px;
+*{
+  box-sizing:border-box;
 }
 
-.box{
-  max-width:650px;
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f6fb;
+  color:#172033;
+}
+
+header{
+  background:#111827;
+  color:white;
+  text-align:center;
+  padding:22px 10px;
+}
+
+header h1{
+  margin:0;
+  font-size:24px;
+}
+
+header p{
+  margin:8px 0 0;
+  font-size:13px;
+}
+
+.container{
+  width:100%;
+  max-width:800px;
   margin:auto;
+  padding:15px;
+}
+
+.card{
   background:white;
   padding:20px;
-  border-radius:12px;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+h2{
+  margin-top:0;
 }
 
 textarea{
   width:100%;
-  min-height:160px;
-  padding:12px;
-  box-sizing:border-box;
-  font-size:15px;
+  min-height:180px;
+  padding:14px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  font-family:monospace;
+  font-size:14px;
+  resize:vertical;
 }
 
 button{
-  padding:10px 15px;
-  margin:6px 4px 6px 0;
   border:0;
-  border-radius:7px;
+  border-radius:8px;
   background:#2563eb;
   color:white;
+  padding:11px 15px;
+  margin:8px 5px 8px 0;
+  cursor:pointer;
 }
 
-#result{
-  margin-top:15px;
+button:hover{
+  background:#1d4ed8;
+}
+
+.output{
+  margin-top:12px;
   padding:15px;
+  min-height:100px;
+  border:1px solid #d5dbe5;
+  border-radius:10px;
   background:#111827;
   color:white;
-  border-radius:8px;
   white-space:pre-wrap;
-  min-height:80px;
+  overflow:auto;
+  font-family:monospace;
 }
 
-.error{
-  color:#dc2626 !important;
-  background:#fff1f2 !important;
+.valid{
+  background:#ecfdf5;
+  color:#15803d;
+}
+
+.invalid{
+  background:#fef2f2;
+  color:#dc2626;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:#64748b;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+  .card{
+    padding:15px;
+  }
+
+  header h1{
+    font-size:21px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<header>
+  <h1>🚀 Coding Super Hub</h1>
+  <p>Developer Tools</p>
+</header>
 
-<h1>📝 JSON Formatter</h1>
+<div class="container">
 
-<textarea id="jsonInput"
-placeholder='{"name":"Coding Super Hub","version":1}'></textarea>
+<div class="card">
 
-<br>
+<h2>📝 JSON Formatter & Validator</h2>
 
-<button onclick="formatJSON()">✨ Format JSON</button>
-<button onclick="validateJSON()">✅ Validate</button>
-<button onclick="clearJSON()">🗑️ Clear</button>
+<p>
+Paste JSON below and use the buttons to test it.
+</p>
 
-<div id="result">
+<textarea
+id="jsonInput"
+placeholder='{"name":"Coding Super Hub","version":1,"active":true}'
+></textarea>
+
+<div>
+
+<button onclick="formatJSON()">
+✨ Format JSON
+</button>
+
+<button onclick="validateJSON()">
+✅ Validate
+</button>
+
+<button onclick="clearJSON()">
+🗑️ Clear
+</button>
+
+</div>
+
+<h3>Result</h3>
+
+<div id="result" class="output">
 Result will appear here...
 </div>
 
 </div>
+
+</div>
+
+<footer>
+🚀 Coding Super Hub — Test 4
+</footer>
 
 <script>
 
@@ -85,22 +182,35 @@ function formatJSON(){
   const result =
     document.getElementById("result");
 
-  try{
+  if(input === ""){
 
-    const parsed = JSON.parse(input);
-
-    result.className = "";
+    result.className = "output invalid";
 
     result.textContent =
-      JSON.stringify(parsed, null, 2);
+      "❌ Please enter JSON first.";
+
+    return;
+  }
+
+  try{
+
+    const parsed =
+      JSON.parse(input);
+
+    result.className = "output valid";
+
+    result.textContent =
+      JSON.stringify(parsed,null,2);
 
   }catch(error){
 
-    result.className = "error";
+    result.className = "output invalid";
 
     result.textContent =
       "❌ Invalid JSON";
+
   }
+
 }
 
 
@@ -112,22 +222,34 @@ function validateJSON(){
   const result =
     document.getElementById("result");
 
+  if(input === ""){
+
+    result.className = "output invalid";
+
+    result.textContent =
+      "❌ Please enter JSON first.";
+
+    return;
+  }
+
   try{
 
     JSON.parse(input);
 
-    result.className = "";
+    result.className = "output valid";
 
     result.textContent =
       "✅ Valid JSON";
 
   }catch(error){
 
-    result.className = "error";
+    result.className = "output invalid";
 
     result.textContent =
       "❌ Invalid JSON";
+
   }
+
 }
 
 
@@ -135,10 +257,14 @@ function clearJSON(){
 
   document.getElementById("jsonInput").value = "";
 
-  document.getElementById("result").textContent =
+  const result =
+    document.getElementById("result");
+
+  result.className = "output";
+
+  result.textContent =
     "Result will appear here...";
 
-  document.getElementById("result").className = "";
 }
 
 </script>
