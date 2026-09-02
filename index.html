@@ -1,217 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coding Super Hub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Super Hub</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    body {
-      background: #0b1020;
-      color: white;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:#080d14;
+  color:white;
+}
 
-    header {
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #26304a;
-    }
+header{
+  padding:18px 20px;
+  border-bottom:1px solid #263040;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  background:#080d14;
+  z-index:10;
+}
 
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-    }
+.logo{
+  font-size:21px;
+  font-weight:bold;
+}
 
-    .logo span {
-      color: #6c63ff;
-    }
+nav a{
+  color:#aaa;
+  text-decoration:none;
+  margin-left:15px;
+}
 
-    nav a {
-      color: #cbd5e1;
-      text-decoration: none;
-      margin-left: 15px;
-      font-size: 14px;
-    }
+.hero{
+  text-align:center;
+  padding:45px 20px 30px;
+}
 
-    .hero {
-      text-align: center;
-      padding: 80px 20px 50px;
-    }
+.hero h1{
+  font-size:34px;
+  margin-bottom:12px;
+}
 
-    .hero h1 {
-      font-size: 45px;
-      margin-bottom: 18px;
-    }
+.hero p{
+  color:#aaa;
+  font-size:16px;
+}
 
-    .hero h1 span {
-      color: #6c63ff;
-    }
+.editor-section{
+  max-width:1100px;
+  margin:20px auto;
+  padding:20px;
+}
 
-    .hero p {
-      color: #aab4c8;
-      max-width: 650px;
-      margin: auto;
-      line-height: 1.6;
-    }
+.editor-section h2{
+  margin-bottom:15px;
+}
 
-    .button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 14px 25px;
-      background: #6c63ff;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: bold;
-    }
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+  flex-wrap:wrap;
+}
 
-    .section {
-      padding: 40px 20px 70px;
-      max-width: 1100px;
-      margin: auto;
-    }
+.tab{
+  border:1px solid #303b4d;
+  background:#111923;
+  color:#bbb;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-    .section h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 30px;
-    }
+.tab.active{
+  background:#2563eb;
+  color:white;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
+.editor{
+  width:100%;
+  min-height:300px;
+  resize:vertical;
+  background:#0d141e;
+  color:#e5e7eb;
+  border:1px solid #303b4d;
+  border-radius:10px;
+  padding:15px;
+  font-family:monospace;
+  font-size:14px;
+  line-height:1.6;
+  outline:none;
+}
 
-    .card {
-      background: #151c30;
-      border: 1px solid #293451;
-      padding: 25px;
-      border-radius: 15px;
-    }
+.buttons{
+  display:flex;
+  gap:10px;
+  margin:12px 0 20px;
+  flex-wrap:wrap;
+}
 
-    .card h3 {
-      margin-bottom: 10px;
-    }
+button{
+  border:0;
+  border-radius:8px;
+  padding:11px 18px;
+  font-size:15px;
+  cursor:pointer;
+}
 
-    .card p {
-      color: #9da9bf;
-      line-height: 1.5;
-      font-size: 14px;
-    }
+.run{
+  background:#16a34a;
+  color:white;
+}
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      border-top: 1px solid #26304a;
-      color: #7f8aa3;
-    }
-  </style>
+.copy{
+  background:#2563eb;
+  color:white;
+}
+
+.clear{
+  background:#dc2626;
+  color:white;
+}
+
+.output-title{
+  margin-bottom:10px;
+}
+
+iframe{
+  width:100%;
+  height:350px;
+  background:white;
+  border:1px solid #303b4d;
+  border-radius:10px;
+}
+
+.cards{
+  max-width:1100px;
+  margin:30px auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+}
+
+.card{
+  background:#111923;
+  border:1px solid #263040;
+  border-radius:12px;
+  padding:20px;
+}
+
+.card h3{
+  margin-bottom:8px;
+}
+
+.card p{
+  color:#999;
+}
+
+footer{
+  text-align:center;
+  padding:30px 20px;
+  color:#777;
+  border-top:1px solid #263040;
+  margin-top:30px;
+}
+
+@media(max-width:600px){
+  .hero h1{
+    font-size:28px;
+  }
+
+  .editor-section{
+    padding:15px;
+  }
+
+  .editor{
+    min-height:260px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">Coding <span>Super Hub</span></div>
+<header>
+  <div class="logo">🚀 Coding Super Hub</div>
+  <nav>
+    <a href="#editor">Editor</a>
+    <a href="#tools">Tools</a>
+  </nav>
+</header>
 
-    <nav>
-      <a href="#tools">Tools</a>
-      <a href="#learn">Learn</a>
-      <a href="#ai">AI</a>
-    </nav>
-  </header>
+<section class="hero">
+  <h1>Your All-in-One Coding Super Hub</h1>
+  <p>Write, run and test HTML, CSS and JavaScript directly in your browser.</p>
+</section>
 
-  <section class="hero">
-    <h1>Your <span>All-in-One</span><br>Coding Super Hub</h1>
+<section class="editor-section" id="editor">
 
-    <p>
-      Learn programming, use developer tools, explore ready-made
-      code snippets and build projects with AI — all in one place.
-    </p>
+  <h2>💻 Online Code Editor</h2>
 
-    <a class="button" href="#tools">Explore Coding Tools</a>
-  </section>
+  <div class="tabs">
+    <button class="tab active" onclick="showEditor('html')">HTML</button>
+    <button class="tab" onclick="showEditor('css')">CSS</button>
+    <button class="tab" onclick="showEditor('js')">JavaScript</button>
+  </div>
 
-  <section class="section" id="tools">
-    <h2>Developer Tools</h2>
+  <textarea id="htmlEditor" class="editor"><h1>Hello Coding Super Hub 🚀</h1>
+<p>Start coding here!</p>
+<button onclick="hello()">Click Me</button></textarea>
 
-    <div class="cards">
-      <div class="card">
-        <h3>💻 Code Editor</h3>
-        <p>Write and test your code with powerful coding tools.</p>
-      </div>
+  <textarea id="cssEditor" class="editor" style="display:none;"><style>
+body {
+  font-family: Arial;
+  text-align: center;
+  padding: 30px;
+}
 
-      <div class="card">
-        <h3>🧩 Code Snippets</h3>
-        <p>Find useful ready-made snippets and components.</p>
-      </div>
+h1 {
+  color: blue;
+}
 
-      <div class="card">
-        <h3>🔧 Developer Tools</h3>
-        <p>Useful utilities for everyday programming work.</p>
-      </div>
+button {
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+</style></textarea>
 
-      <div class="card">
-        <h3>🤖 AI Coding</h3>
-        <p>Use AI to generate, explain and improve your code.</p>
-      </div>
-    </div>
-  </section>
+  <textarea id="jsEditor" class="editor" style="display:none;">function hello() {
+  alert("Hello from Coding Super Hub!");
+}</textarea>
 
-  <section class="section" id="learn">
-    <h2>Learn Programming</h2>
+  <div class="buttons">
+    <button class="run" onclick="runCode()">▶ Run Code</button>
+    <button class="copy" onclick="copyCode()">📋 Copy</button>
+    <button class="clear" onclick="clearCode()">🗑 Clear</button>
+  </div>
 
-    <div class="cards">
-      <div class="card">
-        <h3>HTML & CSS</h3>
-        <p>Build beautiful websites from the ground up.</p>
-      </div>
+  <h3 class="output-title">👀 Live Output</h3>
 
-      <div class="card">
-        <h3>JavaScript</h3>
-        <p>Learn modern JavaScript and interactive web development.</p>
-      </div>
+  <iframe id="output"></iframe>
 
-      <div class="card">
-        <h3>Python</h3>
-        <p>Learn Python from beginner concepts to real projects.</p>
-      </div>
+</section>
 
-      <div class="card">
-        <h3>React</h3>
-        <p>Create modern and powerful web applications.</p>
-      </div>
-    </div>
-  </section>
+<section class="cards" id="tools">
 
-  <section class="section" id="ai">
-    <h2>🚀 Coming Soon</h2>
+  <div class="card">
+    <h3>🧩 Code Snippets</h3>
+    <p>Useful ready-made coding examples.</p>
+  </div>
 
-    <div class="cards">
-      <div class="card">
-        <h3>AI Project Generator</h3>
-        <p>Describe your idea and generate a complete project.</p>
-      </div>
+  <div class="card">
+    <h3>🔧 Developer Tools</h3>
+    <p>Helpful tools for everyday developers.</p>
+  </div>
 
-      <div class="card">
-        <h3>AI Code Assistant</h3>
-        <p>Generate, explain, debug and improve your code.</p>
-      </div>
-    </div>
-  </section>
+  <div class="card">
+    <h3>🤖 AI Coding</h3>
+    <p>AI-powered coding features coming soon.</p>
+  </div>
 
-  <footer>
-    © 2026 Coding Super Hub — Built for developers.
-  </footer>
+  <div class="card">
+    <h3>📚 Learn Programming</h3>
+    <p>HTML, CSS, JavaScript, Python and more.</p>
+  </div>
+
+</section>
+
+<footer>
+  © 2026 Coding Super Hub — Built for developers.
+</footer>
+
+<script>
+
+let currentEditor = "html";
+
+function showEditor(type){
+
+  currentEditor = type;
+
+  document.getElementById("htmlEditor").style.display = "none";
+  document.getElementById("cssEditor").style.display = "none";
+  document.getElementById("jsEditor").style.display = "none";
+
+  document.getElementById(type + "Editor").style.display = "block";
+
+  document.querySelectorAll(".tab").forEach(function(tab){
+    tab.classList.remove("active");
+  });
+
+  event.target.classList.add("active");
+}
+
+function runCode(){
+
+  let html = document.getElementById("htmlEditor").value;
+  let css = document.getElementById("cssEditor").value;
+  let js = document.getElementById("jsEditor").value;
+
+  let finalCode =
+  "<!DOCTYPE html>" +
+  "<html>" +
+  "<head>" +
+  css +
+  "</head>" +
+  "<body>" +
+  html +
+  "<script>" +
+  js.replace(/<\/script>/gi,"<\\/script>") +
+  "<\/script>" +
+  "</body>" +
+  "</html>";
+
+  document.getElementById("output").srcdoc = finalCode;
+}
+
+function copyCode(){
+
+  let editor = document.getElementById(currentEditor + "Editor");
+
+  navigator.clipboard.writeText(editor.value);
+
+  alert("Code copied!");
+}
+
+function clearCode(){
+
+  document.getElementById(currentEditor + "Editor").value = "";
+
+}
+
+runCode();
+
+</script>
 
 </body>
 </html>
