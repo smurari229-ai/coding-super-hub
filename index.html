@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>URL Encoder & Decoder</title>
+  <title>Password Generator</title>
 
   <style>
     * {
@@ -31,19 +31,46 @@
       margin-top: 0;
     }
 
-    textarea {
+    .password-box {
       width: 100%;
-      min-height: 200px;
-      padding: 14px;
-      border: 1px solid #cbd5e1;
+      min-height: 70px;
+      padding: 15px;
+      background: #111827;
+      color: white;
       border-radius: 10px;
+      font-family: monospace;
+      font-size: 18px;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
       font-size: 16px;
-      resize: vertical;
+    }
+
+    .option {
+      margin: 12px 0;
+    }
+
+    .option input {
+      margin-right: 8px;
     }
 
     button {
       padding: 11px 16px;
-      margin: 10px 5px 5px 0;
+      margin: 12px 5px 5px 0;
       border: none;
       border-radius: 8px;
       background: #2563eb;
@@ -56,21 +83,9 @@
       background: #1d4ed8;
     }
 
-    .result {
-      margin-top: 18px;
-      padding: 15px;
-      min-height: 100px;
-      background: #111827;
-      color: white;
-      border-radius: 10px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: monospace;
-    }
-
-    .error {
-      background: #fef2f2;
-      color: #dc2626;
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -79,138 +94,195 @@
 
 <div class="container">
 
-  <h1>🔗 URL Encoder & Decoder</h1>
+  <h1>🔐 Password Generator</h1>
 
-  <p>
-    Enter text or a URL and encode it or decode it.
-  </p>
+  <p>Create a random and strong password.</p>
 
-  <textarea
-    id="inputText"
-    placeholder="Enter text or URL here..."
-  ></textarea>
+  <div id="password" class="password-box">
+    Click Generate Password
+  </div>
 
-  <br>
+  <label for="length">Password Length</label>
 
-  <button onclick="encodeURL()">
-    🔒 Encode URL
+  <input
+    type="number"
+    id="length"
+    min="4"
+    max="100"
+    value="16"
+  >
+
+  <div class="option">
+    <label>
+      <input type="checkbox" id="uppercase" checked>
+      🔠 Uppercase (A-Z)
+    </label>
+  </div>
+
+  <div class="option">
+    <label>
+      <input type="checkbox" id="lowercase" checked>
+      🔡 Lowercase (a-z)
+    </label>
+  </div>
+
+  <div class="option">
+    <label>
+      <input type="checkbox" id="numbers" checked>
+      🔢 Numbers (0-9)
+    </label>
+  </div>
+
+  <div class="option">
+    <label>
+      <input type="checkbox" id="symbols" checked>
+      🔣 Symbols (!@#$)
+    </label>
+  </div>
+
+  <button onclick="generatePassword()">
+    🔄 Generate Password
   </button>
 
-  <button onclick="decodeURL()">
-    🔓 Decode URL
+  <button onclick="copyPassword()">
+    📋 Copy Password
   </button>
 
-  <button onclick="copyResult()">
-    📋 Copy Result
-  </button>
-
-  <button onclick="clearAll()">
+  <button onclick="clearPassword()">
     🗑️ Clear
   </button>
 
-  <div id="result" class="result">
-    Result will appear here...
-  </div>
+  <div id="message" class="message"></div>
 
 </div>
 
 <script>
 
-function encodeURL() {
+function generatePassword() {
 
-  const input =
-    document.getElementById("inputText").value;
+  const length =
+    parseInt(document.getElementById("length").value);
 
-  const result =
-    document.getElementById("result");
+  const useUppercase =
+    document.getElementById("uppercase").checked;
 
-  if (input === "") {
-    result.className = "result error";
-    result.textContent = "❌ Please enter some text or URL.";
+  const useLowercase =
+    document.getElementById("lowercase").checked;
+
+  const useNumbers =
+    document.getElementById("numbers").checked;
+
+  const useSymbols =
+    document.getElementById("symbols").checked;
+
+  const passwordBox =
+    document.getElementById("password");
+
+  const message =
+    document.getElementById("message");
+
+  if (isNaN(length) || length < 4 || length > 100) {
+    message.textContent =
+      "❌ Length must be between 4 and 100.";
     return;
   }
 
-  try {
+  let characters = "";
 
-    const encoded =
-      encodeURIComponent(input);
-
-    result.className = "result";
-    result.textContent = encoded;
-
-  } catch (error) {
-
-    result.className = "result error";
-    result.textContent = "❌ URL encoding failed.";
-
+  if (useUppercase) {
+    characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   }
-}
 
+  if (useLowercase) {
+    characters += "abcdefghijklmnopqrstuvwxyz";
+  }
 
-function decodeURL() {
+  if (useNumbers) {
+    characters += "0123456789";
+  }
 
-  const input =
-    document.getElementById("inputText").value;
+  if (useSymbols) {
+    characters += "!@#$%^&*()_+-=[]{}|;:,.<>?";
+  }
 
-  const result =
-    document.getElementById("result");
-
-  if (input === "") {
-    result.className = "result error";
-    result.textContent = "❌ Please enter encoded URL text.";
+  if (characters === "") {
+    message.textContent =
+      "❌ Select at least one character type.";
     return;
   }
 
-  try {
+  let password = "";
 
-    const decoded =
-      decodeURIComponent(input);
+  for (let i = 0; i < length; i++) {
 
-    result.className = "result";
-    result.textContent = decoded;
+    const randomIndex =
+      Math.floor(Math.random() * characters.length);
 
-  } catch (error) {
-
-    result.className = "result error";
-    result.textContent = "❌ Invalid encoded URL.";
+    password += characters[randomIndex];
   }
+
+  passwordBox.textContent = password;
+
+  message.textContent =
+    "✅ Password generated!";
 }
 
 
-function copyResult() {
+function copyPassword() {
 
-  const text =
-    document.getElementById("result").textContent;
+  const password =
+    document.getElementById("password").textContent;
+
+  const message =
+    document.getElementById("message");
 
   if (
-    text === "Result will appear here..." ||
-    text.startsWith("❌")
+    password === "Click Generate Password" ||
+    password === ""
   ) {
-    alert("❌ No valid result to copy.");
+    message.textContent =
+      "❌ Generate a password first.";
     return;
   }
 
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(password)
     .then(function() {
-      alert("✅ Result copied!");
+
+      message.textContent =
+        "✅ Password copied!";
+
     })
     .catch(function() {
-      alert("❌ Copy failed.");
+
+      message.textContent =
+        "❌ Copy failed.";
+
     });
 }
 
 
-function clearAll() {
+function clearPassword() {
 
-  document.getElementById("inputText").value = "";
+  document.getElementById("password").textContent =
+    "Click Generate Password";
 
-  const result =
-    document.getElementById("result");
+  document.getElementById("message").textContent =
+    "";
 
-  result.className = "result";
+  document.getElementById("length").value =
+    16;
 
-  result.textContent =
-    "Result will appear here...";
+  document.getElementById("uppercase").checked =
+    true;
+
+  document.getElementById("lowercase").checked =
+    true;
+
+  document.getElementById("numbers").checked =
+    true;
+
+  document.getElementById("symbols").checked =
+    true;
 }
 
 </script>
