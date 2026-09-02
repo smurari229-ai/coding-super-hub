@@ -314,7 +314,107 @@
 
   <div class="output" id="entityOutput"></div>
 </div>
+<!-- TEST 11 - UUID GENERATOR -->
 
+<div class="card">
+  <h2>11. UUID Generator</h2>
+
+  <button onclick="generateUUID()">Generate UUID</button>
+
+  <div class="output" id="uuidOutput"></div>
+</div>
+
+
+<!-- TEST 12 - TEXT TO SLUG -->
+
+<div class="card">
+  <h2>12. Text to Slug Converter</h2>
+
+  <input
+    type="text"
+    id="slugInput"
+    placeholder="Enter title...">
+
+  <button onclick="convertSlug()">Convert to Slug</button>
+
+  <div class="output" id="slugOutput"></div>
+</div>
+
+
+<!-- TEST 13 - REGEX TESTER -->
+
+<div class="card">
+  <h2>13. Regex Tester</h2>
+
+  <input
+    type="text"
+    id="regexPattern"
+    placeholder="Regex pattern e.g. ^[A-Za-z]+$">
+
+  <input
+    type="text"
+    id="regexText"
+    placeholder="Enter text to test">
+
+  <input
+    type="text"
+    id="regexFlags"
+    placeholder="Flags e.g. gi">
+
+  <button onclick="testRegex()">Test Regex</button>
+
+  <div class="output" id="regexOutput"></div>
+</div>
+
+
+<!-- TEST 14 - HTML PREVIEWER -->
+
+<div class="card">
+  <h2>14. HTML Previewer</h2>
+
+  <textarea
+    id="htmlPreviewInput"
+    placeholder="Write HTML here..."></textarea>
+
+  <button onclick="previewHTML()">Preview HTML</button>
+
+  <div class="output" id="htmlPreviewOutput"></div>
+</div>
+
+
+<!-- TEST 15 - CSS GRADIENT GENERATOR -->
+
+<div class="card">
+  <h2>15. CSS Gradient Generator</h2>
+
+  <input
+    type="color"
+    id="gradientColor1"
+    value="#2563eb">
+
+  <input
+    type="color"
+    id="gradientColor2"
+    value="#9333ea">
+
+  <input
+    type="number"
+    id="gradientAngle"
+    value="90"
+    min="0"
+    max="360">
+
+  <button onclick="generateGradient()">
+    Generate Gradient
+  </button>
+
+  <div
+    id="gradientPreview"
+    style="height:100px;margin-top:10px;border-radius:10px;">
+  </div>
+
+  <div class="output" id="gradientOutput"></div>
+</div>
   <script>
 
     /* =========================
@@ -688,6 +788,135 @@ function decodeHTML() {
 function clearHTML() {
   document.getElementById("entityInput").value = "";
   document.getElementById("entityOutput").textContent = "";
+}/* =========================
+   TEST 11 - UUID GENERATOR
+========================= */
+
+function generateUUID() {
+  let uuid;
+
+  if (crypto.randomUUID) {
+    uuid = crypto.randomUUID();
+  } else {
+    uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === "x" ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      }
+    );
+  }
+
+  document.getElementById("uuidOutput").textContent = uuid;
+}
+
+
+/* =========================
+   TEST 12 - TEXT TO SLUG
+========================= */
+
+function convertSlug() {
+  const text =
+    document.getElementById("slugInput").value.trim();
+
+  const slug = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  document.getElementById("slugOutput").textContent =
+    slug;
+}
+
+
+/* =========================
+   TEST 13 - REGEX TESTER
+========================= */
+
+function testRegex() {
+  const pattern =
+    document.getElementById("regexPattern").value;
+
+  const text =
+    document.getElementById("regexText").value;
+
+  const flags =
+    document.getElementById("regexFlags").value;
+
+  try {
+    const regex = new RegExp(pattern, flags);
+    const matches = text.match(regex);
+
+    if (matches) {
+      document.getElementById("regexOutput").textContent =
+        "✅ Match found: " + matches.join(", ");
+    } else {
+      document.getElementById("regexOutput").textContent =
+        "❌ No match found";
+    }
+  } catch (error) {
+    document.getElementById("regexOutput").textContent =
+      "❌ Invalid regular expression";
+  }
+}
+
+
+/* =========================
+   TEST 14 - HTML PREVIEWER
+========================= */
+
+function previewHTML() {
+  const html =
+    document.getElementById("htmlPreviewInput").value;
+
+  const output =
+    document.getElementById("htmlPreviewOutput");
+
+  output.innerHTML = "";
+
+  const iframe = document.createElement("iframe");
+
+  iframe.style.width = "100%";
+  iframe.style.height = "250px";
+  iframe.style.border = "1px solid #ccc";
+  iframe.style.borderRadius = "8px";
+
+  iframe.srcdoc = html;
+
+  output.appendChild(iframe);
+}
+
+
+/* =========================
+   TEST 15 - CSS GRADIENT GENERATOR
+========================= */
+
+function generateGradient() {
+  const color1 =
+    document.getElementById("gradientColor1").value;
+
+  const color2 =
+    document.getElementById("gradientColor2").value;
+
+  const angle =
+    document.getElementById("gradientAngle").value;
+
+  const gradient =
+    "linear-gradient(" +
+    angle + "deg, " +
+    color1 + ", " +
+    color2 + ")";
+
+  document.getElementById("gradientPreview").style.background =
+    gradient;
+
+  document.getElementById("gradientOutput").textContent =
+    "CSS: background: " + gradient + ";";
 }
   </script>
 
