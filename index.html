@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word Counter Test</title>
+<title>JSON Formatter Test</title>
 
 <style>
 body{
@@ -13,7 +13,7 @@ body{
 }
 
 .box{
-  max-width:600px;
+  max-width:650px;
   margin:auto;
   background:white;
   padding:20px;
@@ -25,15 +25,31 @@ textarea{
   min-height:160px;
   padding:12px;
   box-sizing:border-box;
-  font-size:16px;
+  font-size:15px;
 }
 
-.stats{
+button{
+  padding:10px 15px;
+  margin:6px 4px 6px 0;
+  border:0;
+  border-radius:7px;
+  background:#2563eb;
+  color:white;
+}
+
+#result{
   margin-top:15px;
   padding:15px;
-  background:#f8fafc;
-  border:1px solid #ddd;
+  background:#111827;
+  color:white;
   border-radius:8px;
+  white-space:pre-wrap;
+  min-height:80px;
+}
+
+.error{
+  color:#dc2626 !important;
+  background:#fff1f2 !important;
 }
 </style>
 </head>
@@ -42,47 +58,87 @@ textarea{
 
 <div class="box">
 
-<h1>🔢 Word & Character Counter</h1>
+<h1>📝 JSON Formatter</h1>
 
-<textarea
-id="textInput"
-placeholder="Type your text here..."
-oninput="countText()"></textarea>
+<textarea id="jsonInput"
+placeholder='{"name":"Coding Super Hub","version":1}'></textarea>
 
-<div class="stats">
-  <p>Words: <b id="wordCount">0</b></p>
-  <p>Characters: <b id="charCount">0</b></p>
-  <p>Characters (without spaces): <b id="noSpaceCount">0</b></p>
+<br>
+
+<button onclick="formatJSON()">✨ Format JSON</button>
+<button onclick="validateJSON()">✅ Validate</button>
+<button onclick="clearJSON()">🗑️ Clear</button>
+
+<div id="result">
+Result will appear here...
 </div>
 
 </div>
 
 <script>
 
-function countText(){
+function formatJSON(){
 
-  const text =
-    document.getElementById("textInput").value;
+  const input =
+    document.getElementById("jsonInput").value.trim();
 
-  const words =
-    text.trim()
-      ? text.trim().split(/\s+/).length
-      : 0;
+  const result =
+    document.getElementById("result");
 
-  const characters =
-    text.length;
+  try{
 
-  const withoutSpaces =
-    text.replace(/\s/g,"").length;
+    const parsed = JSON.parse(input);
 
-  document.getElementById("wordCount")
-    .textContent = words;
+    result.className = "";
 
-  document.getElementById("charCount")
-    .textContent = characters;
+    result.textContent =
+      JSON.stringify(parsed, null, 2);
 
-  document.getElementById("noSpaceCount")
-    .textContent = withoutSpaces;
+  }catch(error){
+
+    result.className = "error";
+
+    result.textContent =
+      "❌ Invalid JSON";
+  }
+}
+
+
+function validateJSON(){
+
+  const input =
+    document.getElementById("jsonInput").value.trim();
+
+  const result =
+    document.getElementById("result");
+
+  try{
+
+    JSON.parse(input);
+
+    result.className = "";
+
+    result.textContent =
+      "✅ Valid JSON";
+
+  }catch(error){
+
+    result.className = "error";
+
+    result.textContent =
+      "❌ Invalid JSON";
+  }
+}
+
+
+function clearJSON(){
+
+  document.getElementById("jsonInput").value = "";
+
+  document.getElementById("result").textContent =
+    "Result will appear here...";
+
+  document.getElementById("result").className = "";
 }
 
 </script>
