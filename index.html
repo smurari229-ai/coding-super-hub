@@ -1,27 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coding Super Hub Test</title>
+  <title>Text Case Converter Test</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 25px;
+      background: #f3f6fb;
+    }
+
+    .box {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 12px;
+      box-sizing: border-box;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 14px;
+      margin: 4px;
+      border: 0;
+      border-radius: 7px;
+      background: #2563eb;
+      color: white;
+    }
+
+    #result {
+      margin-top: 15px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid #ddd;
+      min-height: 50px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 
-<body style="font-family:Arial;text-align:center;padding:40px">
+<body>
 
-  <h1>🚀 Coding Super Hub</h1>
+<div class="box">
 
-  <p id="message">Website is working!</p>
+  <h1>🔤 Text Case Converter</h1>
 
-  <button onclick="testButton()">
-    Test Button
+  <textarea id="textInput"
+    placeholder="Type your text here..."></textarea>
+
+  <br>
+
+  <button onclick="makeUppercase()">
+    UPPERCASE
   </button>
 
-  <script>
-    function testButton() {
-      document.getElementById("message").textContent =
-        "✅ JavaScript is working!";
-    }
-  </script>
+  <button onclick="makeLowercase()">
+    lowercase
+  </button>
+
+  <button onclick="makeTitleCase()">
+    Title Case
+  </button>
+
+  <button onclick="clearText()">
+    Clear
+  </button>
+
+  <div id="result">
+    Result will appear here...
+  </div>
+
+</div>
+
+<script>
+
+function makeUppercase() {
+  const text = document.getElementById("textInput").value;
+
+  document.getElementById("result").textContent =
+    text.toUpperCase();
+}
+
+function makeLowercase() {
+  const text = document.getElementById("textInput").value;
+
+  document.getElementById("result").textContent =
+    text.toLowerCase();
+}
+
+function makeTitleCase() {
+  const text = document.getElementById("textInput").value;
+
+  const result = text
+    .toLowerCase()
+    .replace(/\b\w/g, function(letter) {
+      return letter.toUpperCase();
+    });
+
+  document.getElementById("result").textContent = result;
+}
+
+function clearText() {
+  document.getElementById("textInput").value = "";
+  document.getElementById("result").textContent =
+    "Result will appear here...";
+}
+
+</script>
 
 </body>
 </html>
