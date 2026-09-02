@@ -108,6 +108,7 @@ button:hover{
   padding:12px;
   min-height:80px;
   overflow:auto;
+  white-space:pre-wrap;
 }
 
 iframe{
@@ -172,6 +173,7 @@ footer{
 }
 
 @media(max-width:600px){
+
   header h1{
     font-size:21px;
   }
@@ -204,9 +206,23 @@ footer{
 <h2>💻 Online Code Editor</h2>
 
 <div class="tabs">
-  <button id="htmlTab" class="active" onclick="showEditor('html')">HTML</button>
-  <button id="cssTab" onclick="showEditor('css')">CSS</button>
-  <button id="jsTab" onclick="showEditor('js')">JavaScript</button>
+
+<button id="htmlTab"
+class="active"
+onclick="showEditor('html')">
+HTML
+</button>
+
+<button id="cssTab"
+onclick="showEditor('css')">
+CSS
+</button>
+
+<button id="jsTab"
+onclick="showEditor('js')">
+JavaScript
+</button>
+
 </div>
 
 <textarea id="codeEditor"><h1>Hello Coding Super Hub!</h1>
@@ -214,9 +230,19 @@ footer{
 <button onclick="hello()">Click Me</button></textarea>
 
 <div>
-  <button onclick="runCode()">▶️ Run Code</button>
-  <button onclick="copyCode()">📋 Copy</button>
-  <button onclick="clearCode()">🗑️ Clear</button>
+
+<button onclick="runCode()">
+▶️ Run Code
+</button>
+
+<button onclick="copyCode()">
+📋 Copy
+</button>
+
+<button onclick="clearCode()">
+🗑️ Clear
+</button>
+
 </div>
 
 <h3>🌐 Live Output</h3>
@@ -233,10 +259,10 @@ footer{
 <h2>🧩 Code Snippets Library</h2>
 
 <input
-  type="text"
-  id="snippetSearch"
-  placeholder="Search snippets..."
-  oninput="searchSnippets()"
+type="text"
+id="snippetSearch"
+placeholder="Search snippets..."
+oninput="searchSnippets()"
 >
 
 <div id="snippetList"></div>
@@ -254,6 +280,7 @@ footer{
 
 <div class="tool-grid">
 
+
 <!-- TEXT CASE -->
 
 <div class="snippet">
@@ -261,13 +288,21 @@ footer{
 <h3>🔤 Text Case Converter</h3>
 
 <textarea
-  id="caseInput"
-  placeholder="Enter text..."
+id="caseInput"
+placeholder="Enter text..."
 ></textarea>
 
-<button onclick="upperCase()">UPPERCASE</button>
-<button onclick="lowerCase()">lowercase</button>
-<button onclick="titleCase()">Title Case</button>
+<button onclick="upperCase()">
+UPPERCASE
+</button>
+
+<button onclick="lowerCase()">
+lowercase
+</button>
+
+<button onclick="titleCase()">
+Title Case
+</button>
 
 </div>
 
@@ -279,15 +314,17 @@ footer{
 <h3>🔢 Word & Character Counter</h3>
 
 <textarea
-  id="counterInput"
-  placeholder="Type text here..."
-  oninput="countText()"
+id="counterInput"
+placeholder="Type text here..."
+oninput="countText()"
 ></textarea>
 
 <p>
-Words: <b id="wordCount">0</b>
+Words:
+<b id="wordCount">0</b>
 |
-Characters: <b id="charCount">0</b>
+Characters:
+<b id="charCount">0</b>
 </p>
 
 </div>
@@ -300,11 +337,13 @@ Characters: <b id="charCount">0</b>
 <h3>📝 JSON Formatter</h3>
 
 <textarea
-  id="jsonInput"
-  placeholder='{"name":"Coding Super Hub"}'
+id="jsonInput"
+placeholder='{"name":"Coding Super Hub"}'
 ></textarea>
 
-<button onclick="formatJSON()">✨ Format JSON</button>
+<button onclick="formatJSON()">
+✨ Format JSON
+</button>
 
 <div id="jsonResult" class="output"></div>
 
@@ -318,12 +357,17 @@ Characters: <b id="charCount">0</b>
 <h3>🔗 URL Encoder / Decoder</h3>
 
 <textarea
-  id="urlInput"
-  placeholder="Enter URL or text..."
+id="urlInput"
+placeholder="Enter URL or text..."
 ></textarea>
 
-<button onclick="encodeURL()">Encode</button>
-<button onclick="decodeURL()">Decode</button>
+<button onclick="encodeURL()">
+Encode
+</button>
+
+<button onclick="decodeURL()">
+Decode
+</button>
 
 </div>
 
@@ -335,11 +379,11 @@ Characters: <b id="charCount">0</b>
 <h3>🔐 Password Generator</h3>
 
 <input
-  type="number"
-  id="passwordLength"
-  value="16"
-  min="6"
-  max="50"
+type="number"
+id="passwordLength"
+value="16"
+min="6"
+max="50"
 >
 
 <button onclick="generatePassword()">
@@ -360,13 +404,15 @@ Your password will appear here
 <h3>🎨 Color Converter</h3>
 
 <input
-  type="color"
-  id="colorPicker"
-  value="#2563eb"
-  onchange="convertColor()"
+type="color"
+id="colorPicker"
+value="#2563eb"
+onchange="convertColor()"
 >
 
-<p id="colorResult">HEX: #2563eb</p>
+<p id="colorResult">
+HEX: #2563eb
+</p>
 
 </div>
 
@@ -378,12 +424,17 @@ Your password will appear here
 <h3>🔐 Base64 Encoder / Decoder</h3>
 
 <textarea
-  id="base64Input"
-  placeholder="Enter text..."
+id="base64Input"
+placeholder="Enter text..."
 ></textarea>
 
-<button onclick="encodeBase64()">Encode</button>
-<button onclick="decodeBase64()">Decode</button>
+<button onclick="encodeBase64()">
+Encode
+</button>
+
+<button onclick="decodeBase64()">
+Decode
+</button>
 
 </div>
 
@@ -394,9 +445,14 @@ Your password will appear here
 
 <h3>⏱️ Timestamp Generator</h3>
 
-<button onclick="generateTimestamp()">Generate Timestamp</button>
+<button onclick="generateTimestamp()">
+Generate Timestamp
+</button>
 
-<div id="timestampResult" class="output"></div>
+<div
+id="timestampResult"
+class="output">
+</div>
 
 </div>
 
@@ -408,22 +464,27 @@ Your password will appear here
 <h3>🎲 Random Number</h3>
 
 <input
-  type="number"
-  id="minNumber"
-  value="1"
-  placeholder="Minimum"
+type="number"
+id="minNumber"
+value="1"
+placeholder="Minimum"
 >
 
 <input
-  type="number"
-  id="maxNumber"
-  value="100"
-  placeholder="Maximum"
+type="number"
+id="maxNumber"
+value="100"
+placeholder="Maximum"
 >
 
-<button onclick="randomNumber()">Generate</button>
+<button onclick="randomNumber()">
+Generate
+</button>
 
-<div id="randomResult" class="output"></div>
+<div
+id="randomResult"
+class="output">
+</div>
 
 </div>
 
@@ -437,14 +498,18 @@ Your password will appear here
 
 <h2>📚 Learn Programming</h2>
 
-<p>HTML, CSS, JavaScript, Python and more.</p>
+<p>
+HTML, CSS, JavaScript, Python and more.
+</p>
 
 
 <div class="learn-card">
 
 <h3>🌐 HTML</h3>
 
-<p>Learn how websites are structured.</p>
+<p>
+Learn how websites are structured.
+</p>
 
 <button onclick="showLesson('html')">
 Learn HTML
@@ -457,7 +522,9 @@ Learn HTML
 
 <h3>🎨 CSS</h3>
 
-<p>Learn how to design beautiful websites.</p>
+<p>
+Learn how to design beautiful websites.
+</p>
 
 <button onclick="showLesson('css')">
 Learn CSS
@@ -470,7 +537,9 @@ Learn CSS
 
 <h3>⚡ JavaScript</h3>
 
-<p>Learn programming and website interactions.</p>
+<p>
+Learn programming and website interactions.
+</p>
 
 <button onclick="showLesson('javascript')">
 Learn JavaScript
@@ -483,7 +552,9 @@ Learn JavaScript
 
 <h3>🐍 Python</h3>
 
-<p>Learn one of the most popular programming languages.</p>
+<p>
+Learn one of the most popular programming languages.
+</p>
 
 <button onclick="showLesson('python')">
 Learn Python
@@ -492,8 +563,12 @@ Learn Python
 </div>
 
 
-<div id="lessonResult" class="output">
+<div
+id="lessonResult"
+class="output">
+
 Select a language to start learning.
+
 </div>
 
 </div>
@@ -505,13 +580,28 @@ Select a language to start learning.
 
 <h2>⚡ Quick Coding Helpers</h2>
 
-<button onclick="showTip('html')">HTML Tip</button>
-<button onclick="showTip('css')">CSS Tip</button>
-<button onclick="showTip('js')">JavaScript Tip</button>
-<button onclick="showTip('python')">Python Tip</button>
+<button onclick="showTip('html')">
+HTML Tip
+</button>
 
-<div id="tipResult" class="output">
+<button onclick="showTip('css')">
+CSS Tip
+</button>
+
+<button onclick="showTip('js')">
+JavaScript Tip
+</button>
+
+<button onclick="showTip('python')">
+Python Tip
+</button>
+
+<div
+id="tipResult"
+class="output">
+
 Choose a tip.
+
 </div>
 
 </div>
@@ -520,7 +610,9 @@ Choose a tip.
 
 
 <footer>
+
 🚀 Coding Super Hub — Built for developers
+
 </footer>
 
 
@@ -533,11 +625,14 @@ Choose a tip.
 let currentEditor = "html";
 
 let editors = {
-  html: `<h1>Hello Coding Super Hub!</h1>
+
+html:
+`<h1>Hello Coding Super Hub!</h1>
 <p>Start coding here 🚀</p>
 <button onclick="hello()">Click Me</button>`,
 
-  css: `body {
+css:
+`body {
   font-family: Arial;
   text-align: center;
   padding: 30px;
@@ -547,9 +642,11 @@ h1 {
   color: blue;
 }`,
 
-  js: `function hello() {
+js:
+`function hello() {
   alert("Hello from Coding Super Hub!");
 }`
+
 };
 
 
@@ -563,12 +660,18 @@ function showEditor(type){
   document.getElementById("codeEditor").value =
     editors[type];
 
-  document.getElementById("htmlTab").classList.remove("active");
-  document.getElementById("cssTab").classList.remove("active");
-  document.getElementById("jsTab").classList.remove("active");
+  document.getElementById("htmlTab")
+    .classList.remove("active");
+
+  document.getElementById("cssTab")
+    .classList.remove("active");
+
+  document.getElementById("jsTab")
+    .classList.remove("active");
 
   document.getElementById(type + "Tab")
     .classList.add("active");
+
 }
 
 
@@ -586,11 +689,17 @@ function runCode(){
 
   let documentContent = `
 <!DOCTYPE html>
+
 <html>
+
 <head>
+
 <style>
+
 ${css}
+
 </style>
+
 </head>
 
 <body>
@@ -604,10 +713,12 @@ ${js}
 <\/script>
 
 </body>
+
 </html>
 `;
 
   output.srcdoc = documentContent;
+
 }
 
 
@@ -616,9 +727,18 @@ function copyCode(){
   let code =
     document.getElementById("codeEditor").value;
 
-  navigator.clipboard.writeText(code);
+  navigator.clipboard.writeText(code)
+    .then(function(){
 
-  alert("✅ Code copied!");
+      alert("✅ Code copied!");
+
+    })
+    .catch(function(){
+
+      alert("❌ Copy failed");
+
+    });
+
 }
 
 
@@ -638,13 +758,13 @@ function clearCode(){
 const snippets = [
 
 {
- title:"HTML Button",
- code:`<button>Click Me</button>`
+  title:"HTML Button",
+  code:`<button>Click Me</button>`
 },
 
 {
- title:"CSS Center Content",
- code:`body {
+  title:"CSS Center Content",
+  code:`body {
   display:flex;
   justify-content:center;
   align-items:center;
@@ -652,18 +772,18 @@ const snippets = [
 },
 
 {
- title:"JavaScript Alert",
- code:`alert("Hello World!");`
+  title:"JavaScript Alert",
+  code:`alert("Hello World!");`
 },
 
 {
- title:"HTML Input",
- code:`<input type="text" placeholder="Enter text">`
+  title:"HTML Input",
+  code:`<input type="text" placeholder="Enter text">`
 },
 
 {
- title:"CSS Card",
- code:`.card {
+  title:"CSS Card",
+  code:`.card {
   padding:20px;
   border-radius:10px;
   background:white;
@@ -672,26 +792,27 @@ const snippets = [
 },
 
 {
- title:"JavaScript Function",
- code:`function hello() {
+  title:"JavaScript Function",
+  code:`function hello() {
   console.log("Hello World!");
 }`
 },
 
 {
- title:"HTML Image",
- code:`<img src="image.jpg" alt="My Image">`
+  title:"HTML Image",
+  code:`<img src="image.jpg" alt="My Image">`
 },
 
 {
- title:"CSS Button",
- code:`button {
+  title:"CSS Button",
+  code:`button {
   background:#2563eb;
   color:white;
   padding:10px 15px;
   border:none;
   border-radius:8px;
 }`
+
 }
 
 ];
@@ -704,23 +825,29 @@ function displaySnippets(list = snippets){
 
   container.innerHTML = "";
 
-  list.forEach((item,index)=>{
+  list.forEach(function(item){
 
-    let div = document.createElement("div");
+    let div =
+      document.createElement("div");
 
     div.className = "snippet";
 
+    let originalIndex =
+      snippets.indexOf(item);
+
     div.innerHTML = `
 
-      <h3>${item.title}</h3>
+      <h3>${escapeHTML(item.title)}</h3>
 
-      <div class="code">${escapeHTML(item.code)}</div>
+      <div class="code">
+      ${escapeHTML(item.code)}
+      </div>
 
-      <button onclick="copySnippet(${index})">
+      <button onclick="copySnippet(${originalIndex})">
       📋 Copy
       </button>
 
-      <button onclick="useSnippet(${index})">
+      <button onclick="useSnippet(${originalIndex})">
       🧩 Use in Editor
       </button>
 
@@ -737,18 +864,41 @@ function copySnippet(index){
 
   navigator.clipboard.writeText(
     snippets[index].code
-  );
+  )
+  .then(function(){
 
-  alert("✅ Snippet copied!");
+    alert("✅ Snippet copied!");
+
+  })
+  .catch(function(){
+
+    alert("❌ Copy failed");
+
+  });
+
 }
 
 
 function useSnippet(index){
 
-  currentEditor = "html";
+  let code =
+    snippets[index].code;
 
   document.getElementById("codeEditor").value =
-    snippets[index].code;
+    code;
+
+  currentEditor = "html";
+
+  editors.html = code;
+
+  document.getElementById("htmlTab")
+    .classList.add("active");
+
+  document.getElementById("cssTab")
+    .classList.remove("active");
+
+  document.getElementById("jsTab")
+    .classList.remove("active");
 
   window.scrollTo({
     top:0,
@@ -762,14 +912,24 @@ function searchSnippets(){
 
   let query =
     document.getElementById("snippetSearch")
-    .value
-    .toLowerCase();
+      .value
+      .toLowerCase()
+      .trim();
 
   let filtered =
-    snippets.filter(item =>
-      item.title.toLowerCase().includes(query) ||
-      item.code.toLowerCase().includes(query)
-    );
+    snippets.filter(function(item){
+
+      return item.title
+        .toLowerCase()
+        .includes(query)
+
+        ||
+
+        item.code
+          .toLowerCase()
+          .includes(query);
+
+    });
 
   displaySnippets(filtered);
 
@@ -781,7 +941,9 @@ function escapeHTML(text){
   return text
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
@@ -821,7 +983,9 @@ function titleCase(){
     input.value
       .toLowerCase()
       .replace(/\b\w/g,
-        char => char.toUpperCase()
+        function(char){
+          return char.toUpperCase();
+        }
       );
 
 }
@@ -877,6 +1041,7 @@ function formatJSON(){
       "output success";
 
   }
+
   catch(error){
 
     output.textContent =
@@ -916,6 +1081,7 @@ function decodeURL(){
       decodeURIComponent(input.value);
 
   }
+
   catch(error){
 
     alert("❌ Invalid encoded URL");
@@ -944,6 +1110,9 @@ function generatePassword(){
     length = 50;
   }
 
+  document.getElementById("passwordLength").value =
+    length;
+
   let chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
     "abcdefghijklmnopqrstuvwxyz" +
@@ -958,7 +1127,8 @@ function generatePassword(){
         Math.random() * chars.length
       );
 
-    password += chars[randomIndex];
+    password +=
+      chars[randomIndex];
 
   }
 
@@ -978,7 +1148,8 @@ function convertColor(){
     document.getElementById("colorPicker").value;
 
   document.getElementById("colorResult")
-    .textContent = "HEX: " + color;
+    .textContent =
+      "HEX: " + color;
 
 }
 
@@ -995,9 +1166,14 @@ function encodeBase64(){
   try{
 
     input.value =
-      btoa(unescape(encodeURIComponent(input.value)));
+      btoa(
+        unescape(
+          encodeURIComponent(input.value)
+        )
+      );
 
   }
+
   catch(error){
 
     alert("❌ Cannot encode text");
@@ -1016,10 +1192,13 @@ function decodeBase64(){
 
     input.value =
       decodeURIComponent(
-        escape(atob(input.value))
+        escape(
+          atob(input.value)
+        )
       );
 
   }
+
   catch(error){
 
     alert("❌ Invalid Base64");
@@ -1072,14 +1251,17 @@ function randomNumber(){
   if(min > max){
 
     let temp = min;
+
     min = max;
+
     max = temp;
 
   }
 
   let number =
     Math.floor(
-      Math.random() * (max-min+1)
+      Math.random() *
+      (max - min + 1)
     ) + min;
 
   document.getElementById("randomResult")
@@ -1100,42 +1282,70 @@ function showLesson(language){
 
   let lessons = {
 
-    html: `
+    html:`
+
       <h3>🌐 HTML Basics</h3>
-      <p>HTML creates the structure of a website.</p>
+
+      <p>
+      HTML creates the structure of a website.
+      </p>
+
       <div class="code">
 &lt;h1&gt;Hello World&lt;/h1&gt;
 &lt;p&gt;My website&lt;/p&gt;
       </div>
+
     `,
 
-    css: `
+
+    css:`
+
       <h3>🎨 CSS Basics</h3>
-      <p>CSS is used to style websites.</p>
+
+      <p>
+      CSS is used to style websites.
+      </p>
+
       <div class="code">
 body {
   background:white;
   color:black;
 }
       </div>
+
     `,
 
-    javascript: `
+
+    javascript:`
+
       <h3>⚡ JavaScript Basics</h3>
-      <p>JavaScript adds logic and interaction.</p>
+
+      <p>
+      JavaScript adds logic and interaction.
+      </p>
+
       <div class="code">
 function hello(){
   alert("Hello World!");
 }
       </div>
+
     `,
 
-    python: `
+
+    python:`
+
       <h3>🐍 Python Basics</h3>
-      <p>Python is a popular general-purpose programming language.</p>
+
+      <p>
+      Python is a popular general-purpose
+      programming language.
+      </p>
+
       <div class="code">
 print("Hello World!")
       </div>
+
     `
 
   };
