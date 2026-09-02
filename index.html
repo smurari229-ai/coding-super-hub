@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Word & Character Counter</title>
+  <title>Base64 Encoder & Decoder</title>
 
   <style>
     * {
@@ -14,169 +13,228 @@
     body {
       margin: 0;
       padding: 20px;
-      background: #f1f5f9;
+      background: #f3f6fb;
       font-family: Arial, sans-serif;
-      color: #111827;
+      color: #172033;
     }
 
     .container {
-      max-width: 700px;
-      margin: 40px auto;
+      max-width: 750px;
+      margin: 30px auto;
       background: white;
       padding: 25px;
       border-radius: 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
     }
 
     h1 {
       margin-top: 0;
-      font-size: 28px;
     }
 
     textarea {
       width: 100%;
-      min-height: 220px;
-      padding: 15px;
-      border: 1px solid #999;
-      border-radius: 8px;
+      min-height: 200px;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
       font-size: 16px;
       resize: vertical;
-      outline: none;
-    }
-
-    textarea:focus {
-      border-color: #2563eb;
-    }
-
-    .stats {
-      margin-top: 20px;
-      padding: 20px;
-      background: #f8fafc;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-    }
-
-    .stat {
-      font-size: 18px;
-      margin: 10px 0;
-    }
-
-    .number {
-      font-weight: bold;
-      color: #2563eb;
     }
 
     button {
-      margin-top: 15px;
-      padding: 11px 18px;
+      padding: 11px 16px;
+      margin: 10px 5px 5px 0;
       border: none;
-      border-radius: 7px;
+      border-radius: 8px;
       background: #2563eb;
       color: white;
-      font-size: 15px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     button:hover {
       background: #1d4ed8;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 15px;
+      min-height: 100px;
+      background: #111827;
+      color: white;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: monospace;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: #dc2626;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>🔢 Word & Character Counter</h1>
+  <h1>🔐 Base64 Encoder / Decoder</h1>
 
-    <textarea
-      id="textInput"
-      placeholder="Type or paste your text here..."
-    ></textarea>
+  <p>
+    Enter text below and encode it to Base64 or decode Base64 back to text.
+  </p>
 
-    <button onclick="clearText()">🗑️ Clear</button>
+  <textarea
+    id="inputText"
+    placeholder="Enter text here..."
+  ></textarea>
 
-    <div class="stats">
+  <br>
 
-      <div class="stat">
-        Words:
-        <span class="number" id="wordCount">0</span>
-      </div>
+  <button onclick="encodeBase64()">
+    🔒 Encode
+  </button>
 
-      <div class="stat">
-        Characters:
-        <span class="number" id="characterCount">0</span>
-      </div>
+  <button onclick="decodeBase64()">
+    🔓 Decode
+  </button>
 
-      <div class="stat">
-        Characters (without spaces):
-        <span class="number" id="characterNoSpaceCount">0</span>
-      </div>
+  <button onclick="copyResult()">
+    📋 Copy Result
+  </button>
 
-      <div class="stat">
-        Lines:
-        <span class="number" id="lineCount">0</span>
-      </div>
+  <button onclick="clearAll()">
+    🗑️ Clear
+  </button>
 
-    </div>
-
+  <div id="result" class="result">
+    Result will appear here...
   </div>
 
-  <script>
+</div>
 
-    const textInput = document.getElementById("textInput");
+<script>
 
-    function updateCounter() {
+function encodeBase64() {
 
-      const text = textInput.value;
+  const input =
+    document.getElementById("inputText").value;
 
-      // Character count
-      const characters = text.length;
+  const result =
+    document.getElementById("result");
 
-      // Character count without spaces
-      const charactersWithoutSpaces =
-        text.replace(/\s/g, "").length;
+  if (input === "") {
+    result.className = "result error";
+    result.textContent = "❌ Please enter some text.";
+    return;
+  }
 
-      // Word count
-      const trimmedText = text.trim();
+  try {
 
-      const words = trimmedText === ""
-        ? 0
-        : trimmedText.split(/\s+/).length;
+    const bytes =
+      new TextEncoder().encode(input);
 
-      // Line count
-      const lines = text === ""
-        ? 0
-        : text.split("\n").length;
+    let binary = "";
 
-      document.getElementById("wordCount").textContent = words;
+    bytes.forEach(function(byte) {
+      binary += String.fromCharCode(byte);
+    });
 
-      document.getElementById("characterCount").textContent =
-        characters;
+    const encoded =
+      btoa(binary);
 
-      document.getElementById("characterNoSpaceCount").textContent =
-        charactersWithoutSpaces;
+    result.className = "result";
+    result.textContent = encoded;
 
-      document.getElementById("lineCount").textContent =
-        lines;
-    }
+  } catch (error) {
 
-    function clearText() {
+    result.className = "result error";
+    result.textContent = "❌ Encoding failed.";
 
-      textInput.value = "";
+  }
+}
 
-      updateCounter();
 
-      textInput.focus();
-    }
+function decodeBase64() {
 
-    // Live counter
-    textInput.addEventListener("input", updateCounter);
+  const input =
+    document.getElementById("inputText").value.trim();
 
-    // Initial count
-    updateCounter();
+  const result =
+    document.getElementById("result");
 
-  </script>
+  if (input === "") {
+    result.className = "result error";
+    result.textContent = "❌ Please enter Base64 text.";
+    return;
+  }
+
+  try {
+
+    const binary =
+      atob(input);
+
+    const bytes =
+      Uint8Array.from(
+        binary,
+        function(char) {
+          return char.charCodeAt(0);
+        }
+      );
+
+    const decoded =
+      new TextDecoder().decode(bytes);
+
+    result.className = "result";
+    result.textContent = decoded;
+
+  } catch (error) {
+
+    result.className = "result error";
+    result.textContent = "❌ Invalid Base64.";
+
+  }
+}
+
+
+function copyResult() {
+
+  const text =
+    document.getElementById("result").textContent;
+
+  if (
+    text === "Result will appear here..." ||
+    text.startsWith("❌")
+  ) {
+    alert("❌ No valid result to copy.");
+    return;
+  }
+
+  navigator.clipboard.writeText(text)
+    .then(function() {
+      alert("✅ Result copied!");
+    })
+    .catch(function() {
+      alert("❌ Copy failed.");
+    });
+}
+
+
+function clearAll() {
+
+  document.getElementById("inputText").value = "";
+
+  const result =
+    document.getElementById("result");
+
+  result.className = "result";
+
+  result.textContent =
+    "Result will appear here...";
+}
+
+</script>
 
 </body>
 </html>
