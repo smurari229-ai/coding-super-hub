@@ -12,6 +12,10 @@
   padding:0;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   font-family:Arial,sans-serif;
   background:#080d14;
@@ -19,7 +23,7 @@ body{
 }
 
 header{
-  padding:18px 20px;
+  padding:16px 20px;
   border-bottom:1px solid #263040;
   display:flex;
   justify-content:space-between;
@@ -27,18 +31,23 @@ header{
   position:sticky;
   top:0;
   background:#080d14;
-  z-index:10;
+  z-index:100;
 }
 
 .logo{
-  font-size:21px;
+  font-size:20px;
   font-weight:bold;
 }
 
 nav a{
   color:#aaa;
   text-decoration:none;
-  margin-left:15px;
+  margin-left:14px;
+  font-size:14px;
+}
+
+nav a:hover{
+  color:white;
 }
 
 .hero{
@@ -56,15 +65,22 @@ nav a{
   font-size:16px;
 }
 
-.editor-section{
+.section{
   max-width:1100px;
-  margin:20px auto;
+  margin:30px auto;
   padding:20px;
 }
 
-.editor-section h2{
-  margin-bottom:15px;
+.section-title{
+  margin-bottom:8px;
 }
+
+.section-description{
+  color:#999;
+  margin-bottom:20px;
+}
+
+/* EDITOR */
 
 .tabs{
   display:flex;
@@ -112,9 +128,13 @@ nav a{
 button{
   border:0;
   border-radius:8px;
-  padding:11px 18px;
-  font-size:15px;
+  padding:11px 16px;
+  font-size:14px;
   cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
 }
 
 .run{
@@ -132,10 +152,6 @@ button{
   color:white;
 }
 
-.output-title{
-  margin-bottom:10px;
-}
-
 iframe{
   width:100%;
   height:350px;
@@ -146,19 +162,15 @@ iframe{
 
 /* SNIPPETS */
 
-.snippets{
-  max-width:1100px;
-  margin:30px auto;
-  padding:20px;
-}
-
-.snippets h2{
-  margin-bottom:8px;
-}
-
-.section-description{
-  color:#999;
-  margin-bottom:20px;
+.search-box{
+  width:100%;
+  padding:14px;
+  margin-bottom:18px;
+  background:#0d141e;
+  color:white;
+  border:1px solid #303b4d;
+  border-radius:9px;
+  outline:none;
 }
 
 .snippet-grid{
@@ -175,12 +187,12 @@ iframe{
 }
 
 .snippet h3{
-  margin-bottom:8px;
+  margin-bottom:7px;
 }
 
 .snippet p{
   color:#999;
-  font-size:14px;
+  font-size:13px;
   margin-bottom:12px;
 }
 
@@ -207,11 +219,6 @@ iframe{
   flex-wrap:wrap;
 }
 
-.snippet-buttons button{
-  padding:9px 12px;
-  font-size:13px;
-}
-
 .snip-copy{
   background:#2563eb;
   color:white;
@@ -222,12 +229,96 @@ iframe{
   color:white;
 }
 
-/* CARDS */
+/* DEVELOPER TOOLS */
+
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
+}
+
+.tool-card{
+  background:#111923;
+  border:1px solid #263040;
+  border-radius:12px;
+  padding:18px;
+}
+
+.tool-card h3{
+  margin-bottom:12px;
+}
+
+.tool-card textarea{
+  width:100%;
+  min-height:130px;
+  background:#080d14;
+  color:white;
+  border:1px solid #303b4d;
+  border-radius:8px;
+  padding:12px;
+  resize:vertical;
+  outline:none;
+  font-family:monospace;
+}
+
+.tool-card input[type="text"],
+.tool-card input[type="number"]{
+  width:100%;
+  padding:12px;
+  background:#080d14;
+  color:white;
+  border:1px solid #303b4d;
+  border-radius:8px;
+  outline:none;
+}
+
+.tool-card input[type="color"]{
+  width:100%;
+  height:55px;
+  margin-bottom:12px;
+}
+
+.tool-buttons{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.tool-buttons button{
+  background:#2563eb;
+  color:white;
+}
+
+.counter{
+  color:#aaa;
+  margin-top:12px;
+}
+
+#jsonOutput{
+  margin-top:12px;
+  background:#080d14;
+  color:#d1d5db;
+  padding:12px;
+  border-radius:8px;
+  white-space:pre-wrap;
+  overflow:auto;
+  min-height:50px;
+}
+
+.generated-password{
+  margin-top:12px;
+  padding:12px;
+  background:#080d14;
+  border:1px solid #303b4d;
+  border-radius:8px;
+  color:#93c5fd;
+  word-break:break-all;
+}
+
+/* MAIN CARDS */
 
 .cards{
-  max-width:1100px;
-  margin:30px auto;
-  padding:20px;
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:15px;
@@ -257,26 +348,30 @@ footer{
 }
 
 @media(max-width:600px){
+
   .hero h1{
-    font-size:28px;
-  }
-
-  .editor-section,
-  .snippets{
-    padding:15px;
-  }
-
-  .editor{
-    min-height:260px;
+    font-size:27px;
   }
 
   header{
     padding:14px;
   }
 
+  .logo{
+    font-size:16px;
+  }
+
   nav a{
-    margin-left:8px;
-    font-size:13px;
+    margin-left:7px;
+    font-size:11px;
+  }
+
+  .section{
+    padding:15px;
+  }
+
+  .editor{
+    min-height:260px;
   }
 }
 </style>
@@ -290,33 +385,52 @@ footer{
   <nav>
     <a href="#editor">Editor</a>
     <a href="#snippets">Snippets</a>
-    <a href="#tools">Tools</a>
+    <a href="#developer-tools">Tools</a>
   </nav>
 </header>
 
 <section class="hero">
   <h1>Your All-in-One Coding Super Hub</h1>
-  <p>Write, run and learn code directly in your browser.</p>
+  <p>Write, run, test and use useful developer tools directly in your browser.</p>
 </section>
 
-<!-- CODE EDITOR -->
 
-<section class="editor-section" id="editor">
+<!-- ONLINE CODE EDITOR -->
 
-  <h2>💻 Online Code Editor</h2>
+<section class="section" id="editor">
+
+  <h2 class="section-title">💻 Online Code Editor</h2>
+
+  <p class="section-description">
+    Write HTML, CSS and JavaScript and see the result instantly.
+  </p>
 
   <div class="tabs">
-    <button class="tab active" onclick="showEditor('html',this)">HTML</button>
-    <button class="tab" onclick="showEditor('css',this)">CSS</button>
-    <button class="tab" onclick="showEditor('js',this)">JavaScript</button>
+
+    <button class="tab active"
+      onclick="showEditor('html',this)">
+      HTML
+    </button>
+
+    <button class="tab"
+      onclick="showEditor('css',this)">
+      CSS
+    </button>
+
+    <button class="tab"
+      onclick="showEditor('js',this)">
+      JavaScript
+    </button>
+
   </div>
+
 
   <textarea id="htmlEditor" class="editor"><h1>Hello Coding Super Hub 🚀</h1>
 <p>Start coding here!</p>
 <button onclick="hello()">Click Me</button></textarea>
 
-  <textarea id="cssEditor" class="editor" style="display:none;"><style>
-body {
+
+  <textarea id="cssEditor" class="editor" style="display:none;">body {
   font-family: Arial;
   text-align: center;
   padding: 30px;
@@ -329,52 +443,85 @@ h1 {
 button {
   padding: 10px 20px;
   border-radius: 8px;
-}
-</style></textarea>
+}</textarea>
+
 
   <textarea id="jsEditor" class="editor" style="display:none;">function hello() {
   alert("Hello from Coding Super Hub!");
 }</textarea>
 
+
   <div class="buttons">
-    <button class="run" onclick="runCode()">▶ Run Code</button>
-    <button class="copy" onclick="copyCode()">📋 Copy</button>
-    <button class="clear" onclick="clearCode()">🗑 Clear</button>
+
+    <button class="run" onclick="runCode()">
+      ▶ Run Code
+    </button>
+
+    <button class="copy" onclick="copyCode()">
+      📋 Copy
+    </button>
+
+    <button class="clear" onclick="clearCode()">
+      🗑 Clear
+    </button>
+
   </div>
 
-  <h3 class="output-title">👀 Live Output</h3>
+
+  <h3 style="margin-bottom:10px;">
+    👀 Live Output
+  </h3>
 
   <iframe id="output"></iframe>
 
 </section>
 
+
 <!-- CODE SNIPPETS -->
 
-<section class="snippets" id="snippets">
+<section class="section" id="snippets">
 
-  <h2>🧩 Code Snippets Library</h2>
+  <h2 class="section-title">🧩 Code Snippets Library</h2>
 
   <p class="section-description">
-    Ready-made coding examples. Copy them or load them into the editor.
+    Search, copy or send a ready-made snippet to the editor.
   </p>
 
-  <div class="snippet-grid">
+  <input
+    id="snippetSearch"
+    class="search-box"
+    type="text"
+    placeholder="🔍 Search snippets..."
+    oninput="searchSnippets()"
+  >
 
-    <div class="snippet">
+
+  <div class="snippet-grid" id="snippetGrid">
+
+
+    <div class="snippet" data-name="html button">
       <h3>🔘 HTML Button</h3>
-      <p>A simple modern button.</p>
+      <p>Simple HTML button.</p>
 
       <div class="code-box">
         <pre>&lt;button&gt;Click Me&lt;/button&gt;</pre>
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('&lt;button&gt;Click Me&lt;/button&gt;')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('&lt;button&gt;Click Me&lt;/button&gt;')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('html','&lt;button&gt;Click Me&lt;/button&gt;')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="login form">
       <h3>🪟 Login Form</h3>
       <p>Basic HTML login form.</p>
 
@@ -387,12 +534,20 @@ button {
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('&lt;form&gt;\\n&lt;input type=&quot;email&quot; placeholder=&quot;Email&quot;&gt;\\n&lt;input type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;\\n&lt;button&gt;Login&lt;/button&gt;\\n&lt;/form&gt;')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('&lt;form&gt;\\n&lt;input type=&quot;email&quot; placeholder=&quot;Email&quot;&gt;\\n&lt;input type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;\\n&lt;button&gt;Login&lt;/button&gt;\\n&lt;/form&gt;')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('html','&lt;form&gt;\\n&lt;input type=&quot;email&quot; placeholder=&quot;Email&quot;&gt;\\n&lt;input type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;\\n&lt;button&gt;Login&lt;/button&gt;\\n&lt;/form&gt;')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="navbar navigation">
       <h3>🧭 Navbar</h3>
       <p>Simple navigation menu.</p>
 
@@ -405,12 +560,20 @@ button {
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('&lt;nav&gt;\\n&lt;a href=&quot;#&quot;&gt;Home&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;About&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;Contact&lt;/a&gt;\\n&lt;/nav&gt;')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('&lt;nav&gt;\\n&lt;a href=&quot;#&quot;&gt;Home&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;About&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;Contact&lt;/a&gt;\\n&lt;/nav&gt;')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('html','&lt;nav&gt;\\n&lt;a href=&quot;#&quot;&gt;Home&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;About&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;Contact&lt;/a&gt;\\n&lt;/nav&gt;')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="css card">
       <h3>🎨 CSS Card</h3>
       <p>Reusable card styling.</p>
 
@@ -418,34 +581,49 @@ button {
         <pre>.card {
   padding: 20px;
   border-radius: 12px;
-  background: #fff;
+  background: white;
   box-shadow: 0 4px 15px #ccc;
 }</pre>
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('.card {\\n  padding: 20px;\\n  border-radius: 12px;\\n  background: #fff;\\n  box-shadow: 0 4px 15px #ccc;\\n}')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('.card {\\n  padding: 20px;\\n  border-radius: 12px;\\n  background: white;\\n  box-shadow: 0 4px 15px #ccc;\\n}')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('css','.card {\\n  padding: 20px;\\n  border-radius: 12px;\\n  background: white;\\n  box-shadow: 0 4px 15px #ccc;\\n}')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="gradient">
       <h3>🌈 Gradient</h3>
-      <p>Beautiful CSS gradient background.</p>
+      <p>CSS gradient background.</p>
 
       <div class="code-box">
         <pre>background:
-linear-gradient(135deg,
-#667eea,#764ba2);</pre>
+linear-gradient(135deg,#667eea,#764ba2);</pre>
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('background: linear-gradient(135deg, #667eea, #764ba2);')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('background: linear-gradient(135deg,#667eea,#764ba2);')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('css','background: linear-gradient(135deg,#667eea,#764ba2);')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="javascript alert">
       <h3>⚡ JavaScript Alert</h3>
       <p>Simple JavaScript function.</p>
 
@@ -456,12 +634,20 @@ linear-gradient(135deg,
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('function hello() {\\n  alert(&quot;Hello World!&quot;);\\n}')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('function hello() {\\n  alert(&quot;Hello World!&quot;);\\n}')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('js','function hello() {\\n  alert(&quot;Hello World!&quot;);\\n}')">
+          ⚡ Use in Editor
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="python hello world">
       <h3>🐍 Python Hello World</h3>
       <p>First Python program.</p>
 
@@ -470,14 +656,17 @@ linear-gradient(135deg,
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="copyText('print(&quot;Hello World!&quot;)')">📋 Copy Python</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('print(&quot;Hello World!&quot;)')">
+          📋 Copy Python
+        </button>
       </div>
     </div>
 
-    <div class="snippet">
+
+    <div class="snippet" data-name="responsive css mobile">
       <h3>📱 Responsive CSS</h3>
-      <p>Basic mobile responsive rule.</p>
+      <p>Basic mobile responsive code.</p>
 
       <div class="code-box">
         <pre>@media(max-width:600px) {
@@ -488,48 +677,232 @@ linear-gradient(135deg,
       </div>
 
       <div class="snippet-buttons">
-        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
-        <button class="use-editor" onclick="useSnippet('@media(max-width:600px) {\\n  body {\\n    padding: 10px;\\n  }\\n}')">⚡ Use in Editor</button>
+        <button class="snip-copy"
+          onclick="copyCodeText('@media(max-width:600px) {\\n  body {\\n    padding: 10px;\\n  }\\n}')">
+          📋 Copy Code
+        </button>
+
+        <button class="use-editor"
+          onclick="useInEditor('css','@media(max-width:600px) {\\n  body {\\n    padding: 10px;\\n  }\\n}')">
+          ⚡ Use in Editor
+        </button>
       </div>
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<!-- DEVELOPER TOOLS -->
+
+<section class="section" id="developer-tools">
+
+  <h2 class="section-title">🔧 Developer Tools</h2>
+
+  <p class="section-description">
+    Free browser-based tools for everyday development.
+  </p>
+
+
+  <div class="tools-grid">
+
+
+    <!-- CASE CONVERTER -->
+
+    <div class="tool-card">
+
+      <h3>🔤 Text Case Converter</h3>
+
+      <textarea
+        id="caseInput"
+        placeholder="Type or paste text here..."
+      ></textarea>
+
+      <div class="tool-buttons">
+
+        <button onclick="changeCase('upper')">
+          UPPERCASE
+        </button>
+
+        <button onclick="changeCase('lower')">
+          lowercase
+        </button>
+
+        <button onclick="changeCase('title')">
+          Title Case
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- COUNTER -->
+
+    <div class="tool-card">
+
+      <h3>🔢 Word & Character Counter</h3>
+
+      <textarea
+        id="countInput"
+        oninput="countText()"
+        placeholder="Type text here..."
+      ></textarea>
+
+      <p class="counter">
+        Words:
+        <b id="wordCount">0</b>
+        |
+        Characters:
+        <b id="charCount">0</b>
+      </p>
+
+    </div>
+
+
+    <!-- JSON -->
+
+    <div class="tool-card">
+
+      <h3>🧹 JSON Formatter</h3>
+
+      <textarea
+        id="jsonInput"
+        placeholder='{"name":"Coding Super Hub"}'
+      ></textarea>
+
+      <button onclick="formatJSON()">
+        ✨ Format JSON
+      </button>
+
+      <pre id="jsonOutput"></pre>
+
+    </div>
+
+
+    <!-- URL -->
+
+    <div class="tool-card">
+
+      <h3>🔗 URL Encoder / Decoder</h3>
+
+      <textarea
+        id="urlInput"
+        placeholder="Enter URL or text..."
+      ></textarea>
+
+      <div class="tool-buttons">
+
+        <button onclick="encodeURL()">
+          Encode
+        </button>
+
+        <button onclick="decodeURL()">
+          Decode
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- PASSWORD -->
+
+    <div class="tool-card">
+
+      <h3>🔐 Password Generator</h3>
+
+      <input
+        id="passwordLength"
+        type="number"
+        min="6"
+        max="50"
+        value="16"
+      >
+
+      <button onclick="generatePassword()">
+        🔑 Generate Password
+      </button>
+
+      <div
+        class="generated-password"
+        id="generatedPassword"
+      >
+        Your password will appear here
+      </div>
+
+    </div>
+
+
+    <!-- COLOR -->
+
+    <div class="tool-card">
+
+      <h3>🎨 Color Converter</h3>
+
+      <input
+        id="colorPicker"
+        type="color"
+        value="#2563eb"
+        onchange="convertColor()"
+      >
+
+      <p id="colorResult">
+        HEX: #2563eb
+      </p>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<!-- FEATURE CARDS -->
+
+<section class="section">
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>🧩 Code Snippets</h3>
+      <p>Ready-made coding examples.</p>
+    </div>
+
+    <div class="card">
+      <h3>🔧 Developer Tools</h3>
+      <p>Useful browser-based developer utilities.</p>
+    </div>
+
+    <div class="card">
+      <h3>🤖 AI Coding</h3>
+      <p>AI-powered coding features coming soon.</p>
+    </div>
+
+    <div class="card">
+      <h3>📚 Learn Programming</h3>
+      <p>HTML, CSS, JavaScript, Python and more.</p>
     </div>
 
   </div>
 
 </section>
 
-<!-- MAIN FEATURE CARDS -->
-
-<section class="cards" id="tools">
-
-  <div class="card">
-    <h3>🧩 Code Snippets</h3>
-    <p>Ready-made coding examples for developers.</p>
-  </div>
-
-  <div class="card">
-    <h3>🔧 Developer Tools</h3>
-    <p>Helpful tools for everyday development.</p>
-  </div>
-
-  <div class="card">
-    <h3>🤖 AI Coding</h3>
-    <p>AI-powered coding features coming soon.</p>
-  </div>
-
-  <div class="card">
-    <h3>📚 Learn Programming</h3>
-    <p>HTML, CSS, JavaScript, Python and more.</p>
-  </div>
-
-</section>
 
 <footer>
   © 2026 Coding Super Hub — Built for developers.
 </footer>
 
+
 <script>
 
 let currentEditor = "html";
+
+
+/* EDITOR */
 
 function showEditor(type, clickedTab){
 
@@ -548,6 +921,7 @@ function showEditor(type, clickedTab){
   clickedTab.classList.add("active");
 }
 
+
 function runCode(){
 
   let html = document.getElementById("htmlEditor").value;
@@ -558,7 +932,9 @@ function runCode(){
   "<!DOCTYPE html>" +
   "<html>" +
   "<head>" +
+  "<style>" +
   css +
+  "</style>" +
   "</head>" +
   "<body>" +
   html +
@@ -571,57 +947,305 @@ function runCode(){
   document.getElementById("output").srcdoc = finalCode;
 }
 
+
 function copyCode(){
 
-  let editor = document.getElementById(currentEditor + "Editor");
+  let editor =
+    document.getElementById(
+      currentEditor + "Editor"
+    );
 
-  navigator.clipboard.writeText(editor.value);
-
-  alert("Code copied!");
+  copyCodeText(editor.value);
 }
+
 
 function clearCode(){
 
-  document.getElementById(currentEditor + "Editor").value = "";
+  document.getElementById(
+    currentEditor + "Editor"
+  ).value = "";
 
+  runCode();
 }
 
-function copyText(text){
 
-  navigator.clipboard.writeText(text);
+/* SNIPPETS */
 
-  alert("Code copied!");
+function copyCodeText(text){
+
+  navigator.clipboard.writeText(text)
+    .then(function(){
+      alert("✅ Code copied!");
+    })
+    .catch(function(){
+      alert("Please allow clipboard permission.");
+    });
 }
 
-function copySnippet(button){
 
-  let code = button.parentElement.previousElementSibling.innerText;
+function useInEditor(type, code){
 
-  navigator.clipboard.writeText(code);
+  let decoded = decodeEntities(code);
 
-  alert("Snippet copied!");
-}
+  document.getElementById(
+    type + "Editor"
+  ).value = decoded;
 
-function useSnippet(code){
+  showEditor(
+    type,
+    document.querySelector(
+      ".tab:nth-child(" +
+      (type === "html" ? "1" :
+       type === "css" ? "2" : "3") +
+      ")"
+    )
+  );
 
-  document.getElementById("htmlEditor").value = code;
-
-  currentEditor = "html";
-
-  document.getElementById("htmlEditor").style.display = "block";
-  document.getElementById("cssEditor").style.display = "none";
-  document.getElementById("jsEditor").style.display = "none";
-
-  document.querySelectorAll(".tab").forEach(function(tab){
-    tab.classList.remove("active");
-  });
-
-  document.querySelector(".tab").classList.add("active");
-
-  document.getElementById("editor").scrollIntoView({
+  document.getElementById(
+    "editor"
+  ).scrollIntoView({
     behavior:"smooth"
   });
+
+  runCode();
 }
+
+
+function decodeEntities(text){
+
+  let textarea =
+    document.createElement("textarea");
+
+  textarea.innerHTML = text;
+
+  return textarea.value;
+}
+
+
+function searchSnippets(){
+
+  let query =
+    document.getElementById(
+      "snippetSearch"
+    ).value.toLowerCase().trim();
+
+  let snippets =
+    document.querySelectorAll(
+      ".snippet"
+    );
+
+  snippets.forEach(function(snippet){
+
+    let name =
+      snippet.dataset.name.toLowerCase();
+
+    if(name.includes(query)){
+      snippet.style.display = "block";
+    }else{
+      snippet.style.display = "none";
+    }
+
+  });
+}
+
+
+/* TEXT CASE */
+
+function changeCase(type){
+
+  let input =
+    document.getElementById(
+      "caseInput"
+    );
+
+  if(type === "upper"){
+    input.value =
+      input.value.toUpperCase();
+  }
+
+  if(type === "lower"){
+    input.value =
+      input.value.toLowerCase();
+  }
+
+  if(type === "title"){
+
+    input.value =
+      input.value
+      .toLowerCase()
+      .replace(/\b\w/g,function(letter){
+        return letter.toUpperCase();
+      });
+
+  }
+}
+
+
+/* WORD COUNTER */
+
+function countText(){
+
+  let text =
+    document.getElementById(
+      "countInput"
+    ).value;
+
+  let words =
+    text.trim() === ""
+    ? 0
+    : text.trim().split(/\s+/).length;
+
+  document.getElementById(
+    "wordCount"
+  ).textContent = words;
+
+  document.getElementById(
+    "charCount"
+  ).textContent = text.length;
+}
+
+
+/* JSON FORMATTER */
+
+function formatJSON(){
+
+  let input =
+    document.getElementById(
+      "jsonInput"
+    ).value;
+
+  let output =
+    document.getElementById(
+      "jsonOutput"
+    );
+
+  try{
+
+    let formatted =
+      JSON.stringify(
+        JSON.parse(input),
+        null,
+        2
+      );
+
+    output.textContent =
+      formatted;
+
+  }catch(error){
+
+    output.textContent =
+      "❌ Invalid JSON";
+
+  }
+}
+
+
+/* URL */
+
+function encodeURL(){
+
+  let input =
+    document.getElementById(
+      "urlInput"
+    );
+
+  input.value =
+    encodeURIComponent(
+      input.value
+    );
+}
+
+
+function decodeURL(){
+
+  let input =
+    document.getElementById(
+      "urlInput"
+    );
+
+  try{
+
+    input.value =
+      decodeURIComponent(
+        input.value
+      );
+
+  }catch(error){
+
+    alert(
+      "❌ Invalid encoded text"
+    );
+
+  }
+}
+
+
+/* PASSWORD */
+
+function generatePassword(){
+
+  let length =
+    parseInt(
+      document.getElementById(
+        "passwordLength"
+      ).value
+    ) || 16;
+
+  if(length < 6){
+    length = 6;
+  }
+
+  if(length > 50){
+    length = 50;
+  }
+
+  let chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "0123456789!@#$%^&*()";
+
+  let password = "";
+
+  for(
+    let i = 0;
+    i < length;
+    i++
+  ){
+
+    password +=
+      chars.charAt(
+        Math.floor(
+          Math.random() *
+          chars.length
+        )
+      );
+
+  }
+
+  document.getElementById(
+    "generatedPassword"
+  ).textContent =
+    password;
+}
+
+
+/* COLOR */
+
+function convertColor(){
+
+  let color =
+    document.getElementById(
+      "colorPicker"
+    ).value;
+
+  document.getElementById(
+    "colorResult"
+  ).textContent =
+    "HEX: " + color;
+}
+
+
+/* START */
 
 runCode();
 
