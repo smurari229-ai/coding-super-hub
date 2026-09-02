@@ -521,6 +521,91 @@
   </button>
 
   <div class="output" id="loremOutput"></div>
+</div><!-- TEST 21 - COLOR PALETTE GENERATOR -->
+
+<div class="card">
+  <h2>21. Color Palette Generator</h2>
+
+  <input type="color" id="paletteColor" value="#2563eb">
+
+  <button onclick="generatePalette()">
+    Generate Palette
+  </button>
+
+  <div class="output" id="paletteOutput"></div>
+</div>
+
+
+<!-- TEST 22 - QR CODE GENERATOR -->
+
+<div class="card">
+  <h2>22. QR Code Generator</h2>
+
+  <input
+    type="text"
+    id="qrInput"
+    placeholder="Enter text or URL">
+
+  <button onclick="generateQR()">
+    Generate QR
+  </button>
+
+  <div class="output" id="qrOutput"></div>
+</div>
+
+
+<!-- TEST 23 - IP ADDRESS INFO -->
+
+<div class="card">
+  <h2>23. IP Address Info</h2>
+
+  <button onclick="getIPInfo()">
+    Get IP Info
+  </button>
+
+  <div class="output" id="ipOutput"></div>
+</div>
+
+
+<!-- TEST 24 - AGE CALCULATOR -->
+
+<div class="card">
+  <h2>24. Age Calculator</h2>
+
+  <input
+    type="date"
+    id="birthDate">
+
+  <button onclick="calculateAge()">
+    Calculate Age
+  </button>
+
+  <div class="output" id="ageOutput"></div>
+</div>
+
+
+<!-- TEST 25 - RANDOM NUMBER GENERATOR -->
+
+<div class="card">
+  <h2>25. Random Number Generator</h2>
+
+  <input
+    type="number"
+    id="randomMin"
+    value="1"
+    placeholder="Minimum">
+
+  <input
+    type="number"
+    id="randomMax"
+    value="100"
+    placeholder="Maximum">
+
+  <button onclick="generateRandomNumber()">
+    Generate Number
+  </button>
+
+  <div class="output" id="randomOutput"></div>
 </div>
   <script>
 
@@ -1190,7 +1275,189 @@ function generateLorem() {
 
   document.getElementById("loremOutput").textContent =
     output.trim();
+}/* =========================
+   TEST 21 - COLOR PALETTE
+========================= */
+
+function generatePalette() {
+  const base =
+    document.getElementById("paletteColor").value;
+
+  const output =
+    document.getElementById("paletteOutput");
+
+  const hex = base.replace("#", "");
+
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  const colors = [];
+
+  for (let i = 0; i < 5; i++) {
+    const factor = 0.6 + i * 0.2;
+
+    const nr = Math.min(255, Math.round(r * factor));
+    const ng = Math.min(255, Math.round(g * factor));
+    const nb = Math.min(255, Math.round(b * factor));
+
+    const color =
+      "#" +
+      nr.toString(16).padStart(2, "0") +
+      ng.toString(16).padStart(2, "0") +
+      nb.toString(16).padStart(2, "0");
+
+    colors.push(color);
+  }
+
+  output.textContent =
+    "Palette:\n" + colors.join("\n");
 }
+
+
+/* =========================
+   TEST 22 - QR CODE
+========================= */
+
+function generateQR() {
+  const text =
+    document.getElementById("qrInput").value.trim();
+
+  const output =
+    document.getElementById("qrOutput");
+
+  if (!text) {
+    output.textContent = "❌ Enter text or URL";
+    return;
+  }
+
+  const img = document.createElement("img");
+
+  img.src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+    encodeURIComponent(text);
+
+  img.alt = "Generated QR Code";
+  img.style.maxWidth = "200px";
+  img.style.marginTop = "10px";
+
+  output.innerHTML = "";
+  output.appendChild(img);
+}
+
+
+/* =========================
+   TEST 23 - IP ADDRESS INFO
+========================= */
+
+async function getIPInfo() {
+  const output =
+    document.getElementById("ipOutput");
+
+  output.textContent = "Loading...";
+
+  try {
+    const response =
+      await fetch("https://ipapi.co/json/");
+
+    if (!response.ok) {
+      throw new Error("IP request failed");
+    }
+
+    const data = await response.json();
+
+    output.textContent =
+      "IP: " + (data.ip || "N/A") +
+      "\nCity: " + (data.city || "N/A") +
+      "\nRegion: " + (data.region || "N/A") +
+      "\nCountry: " + (data.country_name || "N/A") +
+      "\nISP: " + (data.org || "N/A");
+  } catch (error) {
+    output.textContent =
+      "❌ Unable to get IP information";
+  }
+}
+
+
+/* =========================
+   TEST 24 - AGE CALCULATOR
+========================= */
+
+function calculateAge() {
+  const birthDate =
+    document.getElementById("birthDate").value;
+
+  const output =
+    document.getElementById("ageOutput");
+
+  if (!birthDate) {
+    output.textContent =
+      "❌ Select your birth date";
+    return;
+  }
+
+  const birth =
+    new Date(birthDate);
+
+  const today =
+    new Date();
+
+  let age =
+    today.getFullYear() -
+    birth.getFullYear();
+
+  const month =
+    today.getMonth() -
+    birth.getMonth();
+
+  if (
+    month < 0 ||
+    (month === 0 &&
+     today.getDate() < birth.getDate())
+  ) {
+    age--;
+  }
+
+  output.textContent =
+    "Age: " + age + " years";
+}
+
+
+/* =========================
+   TEST 25 - RANDOM NUMBER
+========================= */
+
+function generateRandomNumber() {
+  const min =
+    Number(document.getElementById("randomMin").value);
+
+  const max =
+    Number(document.getElementById("randomMax").value);
+
+  const output =
+    document.getElementById("randomOutput");
+
+  if (
+    !Number.isFinite(min) ||
+    !Number.isFinite(max)
+  ) {
+    output.textContent =
+      "❌ Enter valid numbers";
+    return;
+  }
+
+  if (min > max) {
+    output.textContent =
+      "❌ Minimum cannot be greater than maximum";
+    return;
+  }
+
+  const random =
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  output.textContent =
+    "Random Number: " + random;
+                        }
   </script>
 
 </body>
