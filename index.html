@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Base64 Encoder & Decoder</title>
+  <title>URL Encoder & Decoder</title>
 
   <style>
     * {
@@ -79,25 +79,25 @@
 
 <div class="container">
 
-  <h1>🔐 Base64 Encoder / Decoder</h1>
+  <h1>🔗 URL Encoder & Decoder</h1>
 
   <p>
-    Enter text below and encode it to Base64 or decode Base64 back to text.
+    Enter text or a URL and encode it or decode it.
   </p>
 
   <textarea
     id="inputText"
-    placeholder="Enter text here..."
+    placeholder="Enter text or URL here..."
   ></textarea>
 
   <br>
 
-  <button onclick="encodeBase64()">
-    🔒 Encode
+  <button onclick="encodeURL()">
+    🔒 Encode URL
   </button>
 
-  <button onclick="decodeBase64()">
-    🔓 Decode
+  <button onclick="decodeURL()">
+    🔓 Decode URL
   </button>
 
   <button onclick="copyResult()">
@@ -116,7 +116,7 @@
 
 <script>
 
-function encodeBase64() {
+function encodeURL() {
 
   const input =
     document.getElementById("inputText").value;
@@ -126,23 +126,14 @@ function encodeBase64() {
 
   if (input === "") {
     result.className = "result error";
-    result.textContent = "❌ Please enter some text.";
+    result.textContent = "❌ Please enter some text or URL.";
     return;
   }
 
   try {
 
-    const bytes =
-      new TextEncoder().encode(input);
-
-    let binary = "";
-
-    bytes.forEach(function(byte) {
-      binary += String.fromCharCode(byte);
-    });
-
     const encoded =
-      btoa(binary);
+      encodeURIComponent(input);
 
     result.className = "result";
     result.textContent = encoded;
@@ -150,41 +141,30 @@ function encodeBase64() {
   } catch (error) {
 
     result.className = "result error";
-    result.textContent = "❌ Encoding failed.";
+    result.textContent = "❌ URL encoding failed.";
 
   }
 }
 
 
-function decodeBase64() {
+function decodeURL() {
 
   const input =
-    document.getElementById("inputText").value.trim();
+    document.getElementById("inputText").value;
 
   const result =
     document.getElementById("result");
 
   if (input === "") {
     result.className = "result error";
-    result.textContent = "❌ Please enter Base64 text.";
+    result.textContent = "❌ Please enter encoded URL text.";
     return;
   }
 
   try {
 
-    const binary =
-      atob(input);
-
-    const bytes =
-      Uint8Array.from(
-        binary,
-        function(char) {
-          return char.charCodeAt(0);
-        }
-      );
-
     const decoded =
-      new TextDecoder().decode(bytes);
+      decodeURIComponent(input);
 
     result.className = "result";
     result.textContent = decoded;
@@ -192,8 +172,7 @@ function decodeBase64() {
   } catch (error) {
 
     result.className = "result error";
-    result.textContent = "❌ Invalid Base64.";
-
+    result.textContent = "❌ Invalid encoded URL.";
   }
 }
 
