@@ -414,6 +414,113 @@
   </div>
 
   <div class="output" id="gradientOutput"></div>
+</div><!-- TEST 16 - MARKDOWN PREVIEWER -->
+
+<div class="card">
+  <h2>16. Markdown Previewer</h2>
+
+  <textarea
+    id="markdownInput"
+    placeholder="Write Markdown here..."></textarea>
+
+  <button onclick="previewMarkdown()">
+    Preview Markdown
+  </button>
+
+  <div class="output" id="markdownOutput"></div>
+</div>
+
+
+<!-- TEST 17 - NUMBER BASE CONVERTER -->
+
+<div class="card">
+  <h2>17. Number Base Converter</h2>
+
+  <input
+    type="text"
+    id="baseInput"
+    placeholder="Enter number">
+
+  <select id="baseFrom">
+    <option value="10">Decimal</option>
+    <option value="2">Binary</option>
+    <option value="16">Hexadecimal</option>
+    <option value="8">Octal</option>
+  </select>
+
+  <select id="baseTo">
+    <option value="2">Binary</option>
+    <option value="10">Decimal</option>
+    <option value="16">Hexadecimal</option>
+    <option value="8">Octal</option>
+  </select>
+
+  <button onclick="convertBase()">
+    Convert
+  </button>
+
+  <div class="output" id="baseOutput"></div>
+</div>
+
+
+<!-- TEST 18 - JWT DECODER -->
+
+<div class="card">
+  <h2>18. JWT Decoder</h2>
+
+  <textarea
+    id="jwtInput"
+    placeholder="Paste JWT token here..."></textarea>
+
+  <button onclick="decodeJWT()">
+    Decode JWT
+  </button>
+
+  <div class="output" id="jwtOutput"></div>
+</div>
+
+
+<!-- TEST 19 - HTML/CSS/JS MINIFIER -->
+
+<div class="card">
+  <h2>19. HTML/CSS/JS Minifier</h2>
+
+  <textarea
+    id="minifyInput"
+    placeholder="Paste HTML, CSS or JavaScript..."></textarea>
+
+  <select id="minifyType">
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+    <option value="js">JavaScript</option>
+  </select>
+
+  <button onclick="minifyCode()">
+    Minify Code
+  </button>
+
+  <div class="output" id="minifyOutput"></div>
+</div>
+
+
+<!-- TEST 20 - LOREM IPSUM GENERATOR -->
+
+<div class="card">
+  <h2>20. Lorem Ipsum Generator</h2>
+
+  <input
+    type="number"
+    id="loremCount"
+    value="3"
+    min="1"
+    max="20"
+    placeholder="Number of paragraphs">
+
+  <button onclick="generateLorem()">
+    Generate Lorem Ipsum
+  </button>
+
+  <div class="output" id="loremOutput"></div>
 </div>
   <script>
 
@@ -917,6 +1024,172 @@ function generateGradient() {
 
   document.getElementById("gradientOutput").textContent =
     "CSS: background: " + gradient + ";";
+}/* =========================
+   TEST 16 - MARKDOWN PREVIEWER
+========================= */
+
+function previewMarkdown() {
+  const text =
+    document.getElementById("markdownInput").value;
+
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  html = html
+    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.*)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`(.*?)`/g, "<code>$1</code>")
+    .replace(/\n/g, "<br>");
+
+  document.getElementById("markdownOutput").innerHTML =
+    html;
+}
+
+
+/* =========================
+   TEST 17 - NUMBER BASE
+========================= */
+
+function convertBase() {
+  const input =
+    document.getElementById("baseInput").value.trim();
+
+  const from =
+    parseInt(document.getElementById("baseFrom").value);
+
+  const to =
+    parseInt(document.getElementById("baseTo").value);
+
+  if (!input) {
+    document.getElementById("baseOutput").textContent =
+      "❌ Enter a number";
+    return;
+  }
+
+  const number = parseInt(input, from);
+
+  if (isNaN(number)) {
+    document.getElementById("baseOutput").textContent =
+      "❌ Invalid number for selected base";
+    return;
+  }
+
+  document.getElementById("baseOutput").textContent =
+    number.toString(to).toUpperCase();
+}
+
+
+/* =========================
+   TEST 18 - JWT DECODER
+========================= */
+
+function decodeJWT() {
+  const token =
+    document.getElementById("jwtInput").value.trim();
+
+  try {
+    const parts = token.split(".");
+
+    if (parts.length !== 3) {
+      throw new Error("Invalid JWT");
+    }
+
+    function decodePart(part) {
+      const base64 =
+        part.replace(/-/g, "+").replace(/_/g, "/");
+
+      const padded =
+        base64 + "=".repeat((4 - base64.length % 4) % 4);
+
+      return JSON.parse(atob(padded));
+    }
+
+    const header = decodePart(parts[0]);
+    const payload = decodePart(parts[1]);
+
+    document.getElementById("jwtOutput").textContent =
+      "HEADER:\n" +
+      JSON.stringify(header, null, 2) +
+      "\n\nPAYLOAD:\n" +
+      JSON.stringify(payload, null, 2) +
+      "\n\n⚠️ Decode only — signature is not verified.";
+  } catch (error) {
+    document.getElementById("jwtOutput").textContent =
+      "❌ Invalid JWT token";
+  }
+}
+
+
+/* =========================
+   TEST 19 - CODE MINIFIER
+========================= */
+
+function minifyCode() {
+  const input =
+    document.getElementById("minifyInput").value;
+
+  const type =
+    document.getElementById("minifyType").value;
+
+  let output = input;
+
+  if (type === "html") {
+    output = output
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/>\s+</g, "><")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+
+  if (type === "css") {
+    output = output
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\s+/g, " ")
+      .replace(/\s*([{}:;,])\s*/g, "$1")
+      .trim();
+  }
+
+  if (type === "js") {
+    output = output
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^\s*\/\/.*$/gm, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  document.getElementById("minifyOutput").textContent =
+    output;
+}
+
+
+/* =========================
+   TEST 20 - LOREM IPSUM
+========================= */
+
+function generateLorem() {
+  const count =
+    parseInt(document.getElementById("loremCount").value) || 3;
+
+  const paragraphs = [
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  ];
+
+  let output = "";
+
+  for (let i = 0; i < count; i++) {
+    output += paragraphs[i % paragraphs.length] + "\n\n";
+  }
+
+  document.getElementById("loremOutput").textContent =
+    output.trim();
 }
   </script>
 
