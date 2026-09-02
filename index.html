@@ -144,6 +144,86 @@ iframe{
   border-radius:10px;
 }
 
+/* SNIPPETS */
+
+.snippets{
+  max-width:1100px;
+  margin:30px auto;
+  padding:20px;
+}
+
+.snippets h2{
+  margin-bottom:8px;
+}
+
+.section-description{
+  color:#999;
+  margin-bottom:20px;
+}
+
+.snippet-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+
+.snippet{
+  background:#111923;
+  border:1px solid #263040;
+  border-radius:12px;
+  padding:18px;
+}
+
+.snippet h3{
+  margin-bottom:8px;
+}
+
+.snippet p{
+  color:#999;
+  font-size:14px;
+  margin-bottom:12px;
+}
+
+.code-box{
+  background:#080d14;
+  border:1px solid #303b4d;
+  border-radius:8px;
+  padding:12px;
+  overflow:auto;
+  margin-bottom:12px;
+}
+
+.code-box pre{
+  color:#d1d5db;
+  font-family:monospace;
+  font-size:12px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.snippet-buttons{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.snippet-buttons button{
+  padding:9px 12px;
+  font-size:13px;
+}
+
+.snip-copy{
+  background:#2563eb;
+  color:white;
+}
+
+.use-editor{
+  background:#16a34a;
+  color:white;
+}
+
+/* CARDS */
+
 .cards{
   max-width:1100px;
   margin:30px auto;
@@ -181,12 +261,22 @@ footer{
     font-size:28px;
   }
 
-  .editor-section{
+  .editor-section,
+  .snippets{
     padding:15px;
   }
 
   .editor{
     min-height:260px;
+  }
+
+  header{
+    padding:14px;
+  }
+
+  nav a{
+    margin-left:8px;
+    font-size:13px;
   }
 }
 </style>
@@ -196,25 +286,29 @@ footer{
 
 <header>
   <div class="logo">🚀 Coding Super Hub</div>
+
   <nav>
     <a href="#editor">Editor</a>
+    <a href="#snippets">Snippets</a>
     <a href="#tools">Tools</a>
   </nav>
 </header>
 
 <section class="hero">
   <h1>Your All-in-One Coding Super Hub</h1>
-  <p>Write, run and test HTML, CSS and JavaScript directly in your browser.</p>
+  <p>Write, run and learn code directly in your browser.</p>
 </section>
+
+<!-- CODE EDITOR -->
 
 <section class="editor-section" id="editor">
 
   <h2>💻 Online Code Editor</h2>
 
   <div class="tabs">
-    <button class="tab active" onclick="showEditor('html')">HTML</button>
-    <button class="tab" onclick="showEditor('css')">CSS</button>
-    <button class="tab" onclick="showEditor('js')">JavaScript</button>
+    <button class="tab active" onclick="showEditor('html',this)">HTML</button>
+    <button class="tab" onclick="showEditor('css',this)">CSS</button>
+    <button class="tab" onclick="showEditor('js',this)">JavaScript</button>
   </div>
 
   <textarea id="htmlEditor" class="editor"><h1>Hello Coding Super Hub 🚀</h1>
@@ -254,16 +348,167 @@ button {
 
 </section>
 
+<!-- CODE SNIPPETS -->
+
+<section class="snippets" id="snippets">
+
+  <h2>🧩 Code Snippets Library</h2>
+
+  <p class="section-description">
+    Ready-made coding examples. Copy them or load them into the editor.
+  </p>
+
+  <div class="snippet-grid">
+
+    <div class="snippet">
+      <h3>🔘 HTML Button</h3>
+      <p>A simple modern button.</p>
+
+      <div class="code-box">
+        <pre>&lt;button&gt;Click Me&lt;/button&gt;</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('&lt;button&gt;Click Me&lt;/button&gt;')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>🪟 Login Form</h3>
+      <p>Basic HTML login form.</p>
+
+      <div class="code-box">
+        <pre>&lt;form&gt;
+&lt;input type="email" placeholder="Email"&gt;
+&lt;input type="password" placeholder="Password"&gt;
+&lt;button&gt;Login&lt;/button&gt;
+&lt;/form&gt;</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('&lt;form&gt;\\n&lt;input type=&quot;email&quot; placeholder=&quot;Email&quot;&gt;\\n&lt;input type=&quot;password&quot; placeholder=&quot;Password&quot;&gt;\\n&lt;button&gt;Login&lt;/button&gt;\\n&lt;/form&gt;')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>🧭 Navbar</h3>
+      <p>Simple navigation menu.</p>
+
+      <div class="code-box">
+        <pre>&lt;nav&gt;
+&lt;a href="#"&gt;Home&lt;/a&gt;
+&lt;a href="#"&gt;About&lt;/a&gt;
+&lt;a href="#"&gt;Contact&lt;/a&gt;
+&lt;/nav&gt;</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('&lt;nav&gt;\\n&lt;a href=&quot;#&quot;&gt;Home&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;About&lt;/a&gt;\\n&lt;a href=&quot;#&quot;&gt;Contact&lt;/a&gt;\\n&lt;/nav&gt;')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>🎨 CSS Card</h3>
+      <p>Reusable card styling.</p>
+
+      <div class="code-box">
+        <pre>.card {
+  padding: 20px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 15px #ccc;
+}</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('.card {\\n  padding: 20px;\\n  border-radius: 12px;\\n  background: #fff;\\n  box-shadow: 0 4px 15px #ccc;\\n}')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>🌈 Gradient</h3>
+      <p>Beautiful CSS gradient background.</p>
+
+      <div class="code-box">
+        <pre>background:
+linear-gradient(135deg,
+#667eea,#764ba2);</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('background: linear-gradient(135deg, #667eea, #764ba2);')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>⚡ JavaScript Alert</h3>
+      <p>Simple JavaScript function.</p>
+
+      <div class="code-box">
+        <pre>function hello() {
+  alert("Hello World!");
+}</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('function hello() {\\n  alert(&quot;Hello World!&quot;);\\n}')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>🐍 Python Hello World</h3>
+      <p>First Python program.</p>
+
+      <div class="code-box">
+        <pre>print("Hello World!")</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="copyText('print(&quot;Hello World!&quot;)')">📋 Copy Python</button>
+      </div>
+    </div>
+
+    <div class="snippet">
+      <h3>📱 Responsive CSS</h3>
+      <p>Basic mobile responsive rule.</p>
+
+      <div class="code-box">
+        <pre>@media(max-width:600px) {
+  body {
+    padding: 10px;
+  }
+}</pre>
+      </div>
+
+      <div class="snippet-buttons">
+        <button class="snip-copy" onclick="copySnippet(this)">📋 Copy Code</button>
+        <button class="use-editor" onclick="useSnippet('@media(max-width:600px) {\\n  body {\\n    padding: 10px;\\n  }\\n}')">⚡ Use in Editor</button>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- MAIN FEATURE CARDS -->
+
 <section class="cards" id="tools">
 
   <div class="card">
     <h3>🧩 Code Snippets</h3>
-    <p>Useful ready-made coding examples.</p>
+    <p>Ready-made coding examples for developers.</p>
   </div>
 
   <div class="card">
     <h3>🔧 Developer Tools</h3>
-    <p>Helpful tools for everyday developers.</p>
+    <p>Helpful tools for everyday development.</p>
   </div>
 
   <div class="card">
@@ -286,7 +531,7 @@ button {
 
 let currentEditor = "html";
 
-function showEditor(type){
+function showEditor(type, clickedTab){
 
   currentEditor = type;
 
@@ -300,7 +545,7 @@ function showEditor(type){
     tab.classList.remove("active");
   });
 
-  event.target.classList.add("active");
+  clickedTab.classList.add("active");
 }
 
 function runCode(){
@@ -339,6 +584,43 @@ function clearCode(){
 
   document.getElementById(currentEditor + "Editor").value = "";
 
+}
+
+function copyText(text){
+
+  navigator.clipboard.writeText(text);
+
+  alert("Code copied!");
+}
+
+function copySnippet(button){
+
+  let code = button.parentElement.previousElementSibling.innerText;
+
+  navigator.clipboard.writeText(code);
+
+  alert("Snippet copied!");
+}
+
+function useSnippet(code){
+
+  document.getElementById("htmlEditor").value = code;
+
+  currentEditor = "html";
+
+  document.getElementById("htmlEditor").style.display = "block";
+  document.getElementById("cssEditor").style.display = "none";
+  document.getElementById("jsEditor").style.display = "none";
+
+  document.querySelectorAll(".tab").forEach(function(tab){
+    tab.classList.remove("active");
+  });
+
+  document.querySelector(".tab").classList.add("active");
+
+  document.getElementById("editor").scrollIntoView({
+    behavior:"smooth"
+  });
 }
 
 runCode();
