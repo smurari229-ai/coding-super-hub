@@ -837,7 +837,56 @@
   <input id="strongPasswordInput" type="password" placeholder="Enter password">
   <button onclick="checkStrongPassword()">Check Password</button>
   <p id="strongPasswordOutput"></p>
-</div>
+</div>    <div class="tool"><h2>51. JSON Validator</h2><textarea id="t51"></textarea><button onclick="t51fn()">Validate JSON</button><div class="output" id="o51"></div></div>
+    <div class="tool"><h2>52. JSON to CSV</h2><textarea id="t52" placeholder='[{"name":"A","age":20}]'></textarea><button onclick="t52fn()">Convert</button><div class="output" id="o52"></div></div>
+    <div class="tool"><h2>53. CSV to JSON</h2><textarea id="t53" placeholder="name,age&#10;A,20"></textarea><button onclick="t53fn()">Convert</button><div class="output" id="o53"></div></div>
+    <div class="tool"><h2>54. JSON Sorter</h2><textarea id="t54" placeholder='{"z":1,"a":2}'></textarea><button onclick="t54fn()">Sort Keys</button><div class="output" id="o54"></div></div>
+    <div class="tool"><h2>55. XML Formatter</h2><textarea id="t55"></textarea><button onclick="t55fn()">Format XML</button><div class="output" id="o55"></div></div>
+    <div class="tool"><h2>56. Text Sorter</h2><textarea id="t56" placeholder="One item per line"></textarea><button onclick="t56fn('asc')">A → Z</button><button onclick="t56fn('desc')">Z → A</button><div class="output" id="o56"></div></div>
+    <div class="tool"><h2>57. Duplicate Line Remover</h2><textarea id="t57"></textarea><button onclick="t57fn()">Remove Duplicates</button><div class="output" id="o57"></div></div>
+    <div class="tool"><h2>58. Line Counter</h2><textarea id="t58" oninput="t58fn()"></textarea><div class="output" id="o58">Lines: 0</div></div>
+    <div class="tool"><h2>59. Whitespace Cleaner</h2><textarea id="t59"></textarea><button onclick="t59fn()">Clean</button><div class="output" id="o59"></div></div>
+    <div class="tool"><h2>60. Reverse Text</h2><textarea id="t60"></textarea><button onclick="t60fn()">Reverse</button><div class="output" id="o60"></div></div>
+    <div class="tool"><h2>61. Palindrome Checker</h2><input id="t61"><button onclick="t61fn()">Check</button><div class="output" id="o61"></div></div>
+    <div class="tool"><h2>62. Anagram Checker</h2><input id="t62a" placeholder="First text"><input id="t62b" placeholder="Second text"><button onclick="t62fn()">Check</button><div class="output" id="o62"></div></div>
+    <div class="tool"><h2>63. Word Frequency Counter</h2><textarea id="t63"></textarea><button onclick="t63fn()">Count</button><div class="output" id="o63"></div></div>
+    <div class="tool"><h2>64. Text Deduplicator</h2><textarea id="t64"></textarea><button onclick="t64fn()">Deduplicate</button><div class="output" id="o64"></div></div>
+    <div class="tool"><h2>65. Character Frequency</h2><textarea id="t65"></textarea><button onclick="t65fn()">Count</button><div class="output" id="o65"></div></div>
+    <div class="tool"><h2>66. Morse Code Converter</h2><textarea id="t66"></textarea><select id="t66mode"><option value="encode">Text → Morse</option><option value="decode">Morse → Text</option></select><button onclick="t66fn()">Convert</button><div class="output" id="o66"></div></div>
+    <div class="tool"><h2>67. Binary Text Converter</h2><textarea id="t67"></textarea><select id="t67mode"><option value="encode">Text → Binary</option><option value="decode">Binary → Text</option></select><button onclick="t67fn()">Convert</button><div class="output" id="o67"></div></div>
+    <div class="tool"><h2>68. SHA-256 Hash Generator</h2><textarea id="t68"></textarea><button onclick="t68fn()">Hash</button><div class="output" id="o68"></div></div>
+    <div class="tool"><h2>69. URL Parser</h2><input id="t69" placeholder="https://example.com/path?a=1"><button onclick="t69fn()">Parse URL</button><div class="output" id="o69"></div></div>
+    <div class="tool"><h2>70. Query String Parser</h2><input id="t70" placeholder="?name=Murari&age=25"><button onclick="t70fn()">Parse</button><div class="output" id="o70"></div></div>
+    <div class="tool"><h2>71. Browser Information</h2><button onclick="t71fn()">Show Info</button><div class="output" id="o71"></div></div>
+    <div class="tool"><h2>72. Screen & Viewport Info</h2><button onclick="t72fn()">Show Info</button><div class="output" id="o72"></div></div>
+    <div class="tool"><h2>73. Meta Tag Generator</h2><input id="t73title" placeholder="Page title"><input id="t73desc" placeholder="Description"><input id="t73keys" placeholder="Keywords"><button onclick="t73fn()">Generate</button><div class="output" id="o73"></div></div>
+    <div class="tool"><h2>74. HTML Boilerplate Generator</h2><input id="t74title" value="My Website"><button onclick="t74fn()">Generate</button><div class="output" id="o74"></div></div>
+    <div class="tool"><h2>75. CSS Reset Generator</h2><button onclick="t75fn()">Generate Reset</button><div class="output" id="o75"></div></div>
+    <div class="tool"><h2>76. CSS Flexbox Generator</h2><select id="t76dir"><option>row</option><option>column</option></select><select id="t76justify"><option>center</option><option>flex-start</option><option>flex-end</option><option>space-between</option><option>space-around</option></select><select id="t76align"><option>center</option><option>flex-start</option><option>flex-end</option><option>stretch</option></select><button onclick="t76fn()">Generate CSS</button><div class="output" id="o76"></div></div>
+    <div class="tool"><h2>77. CSS Grid Generator</h2><input id="t77cols" type="number" value="3" min="1" max="12"><input id="t77gap" type="number" value="10" min="0"><button onclick="t77fn()">Generate CSS</button><div class="output" id="o77"></div></div>
+    <div class="tool"><h2>78. Box Shadow Generator</h2><input id="t78x" type="number" value="0"><input id="t78y" type="number" value="4"><input id="t78blur" type="number" value="12"><input id="t78spread" type="number" value="0"><input id="t78color" type="color" value="#000000"><button onclick="t78fn()">Generate</button><div class="output" id="o78"></div></div>
+    <div class="tool"><h2>79. Border Radius Generator</h2><input id="t79" type="range" min="0" max="100" value="12" oninput="t79fn()"><div id="p79" style="height:80px;background:#2563eb;"></div><div class="output" id="o79"></div></div>
+    <div class="tool"><h2>80. CSS Clamp Generator</h2><input id="t80min" type="number" value="16"><input id="t80preferred" type="number" value="4"><input id="t80max" type="number" value="48"><button onclick="t80fn()">Generate</button><div class="output" id="o80"></div></div>
+    <div class="tool"><h2>81. PX ↔ REM Converter</h2><input id="t81" type="number" value="16"><input id="t81base" type="number" value="16"><select id="t81mode"><option value="p2r">PX → REM</option><option value="r2p">REM → PX</option></select><button onclick="t81fn()">Convert</button><div class="output" id="o81"></div></div>
+    <div class="tool"><h2>82. Aspect Ratio Calculator</h2><input id="t82w" type="number" placeholder="Width"><input id="t82h" type="number" placeholder="Height"><button onclick="t82fn()">Calculate</button><div class="output" id="o82"></div></div>
+    <div class="tool"><h2>83. Random Color Generator</h2><button onclick="t83fn()">Generate Color</button><div class="output" id="o83"></div></div>
+    <div class="tool"><h2>84. Color Contrast Checker</h2><input id="t84a" type="color" value="#ffffff"><input id="t84b" type="color" value="#000000"><button onclick="t84fn()">Check Contrast</button><div class="output" id="o84"></div></div>
+    <div class="tool"><h2>85. Data URI Generator</h2><textarea id="t85"></textarea><input id="t85mime" value="text/plain"><button onclick="t85fn()">Generate Data URI</button><div class="output" id="o85"></div></div>
+    <div class="tool"><h2>86. Favicon HTML Generator</h2><input id="t86" placeholder="favicon.ico"><button onclick="t86fn()">Generate</button><div class="output" id="o86"></div></div>
+    <div class="tool"><h2>87. Robots.txt Generator</h2><input id="t87" placeholder="https://example.com/sitemap.xml"><button onclick="t87fn()">Generate</button><div class="output" id="o87"></div></div>
+    <div class="tool"><h2>88. Sitemap XML Generator</h2><textarea id="t88" placeholder="One URL per line"></textarea><button onclick="t88fn()">Generate</button><div class="output" id="o88"></div></div>
+    <div class="tool"><h2>89. Gitignore Generator</h2><select id="t89"><option>Node</option><option>Python</option><option>Java</option><option>Android</option><option>React</option></select><button onclick="t89fn()">Generate</button><div class="output" id="o89"></div></div>
+    <div class="tool"><h2>90. README Generator</h2><input id="t90name" placeholder="Project name"><input id="t90desc" placeholder="Project description"><input id="t90tech" placeholder="Technologies"><button onclick="t90fn()">Generate</button><div class="output" id="o90"></div></div>
+    <div class="tool"><h2>91. JavaScript Function Generator</h2><input id="t91name" value="myFunction"><input id="t91args" placeholder="a, b"><button onclick="t91fn()">Generate</button><div class="output" id="o91"></div></div>
+    <div class="tool"><h2>92. Fetch API Snippet Generator</h2><input id="t92url" value="https://api.example.com/data"><select id="t92method"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select><button onclick="t92fn()">Generate</button><div class="output" id="o92"></div></div>
+    <div class="tool"><h2>93. SQL Formatter</h2><textarea id="t93"></textarea><button onclick="t93fn()">Format SQL</button><div class="output" id="o93"></div></div>
+    <div class="tool"><h2>94. SQL String Escaper</h2><input id="t94"><button onclick="t94fn()">Escape</button><div class="output" id="o94"></div></div>
+    <div class="tool"><h2>95. Date Formatter</h2><input id="t95" type="datetime-local"><select id="t95style"><option value="date">Date</option><option value="time">Time</option><option value="full">Date & Time</option></select><button onclick="t95fn()">Format</button><div class="output" id="o95"></div></div>
+    <div class="tool"><h2>96. Unix Timestamp Generator</h2><button onclick="t96fn()">Generate Current Timestamp</button><div class="output" id="o96"></div></div>
+    <div class="tool"><h2>97. HMAC SHA-256 Generator</h2><input id="t97key" placeholder="Secret key"><textarea id="t97msg" placeholder="Message"></textarea><button onclick="t97fn()">Generate HMAC</button><div class="output" id="o97"></div></div>
+    <div class="tool"><h2>98. UUID Bulk Generator</h2><input id="t98" type="number" value="5" min="1" max="100"><button onclick="t98fn()">Generate UUIDs</button><div class="output" id="o98"></div></div>
+    <div class="tool"><h2>99. HTTP Status Code Lookup</h2><input id="t99" type="number" placeholder="404"><button onclick="t99fn()">Lookup</button><div class="output" id="o99"></div></div>
+    <div class="tool"><h2>100. Developer Cheat Sheet</h2><select id="t100"><option value="git">Git</option><option value="js">JavaScript</option><option value="css">CSS</option><option value="html">HTML</option><option value="sql">SQL</option></select><button onclick="t100fn()">Show Cheat Sheet</button><div class="output" id="o100"></div></div>
   <script>
 
     /* =========================
@@ -2405,7 +2454,115 @@ function checkStrongPassword() {
     output.textContent =
       "🟢 Strong Password";
   }
-}
+}function t51fn(){try{JSON.parse(t51.value);o51.textContent="✅ Valid JSON";}catch(e){o51.textContent="❌ Invalid JSON: "+e.message;}}
+
+function t52fn(){try{const a=t52.value.trim()?JSON.parse(t52.value):null;if(!Array.isArray(a)||!a.length||a.some(x=>!x||typeof x!=="object"||Array.isArray(x)))throw Error("Use a non-empty JSON array of objects");const keys=[...new Set(a.flatMap(x=>Object.keys(x)))];const esc=v=>`"${String(v??"").replace(/"/g,'""')}"`;o52.textContent=[keys.map(esc).join(","),...a.map(x=>keys.map(k=>esc(x[k])).join(","))].join("\n");}catch(e){o52.textContent="❌ "+e.message;}}
+
+function t53fn(){try{const lines=t53.value.trim().split(/\r?\n/).filter(Boolean);if(lines.length<2)throw Error("Enter CSV with header and at least one row");const parse=s=>{const r=[];let c="",q=false;for(let i=0;i<s.length;i++){const ch=s[i];if(ch==='"'){if(q&&s[i+1]==='"'){c+='"';i++;}else q=!q;}else if(ch===","&&!q){r.push(c);c="";}else c+=ch;}r.push(c);return r;};const h=parse(lines[0]);const rows=lines.slice(1).map(x=>parse(x));o53.textContent=JSON.stringify(rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]??""]))),null,2);}catch(e){o53.textContent="❌ "+e.message;}}
+
+function t54fn(){try{const x=JSON.parse(t54.value);const sort=v=>Array.isArray(v)?v.map(sort):v&&typeof v==="object"?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sort(v[k])])):v;o54.textContent=JSON.stringify(sort(x),null,2);}catch(e){o54.textContent="❌ Invalid JSON";}}
+
+function t55fn(){let s=t55.value.trim();if(!s){o55.textContent="❌ Enter XML";return;}try{s=s.replace(/>\s*</g,"><").replace(/</g,"\n<");let d=0;o55.textContent=s.split("\n").map(x=>{if(/^<\//.test(x))d--;const line="  ".repeat(Math.max(0,d))+x.trim();if(/^<[^!?/][^>]*[^/]?>$/.test(x)&&!/<\/[^>]+>$/.test(x))d++;return line;}).join("\n").trim();}catch(e){o55.textContent="❌ Invalid XML";}}
+
+function t56fn(mode){o56.textContent=t56.value.split(/\r?\n/).filter(Boolean).sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"})*(mode==="desc"?-1:1)).join("\n");}
+
+function t57fn(){o57.textContent=[...new Set(t57.value.split(/\r?\n/))].join("\n");}
+
+function t58fn(){const s=t58.value;o58.textContent="Lines: "+(s? s.split(/\r?\n/).length:0);}
+
+function t59fn(){o59.textContent=t59.value.replace(/[ \t]+/g," ").replace(/^\s+|\s+$/gm,"").replace(/\n{3,}/g,"\n\n");}
+
+function t60fn(){o60.textContent=Array.from(t60.value).reverse().join("");}
+
+function t61fn(){const s=t61.value.toLowerCase().replace(/[\W_]/g,"");o61.textContent=s===Array.from(s).reverse().join("")?"✅ Palindrome":"❌ Not a palindrome";}
+
+function t62fn(){const norm=s=>s.toLowerCase().replace(/[^\p{L}\p{N}]/gu,"").split("").sort().join("");o62.textContent=norm(t62a.value)===norm(t62b.value)?"✅ Anagram":"❌ Not an anagram";}
+
+function t63fn(){const m={};(t63.value.toLowerCase().match(/\b[\p{L}\p{N}'-]+\b/gu)||[]).forEach(w=>m[w]=(m[w]||0)+1);o63.textContent=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([w,n])=>`${w}: ${n}`).join("\n")||"No words";}
+
+function t64fn(){o64.textContent=[...new Set(t64.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean))].join("\n");}
+
+function t65fn(){const m={};for(const c of t65.value.replace(/\s/g,""))m[c]=(m[c]||0)+1;o65.textContent=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`${c}: ${n}`).join("\n")||"No characters";}
+
+const MORSE={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----."," ":"/"};
+
+function t66fn(){if(t66mode.value==="encode")o66.textContent=t66.value.toUpperCase().split("").map(c=>MORSE[c]||c).join(" ");else{const rev=Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));o66.textContent=t66.value.trim().split(/\s+/).map(x=>rev[x]||"?").join("");}}
+
+function t67fn(){if(t67mode.value==="encode")o67.textContent=Array.from(t67.value).map(c=>c.charCodeAt(0).toString(2).padStart(8,"0")).join(" ");else{const text=t67.value.trim(),parts=text?text.split(/\s+/):[];if(!parts.length||parts.some(x=>!/^[01]+$/.test(x)||x.length>8)){o67.textContent="❌ Enter binary bytes separated by spaces";return;}o67.textContent=parts.map(x=>String.fromCharCode(parseInt(x,2))).join("");}}
+
+async function t68fn(){o68.textContent="Hashing...";try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t68.value));o68.textContent=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}catch(e){o68.textContent="❌ Web Crypto unavailable";}}
+
+function t69fn(){try{const u=new URL(t69.value);o69.textContent=`Protocol: ${u.protocol}\nHost: ${u.host}\nPath: ${u.pathname}\nQuery: ${u.search}\nHash: ${u.hash}`;}catch(e){o69.textContent="❌ Invalid URL";}}
+
+function t70fn(){try{const s=t70.value.replace(/^\?/,""),p=new URLSearchParams(s),r={};for(const [k,v] of p)r[k]=r[k]===undefined?v:Array.isArray(r[k])?[...r[k],v]:[r[k],v];o70.textContent=JSON.stringify(r,null,2);}catch(e){o70.textContent="❌ Invalid query string";}}
+
+function t71fn(){o71.textContent=`Browser: ${navigator.appName}\nUser Agent: ${navigator.userAgent}\nLanguage: ${navigator.language}\nOnline: ${navigator.onLine?"Yes":"No"}\nCookies: ${navigator.cookieEnabled?"Enabled":"Disabled"}`;}
+
+function t72fn(){o72.textContent=`Screen: ${screen.width} × ${screen.height}\nAvailable: ${screen.availWidth} × ${screen.availHeight}\nViewport: ${innerWidth} × ${innerHeight}\nPixel Ratio: ${devicePixelRatio}`;}
+
+function t73fn(){const esc=s=>s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");o73.textContent=`<title>${esc(t73title.value)}</title>\n<meta name="description" content="${esc(t73desc.value)}">\n<meta name="keywords" content="${esc(t73keys.value)}">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">`;}
+
+function t74fn(){const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");o74.textContent=`<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>${esc(t74title.value)}</title>\n</head>\n<body>\n<h1>Hello World</h1>\n</body>\n</html>`;}
+
+function t75fn(){o75.textContent=`*,*::before,*::after{box-sizing:border-box;}html,body{margin:0;padding:0;}h1,h2,h3,p{margin:0;}img,svg{max-width:100%;display:block;}button,input,textarea,select{font:inherit;}`;}
+
+function t76fn(){o76.textContent=`.container {\n  display: flex;\n  flex-direction: ${t76dir.value};\n  justify-content: ${t76justify.value};\n  align-items: ${t76align.value};\n}`;}
+
+function t77fn(){const c=Math.max(1,Math.min(12,Number(t77cols.value)||1)),g=Math.max(0,Number(t77gap.value)||0);o77.textContent=`.grid {\n  display: grid;\n  grid-template-columns: repeat(${c}, 1fr);\n  gap: ${g}px;\n}`;}
+
+function t78fn(){o78.textContent=`box-shadow: ${t78x.value}px ${t78y.value}px ${t78blur.value}px ${t78spread.value}px ${t78color.value};`;}
+
+function t79fn(){const v=t79.value;p79.style.borderRadius=v+"px";o79.textContent="border-radius: "+v+"px;";}
+
+function t80fn(){o80.textContent=`font-size: clamp(${t80min.value}px, ${t80preferred.value}vw, ${t80max.value}px);`;}
+
+function t81fn(){const v=Number(t81.value),b=Number(t81base.value)||16;if(!Number.isFinite(v)||b<=0){o81.textContent="❌ Enter valid values";return;}o81.textContent=t81mode.value==="p2r"?`${v/b}rem`:`${v*b}px`;}
+
+function t82fn(){const w=Number(t82w.value),h=Number(t82h.value);if(w<=0||h<=0){o82.textContent="❌ Enter valid dimensions";return;}let a=w,b=h;while(b)[a,b]=[b,a%b];o82.textContent=`Ratio: ${w/a}:${h/a}`;}
+
+function t83fn(){const h="#"+crypto.getRandomValues(new Uint32Array(1))[0].toString(16).slice(-6).padStart(6,"0");o83.innerHTML=`<span class="swatch" style="background:${h}"></span>\n${h}`;}
+
+function hexRgb(h){const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255];}
+
+function lum(h){const a=hexRgb(h).map(x=>{x/=255;return x<=.03928?x/12.92:((x+.055)/1.055)**2.4});return .2126*a[0]+.7152*a[1]+.0722*a[2];}
+
+function t84fn(){const a=lum(t84a.value),b=lum(t84b.value),r=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);o84.textContent=`Contrast Ratio: ${r.toFixed(2)}:1\n${r>=7?"AAA normal text":r>=4.5?"AA normal text":r>=3?"Large text only":"Insufficient contrast"}`;}
+
+function t85fn(){o85.textContent=`data:${t85mime.value};charset=utf-8,${encodeURIComponent(t85.value)}`;}
+
+function t86fn(){o86.textContent=`<link rel="icon" href="${t86.value}" type="image/x-icon">`;}
+
+function t87fn(){o87.textContent=`User-agent: *\nAllow: /\n\nSitemap: ${t87.value}`;}
+
+function t88fn(){const urls=t88.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!urls.length){o88.textContent="❌ Enter at least one URL";return;}const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");o88.textContent=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u=>`  <url><loc>${esc(u)}</loc></url>`).join("\n")}\n</urlset>`;}
+
+function t89fn(){const sets={Node:"node_modules/\n.env\nnpm-debug.log*",Python:"__pycache__/\n*.py[cod]\n.venv/\n.env",Java:"*.class\ntarget/\n.idea/",Android:".gradle/\nlocal.properties\n/build/\n*.iml",React:"node_modules/\nbuild/\n.env"};o89.textContent=sets[t89.value];}
+
+function t90fn(){o90.textContent=`# ${t90name.value}\n\n${t90desc.value}\n\n## Technologies\n${t90tech.value.split(",").map(x=>"- "+x.trim()).join("\n")}\n\n## Installation\n\`\`\`bash\nnpm install\n\`\`\`\n\n## Usage\nDescribe how to use the project here.`;}
+
+function t91fn(){o91.textContent=`function ${t91name.value}(${t91args.value}) {\n  // Your code here\n  return;\n}`;}
+
+function t92fn(){const method=t92method.value,url=t92url.value;let s=`fetch("${url}", {\n  method: "${method}",\n  headers: { "Content-Type": "application/json" }`;if(method!=="GET"&&method!=="DELETE")s+=`,\n  body: JSON.stringify({})`;s+=`\n})\n.then(response => response.json())\n.then(data => console.log(data))\n.catch(error => console.error(error));`;o92.textContent=s;}
+
+function t93fn(){let s=t93.value.trim().replace(/\s+/g," ");s=s.replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|LEFT JOIN|RIGHT JOIN|INNER JOIN|JOIN|VALUES|SET|AND|OR)\b/gi,"\n$1").replace(/,\s*/g,",\n  ");o93.textContent=s.trim();}
+
+function t94fn(){o94.textContent=t94.value.replace(/'/g,"''");}
+
+function t95fn(){if(!t95.value){o95.textContent="❌ Select date and time";return;}const d=new Date(t95.value);o95.textContent=t95style.value==="date"?d.toLocaleDateString():t95style.value==="time"?d.toLocaleTimeString():d.toLocaleString();}
+
+function t96fn(){o96.textContent=Math.floor(Date.now()/1000);}
+
+async function t97fn(){try{const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(t97key.value),{name:"HMAC",hash:"SHA-256"},false,["sign"]);const sig=await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(t97msg.value));o97.textContent=[...new Uint8Array(sig)].map(x=>x.toString(16).padStart(2,"0")).join("");}catch(e){o97.textContent="❌ Web Crypto unavailable";}}
+
+function t98fn(){const n=Math.max(1,Math.min(100,Number(t98.value)||1));o98.textContent=Array.from({length:n},()=>crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==="x"?r:r&3|8;return v.toString(16)})).join("\n");}
+
+const HTTP_CODES={100:"Continue",101:"Switching Protocols",200:"OK",201:"Created",202:"Accepted",204:"No Content",301:"Moved Permanently",302:"Found",304:"Not Modified",307:"Temporary Redirect",308:"Permanent Redirect",400:"Bad Request",401:"Unauthorized",403:"Forbidden",404:"Not Found",405:"Method Not Allowed",408:"Request Timeout",409:"Conflict",410:"Gone",413:"Content Too Large",415:"Unsupported Media Type",422:"Unprocessable Content",429:"Too Many Requests",500:"Internal Server Error",501:"Not Implemented",502:"Bad Gateway",503:"Service Unavailable",504:"Gateway Timeout"};
+
+function t99fn(){const c=Number(t99.value);if(!Number.isInteger(c)||c<100||c>599){o99.textContent="❌ Enter an HTTP status code from 100 to 599";return;}o99.textContent=HTTP_CODES[c]?`${c} — ${HTTP_CODES[c]}`:"Unknown status code (valid HTTP range)";}
+
+const CHEATS={git:`git init\ngit add .\ngit commit -m "message"\ngit status\ngit push`,js:`const x = 10;\nconsole.log(x);\narray.map(x => x*2);`,css:`display:flex;\njustify-content:center;\nalign-items:center;\ngrid-template-columns:repeat(3,1fr);`,html:`<div class="container"></div>\n<h1>Heading</h1>\n<a href="#">Link</a>`,sql:`SELECT * FROM users;\nSELECT name FROM users WHERE id = 1;\nUPDATE users SET name='A' WHERE id=1;`};
+
+function t100fn(){o100.textContent=CHEATS[t100.value];}
   </script>
 
 </body>
