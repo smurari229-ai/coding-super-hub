@@ -886,7 +886,500 @@
     <div class="tool"><h2>97. HMAC SHA-256 Generator</h2><input id="t97key" placeholder="Secret key"><textarea id="t97msg" placeholder="Message"></textarea><button onclick="t97fn()">Generate HMAC</button><div class="output" id="o97"></div></div>
     <div class="tool"><h2>98. UUID Bulk Generator</h2><input id="t98" type="number" value="5" min="1" max="100"><button onclick="t98fn()">Generate UUIDs</button><div class="output" id="o98"></div></div>
     <div class="tool"><h2>99. HTTP Status Code Lookup</h2><input id="t99" type="number" placeholder="404"><button onclick="t99fn()">Lookup</button><div class="output" id="o99"></div></div>
-    <div class="tool"><h2>100. Developer Cheat Sheet</h2><select id="t100"><option value="git">Git</option><option value="js">JavaScript</option><option value="css">CSS</option><option value="html">HTML</option><option value="sql">SQL</option></select><button onclick="t100fn()">Show Cheat Sheet</button><div class="output" id="o100"></div></div>
+    <div class="tool"><h2>100. Developer Cheat Sheet</h2><select id="t100"><option value="git">Git</option><option value="js">JavaScript</option><option value="css">CSS</option><option value="html">HTML</option><option value="sql">SQL</option></select><button onclick="t100fn()">Show Cheat Sheet</button><div class="output" id="o100"></div></div><!-- TEST 101 -->
+<div class="tool">
+  <h2>101. Text Diff Checker</h2>
+  <textarea id="t101a" placeholder="Original text"></textarea>
+  <textarea id="t101b" placeholder="New text"></textarea>
+  <button onclick="t101fn()">Compare</button>
+  <pre id="o101"></pre>
+</div>
+
+<!-- TEST 102 -->
+<div class="tool">
+  <h2>102. Text Joiner</h2>
+  <textarea id="t102" placeholder="One item per line"></textarea>
+  <input id="t102sep" value=", " placeholder="Separator">
+  <button onclick="t102fn()">Join</button>
+  <pre id="o102"></pre>
+</div>
+
+<!-- TEST 103 -->
+<div class="tool">
+  <h2>103. Line Break Converter</h2>
+  <textarea id="t103"></textarea>
+  <select id="t103mode">
+    <option value="space">Line Break → Space</option>
+    <option value="comma">Line Break → Comma</option>
+    <option value="br">Line Break → &lt;br&gt;</option>
+  </select>
+  <button onclick="t103fn()">Convert</button>
+  <pre id="o103"></pre>
+</div>
+
+<!-- TEST 104 -->
+<div class="tool">
+  <h2>104. Tabs ↔ Spaces Converter</h2>
+  <textarea id="t104"></textarea>
+  <input id="t104size" type="number" value="2" min="1" max="16">
+  <select id="t104mode">
+    <option value="tabs">Spaces → Tabs</option>
+    <option value="spaces">Tabs → Spaces</option>
+  </select>
+  <button onclick="t104fn()">Convert</button>
+  <pre id="o104"></pre>
+</div>
+
+<!-- TEST 105 -->
+<div class="tool">
+  <h2>105. Indent Formatter</h2>
+  <textarea id="t105"></textarea>
+  <input id="t105size" type="number" value="2" min="1" max="8">
+  <button onclick="t105fn()">Format</button>
+  <pre id="o105"></pre>
+</div>
+
+<!-- TEST 106 -->
+<div class="tool">
+  <h2>106. Text Extractor</h2>
+  <textarea id="t106" placeholder="Enter text"></textarea>
+  <select id="t106mode">
+    <option value="emails">Extract Emails</option>
+    <option value="urls">Extract URLs</option>
+    <option value="numbers">Extract Numbers</option>
+    <option value="hashtags">Extract Hashtags</option>
+  </select>
+  <button onclick="t106fn()">Extract</button>
+  <pre id="o106"></pre>
+</div>
+
+<!-- TEST 107 -->
+<div class="tool">
+  <h2>107. Text Trimmer</h2>
+  <textarea id="t107"></textarea>
+  <button onclick="t107fn()">Trim</button>
+  <pre id="o107"></pre>
+</div>
+
+<!-- TEST 108 -->
+<div class="tool">
+  <h2>108. Number List Generator</h2>
+  <input id="t108start" type="number" value="1">
+  <input id="t108end" type="number" value="10">
+  <input id="t108step" type="number" value="1">
+  <button onclick="t108fn()">Generate</button>
+  <pre id="o108"></pre>
+</div>
+
+<!-- TEST 109 -->
+<div class="tool">
+  <h2>109. Text Padding Generator</h2>
+  <input id="t109text" placeholder="Text">
+  <input id="t109char" value="0" maxlength="1">
+  <input id="t109length" type="number" value="10">
+  <select id="t109side">
+    <option value="left">Left</option>
+    <option value="right">Right</option>
+    <option value="both">Both</option>
+  </select>
+  <button onclick="t109fn()">Pad</button>
+  <pre id="o109"></pre>
+</div>
+
+<!-- TEST 110 -->
+<div class="tool">
+  <h2>110. Text Wrap Converter</h2>
+  <textarea id="t110"></textarea>
+  <input id="t110width" type="number" value="40" min="1">
+  <button onclick="t110fn()">Wrap</button>
+  <pre id="o110"></pre>
+</div>
+
+<!-- TEST 111 -->
+<div class="tool">
+  <h2>111. MD5 Hash Generator</h2>
+  <textarea id="t111" placeholder="Enter text"></textarea>
+  <button onclick="t111fn()">Generate MD5</button>
+  <pre id="o111"></pre>
+</div>
+
+<!-- TEST 112 -->
+<div class="tool">
+  <h2>112. SHA-1 Hash Generator</h2>
+  <textarea id="t112"></textarea>
+  <button onclick="t112fn()">Generate Hash</button>
+  <pre id="o112"></pre>
+</div>
+
+<!-- TEST 113 -->
+<div class="tool">
+  <h2>113. SHA-384 Hash Generator</h2>
+  <textarea id="t113"></textarea>
+  <button onclick="t113fn()">Generate Hash</button>
+  <pre id="o113"></pre>
+</div>
+
+<!-- TEST 114 -->
+<div class="tool">
+  <h2>114. SHA-512 Hash Generator</h2>
+  <textarea id="t114"></textarea>
+  <button onclick="t114fn()">Generate Hash</button>
+  <pre id="o114"></pre>
+</div>
+
+<!-- TEST 115 -->
+<div class="tool">
+  <h2>115. HMAC SHA-512 Generator</h2>
+  <input id="t115key" placeholder="Secret key">
+  <textarea id="t115msg" placeholder="Message"></textarea>
+  <button onclick="t115fn()">Generate HMAC</button>
+  <pre id="o115"></pre>
+</div>
+
+<!-- TEST 116 -->
+<div class="tool">
+  <h2>116. Hex Encoder / Decoder</h2>
+  <textarea id="t116"></textarea>
+  <select id="t116mode">
+    <option value="encode">Text → Hex</option>
+    <option value="decode">Hex → Text</option>
+  </select>
+  <button onclick="t116fn()">Convert</button>
+  <pre id="o116"></pre>
+</div>
+
+<!-- TEST 117 -->
+<div class="tool">
+  <h2>117. ROT13 Encoder / Decoder</h2>
+  <textarea id="t117"></textarea>
+  <button onclick="t117fn()">Convert</button>
+  <pre id="o117"></pre>
+</div>
+
+<!-- TEST 118 -->
+<div class="tool">
+  <h2>118. ROT47 Encoder / Decoder</h2>
+  <textarea id="t118"></textarea>
+  <button onclick="t118fn()">Convert</button>
+  <pre id="o118"></pre>
+</div>
+
+<!-- TEST 119 -->
+<div class="tool">
+  <h2>119. Caesar Cipher</h2>
+  <textarea id="t119"></textarea>
+  <input id="t119shift" type="number" value="3">
+  <select id="t119mode">
+    <option value="encrypt">Encrypt</option>
+    <option value="decrypt">Decrypt</option>
+  </select>
+  <button onclick="t119fn()">Convert</button>
+  <pre id="o119"></pre>
+</div>
+
+<!-- TEST 120 -->
+<div class="tool">
+  <h2>120. AES Utility</h2>
+  <input id="t120key" placeholder="Secret password">
+
+  <select id="t120mode">
+    <option value="encrypt">Encrypt</option>
+    <option value="decrypt">Decrypt</option>
+  </select>
+
+  <textarea id="t120msg" placeholder="Message or encrypted package"></textarea>
+
+  <button onclick="t120fn()">Run AES</button>
+  <pre id="o120"></pre>
+</div>
+
+<!-- TEST 121 -->
+<div class="tool">
+  <h2>121. HTTP Header Generator</h2>
+  <input id="t121name" placeholder="Header name">
+  <input id="t121value" placeholder="Header value">
+  <button onclick="t121fn()">Generate</button>
+  <pre id="o121"></pre>
+</div>
+
+<!-- TEST 122 -->
+<div class="tool">
+  <h2>122. HTTP Request Builder</h2>
+  <input id="t122url" value="https://api.example.com/data">
+  <select id="t122method">
+    <option>GET</option>
+    <option>POST</option>
+    <option>PUT</option>
+    <option>PATCH</option>
+    <option>DELETE</option>
+  </select>
+  <textarea id="t122body" placeholder="JSON body"></textarea>
+  <button onclick="t122fn()">Build Request</button>
+  <pre id="o122"></pre>
+</div>
+
+<!-- TEST 123 -->
+<div class="tool">
+  <h2>123. HTTP Response Header Viewer</h2>
+  <textarea id="t123" placeholder="Content-Type: application/json&#10;Cache-Control: no-cache"></textarea>
+  <button onclick="t123fn()">View Headers</button>
+  <pre id="o123"></pre>
+</div>
+
+<!-- TEST 124 -->
+<div class="tool">
+  <h2>124. MIME Type Lookup</h2>
+  <input id="t124" placeholder="example.json">
+  <button onclick="t124fn()">Lookup</button>
+  <pre id="o124"></pre>
+</div>
+
+<!-- TEST 125 -->
+<div class="tool">
+  <h2>125. User-Agent Parser</h2>
+  <textarea id="t125"></textarea>
+  <button onclick="t125fn()">Parse</button>
+  <pre id="o125"></pre>
+</div>
+
+<!-- TEST 126 -->
+<div class="tool">
+  <h2>126. URL Shortener Generator</h2>
+  <input id="t126" placeholder="https://example.com/very/long/url">
+  <button onclick="t126fn()">Generate</button>
+  <pre id="o126"></pre>
+</div>
+
+<!-- TEST 127 -->
+<div class="tool">
+  <h2>127. Open Graph Meta Generator</h2>
+  <input id="t127title" placeholder="Title">
+  <input id="t127desc" placeholder="Description">
+  <input id="t127url" placeholder="URL">
+  <input id="t127image" placeholder="Image URL">
+  <button onclick="t127fn()">Generate</button>
+  <pre id="o127"></pre>
+</div>
+
+<!-- TEST 128 -->
+<div class="tool">
+  <h2>128. Twitter Card Generator</h2>
+  <input id="t128title" placeholder="Title">
+  <input id="t128desc" placeholder="Description">
+  <input id="t128image" placeholder="Image URL">
+  <button onclick="t128fn()">Generate</button>
+  <pre id="o128"></pre>
+</div>
+
+<!-- TEST 129 -->
+<div class="tool">
+  <h2>129. Canonical URL Generator</h2>
+  <input id="t129" placeholder="https://example.com/page">
+  <button onclick="t129fn()">Generate</button>
+  <pre id="o129"></pre>
+</div>
+
+<!-- TEST 130 -->
+<div class="tool">
+  <h2>130. Web Manifest Generator</h2>
+  <input id="t130name" placeholder="App name">
+  <input id="t130short" placeholder="Short name">
+  <input id="t130color" type="color" value="#ffffff">
+  <button onclick="t130fn()">Generate</button>
+  <pre id="o130"></pre>
+</div>
+
+<!-- TEST 131 -->
+<div class="tool">
+  <h2>131. CSS Button Generator</h2>
+  <input id="t131bg" type="color" value="#2563eb">
+  <input id="t131text" type="color" value="#ffffff">
+  <input id="t131radius" type="number" value="8">
+  <button onclick="t131fn()">Generate</button>
+  <pre id="o131"></pre>
+</div>
+
+<!-- TEST 132 -->
+<div class="tool">
+  <h2>132. CSS Text Shadow Generator</h2>
+  <input id="t132x" type="number" value="2">
+  <input id="t132y" type="number" value="2">
+  <input id="t132blur" type="number" value="4">
+  <input id="t132color" type="color" value="#000000">
+  <button onclick="t132fn()">Generate</button>
+  <pre id="o132"></pre>
+</div>
+
+<!-- TEST 133 -->
+<div class="tool">
+  <h2>133. CSS Animation Generator</h2>
+  <input id="t133name" value="move">
+  <input id="t133duration" value="2s">
+  <select id="t133timing">
+    <option>ease</option>
+    <option>linear</option>
+    <option>ease-in</option>
+    <option>ease-out</option>
+  </select>
+  <button onclick="t133fn()">Generate</button>
+  <pre id="o133"></pre>
+</div>
+
+<!-- TEST 134 -->
+<div class="tool">
+  <h2>134. CSS Transform Generator</h2>
+  <input id="t134x" type="number" value="0">
+  <input id="t134y" type="number" value="0">
+  <input id="t134scale" type="number" value="1" step="0.1">
+  <input id="t134rotate" type="number" value="0">
+  <button onclick="t134fn()">Generate</button>
+  <pre id="o134"></pre>
+</div>
+
+<!-- TEST 135 -->
+<div class="tool">
+  <h2>135. CSS Transition Generator</h2>
+  <input id="t135property" value="all">
+  <input id="t135duration" value="0.3s">
+  <select id="t135timing">
+    <option>ease</option>
+    <option>linear</option>
+    <option>ease-in</option>
+    <option>ease-out</option>
+  </select>
+  <button onclick="t135fn()">Generate</button>
+  <pre id="o135"></pre>
+</div>
+
+<!-- TEST 136 -->
+<div class="tool">
+  <h2>136. CSS Filter Generator</h2>
+  <input id="t136blur" type="range" min="0" max="20" value="0">
+  <input id="t136brightness" type="range" min="0" max="200" value="100">
+  <input id="t136grayscale" type="range" min="0" max="100" value="0">
+  <button onclick="t136fn()">Generate</button>
+  <pre id="o136"></pre>
+</div>
+
+<!-- TEST 137 -->
+<div class="tool">
+  <h2>137. CSS Glassmorphism Generator</h2>
+  <input id="t137opacity" type="range" min="0" max="1" step="0.1" value="0.3">
+  <input id="t137blur" type="number" value="10">
+  <button onclick="t137fn()">Generate</button>
+  <pre id="o137"></pre>
+</div>
+
+<!-- TEST 138 -->
+<div class="tool">
+  <h2>138. CSS Neumorphism Generator</h2>
+  <input id="t138bg" type="color" value="#e0e0e0">
+  <input id="t138radius" type="number" value="15">
+  <button onclick="t138fn()">Generate</button>
+  <pre id="o138"></pre>
+</div>
+
+<!-- TEST 139 -->
+<div class="tool">
+  <h2>139. CSS Triangle Generator</h2>
+  <input id="t139size" type="number" value="50">
+  <input id="t139color" type="color" value="#2563eb">
+  <button onclick="t139fn()">Generate</button>
+  <pre id="o139"></pre>
+</div>
+
+<!-- TEST 140 -->
+<div class="tool">
+  <h2>140. CSS Spinner Generator</h2>
+  <input id="t140size" type="number" value="40">
+  <input id="t140speed" value="1s">
+  <button onclick="t140fn()">Generate</button>
+  <pre id="o140"></pre>
+</div>
+
+<!-- TEST 141 -->
+<div class="tool">
+  <h2>141. JavaScript Object Formatter</h2>
+  <textarea id="t141" placeholder='{"name":"Murari","age":25}'></textarea>
+  <button onclick="t141fn()">Format</button>
+  <pre id="o141"></pre>
+</div>
+
+<!-- TEST 142 -->
+<div class="tool">
+  <h2>142. JavaScript Array Generator</h2>
+  <input id="t142" value="1,2,3,4,5">
+  <button onclick="t142fn()">Generate</button>
+  <pre id="o142"></pre>
+</div>
+
+<!-- TEST 143 -->
+<div class="tool">
+  <h2>143. JavaScript Array Methods Cheat Sheet</h2>
+  <button onclick="t143fn()">Show Cheat Sheet</button>
+  <pre id="o143"></pre>
+</div>
+
+<!-- TEST 144 -->
+<div class="tool">
+  <h2>144. JavaScript Date Snippet Generator</h2>
+  <button onclick="t144fn()">Generate</button>
+  <pre id="o144"></pre>
+</div>
+
+<!-- TEST 145 -->
+<div class="tool">
+  <h2>145. JavaScript Debounce Generator</h2>
+  <input id="t145" value="myFunction">
+  <button onclick="t145fn()">Generate</button>
+  <pre id="o145"></pre>
+</div>
+
+<!-- TEST 146 -->
+<div class="tool">
+  <h2>146. JavaScript Throttle Generator</h2>
+  <input id="t146" value="myFunction">
+  <button onclick="t146fn()">Generate</button>
+  <pre id="o146"></pre>
+</div>
+
+<!-- TEST 147 -->
+<div class="tool">
+  <h2>147. Event Listener Generator</h2>
+  <input id="t147event" value="click">
+  <input id="t147selector" value="#myButton">
+  <button onclick="t147fn()">Generate</button>
+  <pre id="o147"></pre>
+</div>
+
+<!-- TEST 148 -->
+<div class="tool">
+  <h2>148. DOM Selector Generator</h2>
+  <input id="t148" value="myButton">
+  <select id="t148type">
+    <option value="id">ID</option>
+    <option value="class">Class</option>
+    <option value="tag">Tag</option>
+  </select>
+  <button onclick="t148fn()">Generate</button>
+  <pre id="o148"></pre>
+</div>
+
+<!-- TEST 149 -->
+<div class="tool">
+  <h2>149. LocalStorage Code Generator</h2>
+  <input id="t149key" value="username">
+  <button onclick="t149fn()">Generate</button>
+  <pre id="o149"></pre>
+</div>
+
+<!-- TEST 150 -->
+<div class="tool">
+  <h2>150. SessionStorage Code Generator</h2>
+  <input id="t150key" value="username">
+  <button onclick="t150fn()">Generate</button>
+  <pre id="o150"></pre>
+    </div>
   <script>
 
     /* =========================
@@ -2562,7 +3055,1358 @@ function t99fn(){const c=Number(t99.value);if(!Number.isInteger(c)||c<100||c>599
 
 const CHEATS={git:`git init\ngit add .\ngit commit -m "message"\ngit status\ngit push`,js:`const x = 10;\nconsole.log(x);\narray.map(x => x*2);`,css:`display:flex;\njustify-content:center;\nalign-items:center;\ngrid-template-columns:repeat(3,1fr);`,html:`<div class="container"></div>\n<h1>Heading</h1>\n<a href="#">Link</a>`,sql:`SELECT * FROM users;\nSELECT name FROM users WHERE id = 1;\nUPDATE users SET name='A' WHERE id=1;`};
 
-function t100fn(){o100.textContent=CHEATS[t100.value];}
+function t100fn(){o100.textContent=CHEATS[t100.value];}function t101fn(){
+  const a=t101a.value.split(/\r?\n/);
+  const b=t101b.value.split(/\r?\n/);
+  const max=Math.max(a.length,b.length);
+  const out=[];
+
+  for(let i=0;i<max;i++){
+    if(a[i]===b[i]){
+      out.push("  "+(a[i]??""));
+    }else{
+      if(a[i]!==undefined) out.push("- "+a[i]);
+      if(b[i]!==undefined) out.push("+ "+b[i]);
+    }
+  }
+
+  o101.textContent=out.join("\n")||"No differences";
+}
+
+
+function t102fn(){
+  o102.textContent=
+    t102.value.split(/\r?\n/).filter(Boolean).join(t102sep.value);
+}
+
+
+function t103fn(){
+  const mode=t103mode.value;
+  const replacement=
+    mode==="space" ? " " :
+    mode==="comma" ? ", " :
+    "<br>";
+
+  o103.textContent=
+    t103.value.split(/\r?\n/).join(replacement);
+}
+
+
+function t104fn(){
+  const n=Math.max(1,Number(t104size.value)||2);
+
+  o104.textContent=
+    t104mode.value==="spaces"
+      ? t104.value.replace(/\t/g," ".repeat(n))
+      : t104.value.replace(new RegExp(" {"+n+"}","g"),"\t");
+}
+
+
+function t105fn(){
+  const n=Math.max(
+    1,
+    Math.min(8,Number(t105size.value)||2)
+  );
+
+  const lines=t105.value.split(/\r?\n/);
+  let level=0;
+
+  o105.textContent=lines.map(line=>{
+    const x=line.trim();
+
+    if(!x) return "";
+
+    if(/^[}\])]/.test(x)){
+      level=Math.max(0,level-1);
+    }
+
+    const result=" ".repeat(level*n)+x;
+
+    if(/[{\[(]$/.test(x)&&!/[}\])]\s*;?$/.test(x)){
+      level++;
+    }
+
+    return result;
+  }).join("\n");
+}
+
+
+function t106fn(){
+  const s=t106.value;
+  let r=[];
+
+  if(t106mode.value==="emails"){
+    r=s.match(
+      /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi
+    )||[];
+  }
+
+  if(t106mode.value==="urls"){
+    r=s.match(/https?:\/\/[^\s]+/gi)||[];
+  }
+
+  if(t106mode.value==="numbers"){
+    r=s.match(/[-+]?\d*\.?\d+/g)||[];
+  }
+
+  if(t106mode.value==="hashtags"){
+    r=s.match(/#[\p{L}\p{N}_]+/gu)||[];
+  }
+
+  o106.textContent=
+    [...new Set(r)].join("\n")||"No matches found";
+}
+
+
+function t107fn(){
+  o107.textContent=t107.value.trim();
+}
+
+
+function t108fn(){
+  let start=Number(t108start.value);
+  const end=Number(t108end.value);
+  const step=Number(t108step.value);
+
+  if(
+    !Number.isFinite(start)||
+    !Number.isFinite(end)||
+    !Number.isFinite(step)||
+    step===0
+  ){
+    o108.textContent="❌ Enter valid values";
+    return;
+  }
+
+  if(
+    (step>0&&start>end)||
+    (step<0&&start<end)
+  ){
+    o108.textContent=
+      "❌ Step direction does not reach the end";
+    return;
+  }
+
+  const arr=[];
+  let count=0;
+
+  while(
+    (step>0 ? start<=end : start>=end)&&
+    count<10000
+  ){
+    arr.push(start);
+    start+=step;
+    count++;
+  }
+
+  o108.textContent=arr.join("\n");
+}
+
+
+function t109fn(){
+  const text=t109text.value;
+  const ch=(t109char.value||" ").charAt(0);
+  const len=Math.max(
+    0,
+    Number(t109length.value)||0
+  );
+
+  const need=Math.max(0,len-text.length);
+
+  if(t109side.value==="left"){
+    o109.textContent=
+      ch.repeat(need)+text;
+  }
+
+  else if(t109side.value==="right"){
+    o109.textContent=
+      text+ch.repeat(need);
+  }
+
+  else{
+    const left=Math.ceil(need/2);
+    const right=need-left;
+
+    o109.textContent=
+      ch.repeat(left)+
+      text+
+      ch.repeat(right);
+  }
+}
+
+
+function t110fn(){
+  const width=Math.max(
+    1,
+    Number(t110width.value)||40
+  );
+
+  const words=t110.value.trim().split(/\s+/);
+  const lines=[];
+  let line="";
+
+  for(const word of words){
+    if(!line){
+      line=word;
+    }
+    else if(line.length+1+word.length<=width){
+      line+=" "+word;
+    }
+    else{
+      lines.push(line);
+      line=word;
+    }
+  }
+
+  if(line) lines.push(line);
+
+  o110.textContent=lines.join("\n");
+}
+
+
+/* =========================
+   TEST 111 - REAL MD5
+   ========================= */
+
+function md5(str){
+
+  function safeAdd(x,y){
+    const l=(x&0xffff)+(y&0xffff);
+
+    return (
+      (((x>>>16)+(y>>>16)+(l>>>16))<<16) |
+      (l&0xffff)
+    );
+  }
+
+  function rol(num,cnt){
+    return (
+      (num<<cnt) |
+      (num>>>(32-cnt))
+    );
+  }
+
+  function cmn(q,a,b,x,s,t){
+    return safeAdd(
+      rol(
+        safeAdd(
+          safeAdd(a,q),
+          safeAdd(x,t)
+        ),
+        s
+      ),
+      b
+    );
+  }
+
+  function ff(a,b,c,d,x,s,t){
+    return cmn(
+      (b&c)|((~b)&d),
+      a,b,x,s,t
+    );
+  }
+
+  function gg(a,b,c,d,x,s,t){
+    return cmn(
+      (b&d)|(c&(~d)),
+      a,b,x,s,t
+    );
+  }
+
+  function hh(a,b,c,d,x,s,t){
+    return cmn(
+      b^c^d,
+      a,b,x,s,t
+    );
+  }
+
+  function ii(a,b,c,d,x,s,t){
+    return cmn(
+      c^(b|(~d)),
+      a,b,x,s,t
+    );
+  }
+
+  const bytes=
+    new TextEncoder().encode(str);
+
+  const len=bytes.length;
+  const bitLen=len*8;
+
+  const total=
+    ((len+8>>>6)+1)*16;
+
+  const x=new Uint32Array(total);
+
+  for(let i=0;i<len;i++){
+    x[i>>2]|=
+      bytes[i]<<((i%4)*8);
+  }
+
+  x[len>>2]|=
+    0x80<<((len%4)*8);
+
+  x[total-2]=bitLen>>>0;
+  x[total-1]=
+    Math.floor(bitLen/4294967296);
+
+  let a=0x67452301;
+  let b=0xefcdab89;
+  let c=0x98badcfe;
+  let d=0x10325476;
+
+  for(let i=0;i<total;i+=16){
+
+    const oa=a;
+    const ob=b;
+    const oc=c;
+    const od=d;
+
+    a=ff(a,b,c,d,x[i+0],7,0xd76aa478);
+    d=ff(d,a,b,c,x[i+1],12,0xe8c7b756);
+    c=ff(c,d,a,b,x[i+2],17,0x242070db);
+    b=ff(b,c,d,a,x[i+3],22,0xc1bdceee);
+
+    a=ff(a,b,c,d,x[i+4],7,0xf57c0faf);
+    d=ff(d,a,b,c,x[i+5],12,0x4787c62a);
+    c=ff(c,d,a,b,x[i+6],17,0xa8304613);
+    b=ff(b,c,d,a,x[i+7],22,0xfd469501);
+
+    a=ff(a,b,c,d,x[i+8],7,0x698098d8);
+    d=ff(d,a,b,c,x[i+9],12,0x8b44f7af);
+    c=ff(c,d,a,b,x[i+10],17,0xffff5bb1);
+    b=ff(b,c,d,a,x[i+11],22,0x895cd7be);
+
+    a=ff(a,b,c,d,x[i+12],7,0x6b901122);
+    d=ff(d,a,b,c,x[i+13],12,0xfd987193);
+    c=ff(c,d,a,b,x[i+14],17,0xa679438e);
+    b=ff(b,c,d,a,x[i+15],22,0x49b40821);
+
+    a=gg(a,b,c,d,x[i+1],5,0xf61e2562);
+    d=gg(d,a,b,c,x[i+6],9,0xc040b340);
+    c=gg(c,d,a,b,x[i+11],14,0x265e5a51);
+    b=gg(b,c,d,a,x[i+0],20,0xe9b6c7aa);
+
+    a=gg(a,b,c,d,x[i+5],5,0xd62f105d);
+    d=gg(d,a,b,c,x[i+10],9,0x02441453);
+    c=gg(c,d,a,b,x[i+15],14,0xd8a1e681);
+    b=gg(b,c,d,a,x[i+4],20,0xe7d3fbc8);
+
+    a=gg(a,b,c,d,x[i+9],5,0x21e1cde6);
+    d=gg(d,a,b,c,x[i+14],9,0xc33707d6);
+    c=gg(c,d,a,b,x[i+3],14,0xf4d50d87);
+    b=gg(b,c,d,a,x[i+8],20,0x455a14ed);
+
+    a=gg(a,b,c,d,x[i+13],5,0xa9e3e905);
+    d=gg(d,a,b,c,x[i+2],9,0xfcefa3f8);
+    c=gg(c,d,a,b,x[i+7],14,0x676f02d9);
+    b=gg(b,c,d,a,x[i+12],20,0x8d2a4c8a);
+
+    a=hh(a,b,c,d,x[i+5],4,0xfffa3942);
+    d=hh(d,a,b,c,x[i+8],11,0x8771f681);
+    c=hh(c,d,a,b,x[i+11],16,0x6d9d6122);
+    b=hh(b,c,d,a,x[i+14],23,0xfde5380c);
+
+    a=hh(a,b,c,d,x[i+1],4,0xa4beea44);
+    d=hh(d,a,b,c,x[i+4],11,0x4bdecfa9);
+    c=hh(c,d,a,b,x[i+7],16,0xf6bb4b60);
+    b=hh(b,c,d,a,x[i+10],23,0xbebfbc70);
+
+    a=hh(a,b,c,d,x[i+13],4,0x289b7ec6);
+    d=hh(d,a,b,c,x[i+0],11,0xeaa127fa);
+    c=hh(c,d,a,b,x[i+3],16,0xd4ef3085);
+    b=hh(b,c,d,a,x[i+6],23,0x04881d05);
+
+    a=hh(a,b,c,d,x[i+9],4,0xd9d4d039);
+    d=hh(d,a,b,c,x[i+12],11,0xe6db99e5);
+    c=hh(c,d,a,b,x[i+15],16,0x1fa27cf8);
+    b=hh(b,c,d,a,x[i+2],23,0xc4ac5665);
+
+    a=ii(a,b,c,d,x[i+0],6,0xf4292244);
+    d=ii(d,a,b,c,x[i+7],10,0x432aff97);
+    c=ii(c,d,a,b,x[i+14],15,0xab9423a7);
+    b=ii(b,c,d,a,x[i+5],21,0xfc93a039);
+
+    a=ii(a,b,c,d,x[i+12],6,0x655b59c3);
+    d=ii(d,a,b,c,x[i+3],10,0x8f0ccc92);
+    c=ii(c,d,a,b,x[i+10],15,0xffeff47d);
+    b=ii(b,c,d,a,x[i+1],21,0x85845dd1);
+
+    a=ii(a,b,c,d,x[i+8],6,0x6fa87e4f);
+    d=ii(d,a,b,c,x[i+15],10,0xfe2ce6e0);
+    c=ii(c,d,a,b,x[i+6],15,0xa3014314);
+    b=ii(b,c,d,a,x[i+13],21,0x4e0811a1);
+
+    a=ii(a,b,c,d,x[i+4],6,0xf7537e82);
+    d=ii(d,a,b,c,x[i+11],10,0xbd3af235);
+    c=ii(c,d,a,b,x[i+2],15,0x2ad7d2bb);
+    b=ii(b,c,d,a,x[i+9],21,0xeb86d391);
+
+    a=safeAdd(a,oa);
+    b=safeAdd(b,ob);
+    c=safeAdd(c,oc);
+    d=safeAdd(d,od);
+  }
+
+  const words=[a,b,c,d];
+  let out="";
+
+  for(const word of words){
+    for(let i=0;i<4;i++){
+      out+=
+        ((word>>>(i*8))&255)
+        .toString(16)
+        .padStart(2,"0");
+    }
+  }
+
+  return out;
+}
+
+
+function t111fn(){
+  o111.textContent=md5(t111.value);
+}
+
+
+/* =========================
+   TEST 112-115 HASH TOOLS
+   ========================= */
+
+async function hashAlgo(text,algo){
+  const b=await crypto.subtle.digest(
+    algo,
+    new TextEncoder().encode(text)
+  );
+
+  return [...new Uint8Array(b)]
+    .map(x=>x.toString(16).padStart(2,"0"))
+    .join("");
+}
+
+
+async function t112fn(){
+  try{
+    o112.textContent=
+      await hashAlgo(t112.value,"SHA-1");
+  }catch(e){
+    o112.textContent=
+      "❌ Web Crypto unavailable";
+  }
+}
+
+
+async function t113fn(){
+  try{
+    o113.textContent=
+      await hashAlgo(t113.value,"SHA-384");
+  }catch(e){
+    o113.textContent=
+      "❌ Web Crypto unavailable";
+  }
+}
+
+
+async function t114fn(){
+  try{
+    o114.textContent=
+      await hashAlgo(t114.value,"SHA-512");
+  }catch(e){
+    o114.textContent=
+      "❌ Web Crypto unavailable";
+  }
+}
+
+
+async function t115fn(){
+  try{
+
+    const key=
+      await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(t115key.value),
+        {
+          name:"HMAC",
+          hash:"SHA-512"
+        },
+        false,
+        ["sign"]
+      );
+
+    const sig=
+      await crypto.subtle.sign(
+        "HMAC",
+        key,
+        new TextEncoder().encode(t115msg.value)
+      );
+
+    o115.textContent=
+      [...new Uint8Array(sig)]
+        .map(x=>x.toString(16).padStart(2,"0"))
+        .join("");
+
+  }catch(e){
+    o115.textContent=
+      "❌ Web Crypto unavailable";
+  }
+}
+
+
+/* =========================
+   TEST 116-119
+   ========================= */
+
+function t116fn(){
+
+  if(t116mode.value==="encode"){
+
+    o116.textContent=
+      [...new TextEncoder().encode(t116.value)]
+        .map(x=>x.toString(16).padStart(2,"0"))
+        .join(" ");
+
+  }else{
+
+    try{
+
+      const parts=
+        t116.value.trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+      if(
+        parts.some(
+          x=>!/^[0-9a-fA-F]{2}$/.test(x)
+        )
+      ){
+        throw Error();
+      }
+
+      o116.textContent=
+        new TextDecoder().decode(
+          new Uint8Array(
+            parts.map(x=>parseInt(x,16))
+          )
+        );
+
+    }catch(e){
+      o116.textContent=
+        "❌ Invalid hexadecimal";
+    }
+  }
+}
+
+
+function t117fn(){
+  o117.textContent=
+    t117.value.replace(
+      /[A-Za-z]/g,
+      c=>{
+        const base=c<="Z"?65:97;
+
+        return String.fromCharCode(
+          (c.charCodeAt(0)-base+13)%26+base
+        );
+      }
+    );
+}
+
+
+function t118fn(){
+
+  o118.textContent=
+    [...t118.value].map(c=>{
+
+      const n=c.charCodeAt(0);
+
+      return n>=33&&n<=126
+        ? String.fromCharCode(
+            33+(n-33+47)%94
+          )
+        : c;
+
+    }).join("");
+}
+
+
+function t119fn(){
+
+  const shift=
+    (
+      ((Number(t119shift.value)||0)%26+26)%26
+    )*
+    (t119mode.value==="decrypt"?-1:1);
+
+  o119.textContent=
+    [...t119.value].map(c=>{
+
+      if(/[A-Z]/.test(c)){
+        return String.fromCharCode(
+          (c.charCodeAt(0)-65+shift+26)%26+65
+        );
+      }
+
+      if(/[a-z]/.test(c)){
+        return String.fromCharCode(
+          (c.charCodeAt(0)-97+shift+26)%26+97
+        );
+      }
+
+      return c;
+
+    }).join("");
+}
+
+
+/* =========================
+   TEST 120 - REAL AES-GCM
+   ========================= */
+
+function bytesToBase64(bytes){
+
+  let binary="";
+
+  for(const b of bytes){
+    binary+=String.fromCharCode(b);
+  }
+
+  return btoa(binary);
+}
+
+
+function base64ToBytes(str){
+
+  const binary=atob(str);
+
+  return Uint8Array.from(
+    binary,
+    c=>c.charCodeAt(0)
+  );
+}
+
+
+async function aesKeyFromPassword(password){
+
+  const hash=
+    await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(password)
+    );
+
+  return crypto.subtle.importKey(
+    "raw",
+    hash,
+    {
+      name:"AES-GCM"
+    },
+    false,
+    [
+      "encrypt",
+      "decrypt"
+    ]
+  );
+}
+
+
+async function t120fn(){
+
+  try{
+
+    if(!window.crypto?.subtle){
+      throw new Error(
+        "Web Crypto unavailable"
+      );
+    }
+
+    const password=t120key.value;
+
+    if(!password){
+      o120.textContent=
+        "❌ Enter a secret password";
+      return;
+    }
+
+    const key=
+      await aesKeyFromPassword(password);
+
+
+    /* ENCRYPT */
+
+    if(t120mode.value==="encrypt"){
+
+      const iv=
+        crypto.getRandomValues(
+          new Uint8Array(12)
+        );
+
+      const encrypted=
+        await crypto.subtle.encrypt(
+          {
+            name:"AES-GCM",
+            iv:iv
+          },
+          key,
+          new TextEncoder().encode(
+            t120msg.value
+          )
+        );
+
+      const packageText=
+        bytesToBase64(iv)+
+        "."+
+        bytesToBase64(
+          new Uint8Array(encrypted)
+        );
+
+      o120.textContent=
+`AES-GCM Encrypted Package:
+
+${packageText}
+
+Keep this package and your password to decrypt it.`;
+    }
+
+
+    /* DECRYPT */
+
+    else{
+
+      const parts=
+        t120msg.value.trim().split(".");
+
+      if(parts.length!==2){
+        throw new Error(
+          "Invalid AES package"
+        );
+      }
+
+      const iv=
+        base64ToBytes(parts[0]);
+
+      const encrypted=
+        base64ToBytes(parts[1]);
+
+      if(iv.length!==12){
+        throw new Error(
+          "Invalid IV"
+        );
+      }
+
+      const decrypted=
+        await crypto.subtle.decrypt(
+          {
+            name:"AES-GCM",
+            iv:iv
+          },
+          key,
+          encrypted
+        );
+
+      o120.textContent=
+        new TextDecoder().decode(
+          decrypted
+        );
+    }
+
+  }catch(e){
+
+    o120.textContent=
+      "❌ AES operation failed. Check password and encrypted package.";
+  }
+}
+
+
+/* =========================
+   TEST 121-130
+   ========================= */
+
+function t121fn(){
+
+  const n=t121name.value.trim();
+  const v=t121value.value;
+
+  if(!n){
+    o121.textContent=
+      "❌ Enter header name";
+    return;
+  }
+
+  o121.textContent=
+    `${n}: ${v}`;
+}
+
+
+function t122fn(){
+
+  const method=t122method.value;
+  const url=t122url.value;
+
+  let code=
+`fetch(${JSON.stringify(url)}, {
+  method: ${JSON.stringify(method)}`;
+
+  if(
+    method!=="GET"&&
+    method!=="DELETE"
+  ){
+
+    code+=`,
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(${t122body.value.trim()||"{}"})`;
+  }
+
+  code+=`
+})
+.then(r => r.json())
+.then(data => console.log(data))
+.catch(err => console.error(err));`;
+
+  o122.textContent=code;
+}
+
+
+function t123fn(){
+
+  const lines=
+    t123.value
+      .split(/\r?\n/)
+      .filter(Boolean);
+
+  const result=[];
+
+  for(const line of lines){
+
+    const i=line.indexOf(":");
+
+    if(i>0){
+      result.push(
+        `${line.slice(0,i).trim()} = ${line.slice(i+1).trim()}`
+      );
+    }else{
+      result.push(line);
+    }
+  }
+
+  o123.textContent=
+    result.join("\n");
+}
+
+
+function t124fn(){
+
+  const types={
+    html:"text/html",
+    htm:"text/html",
+    css:"text/css",
+    js:"text/javascript",
+    json:"application/json",
+    xml:"application/xml",
+    txt:"text/plain",
+    csv:"text/csv",
+    pdf:"application/pdf",
+    zip:"application/zip",
+    png:"image/png",
+    jpg:"image/jpeg",
+    jpeg:"image/jpeg",
+    gif:"image/gif",
+    svg:"image/svg+xml",
+    webp:"image/webp",
+    mp3:"audio/mpeg",
+    mp4:"video/mp4"
+  };
+
+  const ext=
+    t124.value
+      .toLowerCase()
+      .split(".")
+      .pop();
+
+  o124.textContent=
+    types[ext]||"Unknown MIME type";
+}
+
+
+function t125fn(){
+
+  const ua=
+    t125.value.trim()||
+    navigator.userAgent;
+
+  let browser="Unknown";
+
+  if(/Edg\//.test(ua)){
+    browser="Microsoft Edge";
+  }
+  else if(
+    /Chrome\//.test(ua)&&
+    !/Edg\//.test(ua)
+  ){
+    browser="Google Chrome";
+  }
+  else if(/Firefox\//.test(ua)){
+    browser="Mozilla Firefox";
+  }
+  else if(
+    /Safari\//.test(ua)&&
+    !/Chrome\//.test(ua)
+  ){
+    browser="Safari";
+  }
+
+  let os="Unknown";
+
+  if(/Android/.test(ua)){
+    os="Android";
+  }
+  else if(/iPhone|iPad|iPod/.test(ua)){
+    os="iOS";
+  }
+  else if(/Windows/.test(ua)){
+    os="Windows";
+  }
+  else if(/Mac OS X/.test(ua)){
+    os="macOS";
+  }
+  else if(/Linux/.test(ua)){
+    os="Linux";
+  }
+
+  o125.textContent=
+`Browser: ${browser}
+OS: ${os}
+
+User-Agent:
+${ua}`;
+}
+
+
+function t126fn(){
+
+  try{
+
+    const u=new URL(t126.value);
+
+    const token=
+      btoa(u.href)
+        .replace(/[^a-zA-Z0-9]/g,"")
+        .slice(-8);
+
+    o126.textContent=
+`Short ID: ${token}
+
+Note: This generates a local short identifier; it does not create a public redirect service.`;
+
+  }catch(e){
+
+    o126.textContent=
+      "❌ Invalid URL";
+  }
+}
+
+
+function t127fn(){
+
+  const esc=s=>
+    s.replace(/&/g,"&amp;")
+     .replace(/"/g,"&quot;")
+     .replace(/</g,"&lt;")
+     .replace(/>/g,"&gt;");
+
+  o127.textContent=
+`<meta property="og:title" content="${esc(t127title.value)}">
+<meta property="og:description" content="${esc(t127desc.value)}">
+<meta property="og:url" content="${esc(t127url.value)}">
+<meta property="og:image" content="${esc(t127image.value)}">`;
+}
+
+
+function t128fn(){
+
+  const esc=s=>
+    s.replace(/&/g,"&amp;")
+     .replace(/"/g,"&quot;")
+     .replace(/</g,"&lt;")
+     .replace(/>/g,"&gt;");
+
+  o128.textContent=
+`<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(t128title.value)}">
+<meta name="twitter:description" content="${esc(t128desc.value)}">
+<meta name="twitter:image" content="${esc(t128image.value)}">`;
+}
+
+
+function t129fn(){
+
+  try{
+
+    const u=new URL(t129.value);
+
+    o129.textContent=
+      `<link rel="canonical" href="${u.href}">`;
+
+  }catch(e){
+
+    o129.textContent=
+      "❌ Invalid URL";
+  }
+}
+
+
+function t130fn(){
+
+  const manifest={
+    name:t130name.value,
+    short_name:t130short.value,
+    start_url:"/",
+    display:"standalone",
+    background_color:t130color.value,
+    theme_color:t130color.value,
+    icons:[]
+  };
+
+  o130.textContent=
+    JSON.stringify(manifest,null,2);
+}
+
+
+/* =========================
+   TEST 131-140
+   ========================= */
+
+function t131fn(){
+
+  o131.textContent=
+`.button {
+  background: ${t131bg.value};
+  color: ${t131text.value};
+  border: none;
+  border-radius: ${Math.max(0,Number(t131radius.value)||0)}px;
+  padding: 10px 18px;
+  cursor: pointer;
+}`;
+}
+
+
+function t132fn(){
+
+  o132.textContent=
+`text-shadow: ${t132x.value}px ${t132y.value}px ${t132blur.value}px ${t132color.value};`;
+}
+
+
+function t133fn(){
+
+  o133.textContent=
+`@keyframes ${t133name.value} {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100px);
+  }
+}
+
+.element {
+  animation:
+    ${t133name.value}
+    ${t133duration.value}
+    ${t133timing.value}
+    infinite alternate;
+}`;
+}
+
+
+function t134fn(){
+
+  o134.textContent=
+`transform:
+  translate(${t134x.value}px, ${t134y.value}px)
+  scale(${t134scale.value})
+  rotate(${t134rotate.value}deg);`;
+}
+
+
+function t135fn(){
+
+  o135.textContent=
+`transition:
+  ${t135property.value}
+  ${t135duration.value}
+  ${t135timing.value};`;
+}
+
+
+function t136fn(){
+
+  o136.textContent=
+`filter:
+  blur(${t136blur.value}px)
+  brightness(${t136brightness.value}%)
+  grayscale(${t136grayscale.value}%);`;
+}
+
+
+function t137fn(){
+
+  o137.textContent=
+`background:
+  rgba(255, 255, 255, ${t137opacity.value});
+
+backdrop-filter:
+  blur(${t137blur.value}px);
+
+-webkit-backdrop-filter:
+  blur(${t137blur.value}px);
+
+border:
+  1px solid rgba(255,255,255,0.2);`;
+}
+
+
+function t138fn(){
+
+  const r=Math.max(
+    0,
+    Number(t138radius.value)||0
+  );
+
+  o138.textContent=
+`background: ${t138bg.value};
+border-radius: ${r}px;
+
+box-shadow:
+  ${r/2}px ${r/2}px ${r}px #bebebe,
+  -${r/2}px -${r/2}px ${r}px #ffffff;`;
+}
+
+
+function t139fn(){
+
+  const s=Math.max(
+    1,
+    Number(t139size.value)||50
+  );
+
+  o139.textContent=
+`.triangle {
+  width: 0;
+  height: 0;
+  border-left: ${s}px solid transparent;
+  border-right: ${s}px solid transparent;
+  border-bottom: ${s*1.5}px solid ${t139color.value};
+}`;
+}
+
+
+function t140fn(){
+
+  o140.textContent=
+`.spinner {
+  width: ${Math.max(1,Number(t140size.value)||40)}px;
+  height: ${Math.max(1,Number(t140size.value)||40)}px;
+  border: 4px solid #ddd;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin ${t140speed.value} linea/* =========================
+   TEST 141-150
+   ========================= */
+
+function t141fn(){
+
+  try{
+
+    o141.textContent=
+      JSON.stringify(
+        JSON.parse(t141.value),
+        null,
+        2
+      );
+
+  }catch(e){
+
+    o141.textContent=
+      "❌ Invalid JavaScript object/JSON";
+  }
+}
+
+
+function t142fn(){
+
+  const values=
+    t142.value
+      .split(",")
+      .map(x=>x.trim())
+      .filter(Boolean);
+
+  o142.textContent=
+`const array = [${values.map(
+  x=>JSON.stringify(x)
+).join(", ")}];`;
+}
+
+
+function t143fn(){
+
+  o143.textContent=
+`map()        → Transform every item
+filter()     → Keep matching items
+reduce()     → Reduce to one value
+find()       → Find first matching item
+findIndex()  → Find first matching index
+includes()   → Check if value exists
+some()       → Check if any item matches
+every()      → Check if all items match
+sort()       → Sort array
+reverse()    → Reverse array
+slice()      → Copy a portion
+splice()     → Add/remove items
+push()       → Add to end
+pop()        → Remove from end
+shift()      → Remove from start
+unshift()    → Add to start
+join()       → Convert to string`;
+}
+
+
+function t144fn(){
+
+  o144.textContent=
+`const now = new Date();
+
+now.getFullYear();
+now.getMonth();
+now.getDate();
+now.getDay();
+now.getHours();
+now.getMinutes();
+now.getSeconds();
+
+now.toISOString();
+now.toLocaleDateString();
+now.toLocaleTimeString();`;
+}
+
+
+function t145fn(){
+
+  const name=
+    t145.value.trim()||"myFunction";
+
+  o145.textContent=
+`function debounce(fn, delay = 300) {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(
+      () => fn(...args),
+      delay
+    );
+  };
+}
+
+const ${name}Debounced =
+  debounce(${name});`;
+}
+
+
+function t146fn(){
+
+  const name=
+    t146.value.trim()||"myFunction";
+
+  o146.textContent=
+`function throttle(fn, limit = 300) {
+  let waiting = false;
+
+  return (...args) => {
+    if (waiting) return;
+
+    fn(...args);
+
+    waiting = true;
+
+    setTimeout(
+      () => waiting = false,
+      limit
+    );
+  };
+}
+
+const ${name}Throttled =
+  throttle(${name});`;
+}
+
+
+function t147fn(){
+
+  o147.textContent=
+`document.querySelector(${JSON.stringify(t147selector.value)})
+  .addEventListener(${JSON.stringify(t147event.value)}, (event) => {
+    console.log(event);
+  });`;
+}
+
+
+function t148fn(){
+
+  const v=t148.value.trim();
+
+  if(!v){
+    o148.textContent=
+      "❌ Enter a selector value";
+    return;
+  }
+
+  const selector=
+    t148type.value==="id"
+      ? "#"+v
+      : t148type.value==="class"
+        ? "."+v
+        : v;
+
+  o148.textContent=
+    \`document.querySelector(\${JSON.stringify(selector)})\`;
+}
+
+
+function t149fn(){
+
+  const key=
+    JSON.stringify(t149key.value);
+
+  o149.textContent=
+\`localStorage.setItem(\${key}, "value");
+
+const value =
+  localStorage.getItem(\${key});
+
+localStorage.removeItem(\${key});
+
+// localStorage.clear();\`;
+}
+
+
+function t150fn(){
+
+  const key=
+    JSON.stringify(t150key.value);
+
+  o150.textContent=
+\`sessionStorage.setItem(\${key}, "value");
+
+const value =
+  sessionStorage.getItem(\${key});
+
+sessionStorage.removeItem(\${key});
+
+// sessionStorage.clear();\`;
+    }
   </script>
 
 </body>
