@@ -4200,8 +4200,6 @@ function t139fn(){
   border-bottom: ${s*1.5}px solid ${t139color.value};
 }`;
 }
-
-
 function t140fn(){
 
   o140.textContent=
@@ -4211,10 +4209,20 @@ function t140fn(){
   border: 4px solid #ddd;
   border-top-color: #333;
   border-radius: 50%;
-  animation: spin ${t140speed.value} linea/* =========================
+  animation: spin ${t140speed.value} linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}`;
+}
+
+
+/* =========================
    TEST 141-150
    ========================= */
-
 function t141fn(){
 
   try{
