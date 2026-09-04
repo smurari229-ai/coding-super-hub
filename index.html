@@ -4314,6 +4314,156 @@ function t145fn(){
     timer = setTimeout(
       () => fn(...args),
       delay
+function t138fn(){
+
+  const r=Math.max(
+    0,
+    Number(t138radius.value)||0
+  );
+
+  o138.textContent=
+`background: ${t138bg.value};
+border-radius: ${r}px;
+
+box-shadow:
+  ${r/2}px ${r/2}px ${r}px #bebebe,
+  -${r/2}px -${r/2}px ${r}px #ffffff;`;
+}
+
+
+function t139fn(){
+
+  const s=Math.max(
+    1,
+    Number(t139size.value)||50
+  );
+
+  o139.textContent=
+`.triangle {
+  width: 0;
+  height: 0;
+  border-left: ${s}px solid transparent;
+  border-right: ${s}px solid transparent;
+  border-bottom: ${s*1.5}px solid ${t139color.value};
+}`;
+}
+
+
+function t140fn(){
+
+  o140.textContent=
+`.spinner {
+  width: ${Math.max(1,Number(t140size.value)||40)}px;
+  height: ${Math.max(1,Number(t140size.value)||40)}px;
+  border: 4px solid #ddd;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin ${t140speed.value} linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}`;
+}
+
+
+/* =========================
+   TEST 141-150
+   ========================= */
+
+function t141fn(){
+
+  try{
+
+    o141.textContent=
+      JSON.stringify(
+        JSON.parse(t141.value),
+        null,
+        2
+      );
+
+  }catch(e){
+
+    o141.textContent=
+      "❌ Invalid JavaScript object/JSON";
+  }
+}
+
+
+function t142fn(){
+
+  const values=
+    t142.value
+      .split(",")
+      .map(x=>x.trim())
+      .filter(Boolean);
+
+  o142.textContent=
+`const array = [${values.map(
+  x=>JSON.stringify(x)
+).join(", ")}];`;
+}
+
+
+function t143fn(){
+
+  o143.textContent=
+`map()        → Transform every item
+filter()     → Keep matching items
+reduce()     → Reduce to one value
+find()       → Find first matching item
+findIndex()  → Find first matching index
+includes()   → Check if value exists
+some()       → Check if any item matches
+every()      → Check if all items match
+sort()       → Sort array
+reverse()    → Reverse array
+slice()      → Copy a portion
+splice()     → Add/remove items
+push()       → Add to end
+pop()        → Remove from end
+shift()      → Remove from start
+unshift()    → Add to start
+join()       → Convert to string`;
+}
+
+
+function t144fn(){
+
+  o144.textContent=
+`const now = new Date();
+
+now.getFullYear();
+now.getMonth();
+now.getDate();
+now.getDay();
+now.getHours();
+now.getMinutes();
+now.getSeconds();
+
+now.toISOString();
+now.toLocaleDateString();
+now.toLocaleTimeString();`;
+}
+
+
+function t145fn(){
+
+  const name=
+    t145.value.trim()||"myFunction";
+
+  o145.textContent=
+`function debounce(fn, delay = 300) {
+  let timer;
+
+  return (...args) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(
+      () => fn(...args),
+      delay
     );
   };
 }
@@ -4366,8 +4516,10 @@ function t148fn(){
   const v=t148.value.trim();
 
   if(!v){
+
     o148.textContent=
       "❌ Enter a selector value";
+
     return;
   }
 
@@ -4379,22 +4531,24 @@ function t148fn(){
         : v;
 
   o148.textContent=
-    \`document.querySelector(\${JSON.stringify(selector)})\`;
+    `document.querySelector(${JSON.stringify(selector)})`;
 }
+
+
 function t149fn(){
 
   const key=
     JSON.stringify(t149key.value);
 
   o149.textContent=
-\`localStorage.setItem(\${key}, "value");
+`localStorage.setItem(${key}, "value");
 
 const value =
-  localStorage.getItem(\${key});
+  localStorage.getItem(${key});
 
-localStorage.removeItem(\${key});
+localStorage.removeItem(${key});
 
-// localStorage.clear();\`;
+// localStorage.clear();`;
 }
 
 
@@ -4404,15 +4558,15 @@ function t150fn(){
     JSON.stringify(t150key.value);
 
   o150.textContent=
-\`sessionStorage.setItem(\${key}, "value");
+`sessionStorage.setItem(${key}, "value");
 
 const value =
-  sessionStorage.getItem(\${key});
+  sessionStorage.getItem(${key});
 
-sessionStorage.removeItem(\${key});
+sessionStorage.removeItem(${key});
 
-// sessionStorage.clear();\`;
-    }
+// sessionStorage.clear();`;
+  }
   </script>
 
 </body>
