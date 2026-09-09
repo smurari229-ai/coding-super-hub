@@ -21,6 +21,7 @@ body{font-family:Arial,sans-serif;background:#f4f6f8;color:#111827;margin:0;padd
 <script>
 const $=id=>document.getElementById(id);
 function add(label,state,detail=''){const d=document.createElement('div');d.className='item '+state;d.innerHTML='<strong>'+label+'</strong>'+ (detail?' — '+detail:'');$('results').appendChild(d)}
+function uniqueMatches(text,re){return [...new Set([...text.matchAll(re)].map(m=>m[1]).filter(Boolean))]}
 async function audit(){
  $('results').textContent='';$('status').textContent='Loading index.html…';
  try{
@@ -30,7 +31,9 @@ async function audit(){
   add('index.html loads','ok',text.length.toLocaleString()+' characters');
   add('Test markers found',uniq.length?'ok':'bad',uniq.length+' unique markers');
   const missing=[]; for(let n=1;n<=150;n++) if(!uniq.includes(n)) missing.push(n);
+  const duplicateTests=tests.filter((n,i)=>tests.indexOf(n)!==i); const gaps=[]; for(let i=1;i<=150;i++) if(!uniq.includes(i)) gaps.push(i);
   add('Tests 1–150 present',missing.length?'bad':'ok',missing.length?'Missing: '+missing.join(', '):'All 150 markers found');
+  add('Duplicate test markers',duplicateTests.length?'warn':'ok',duplicateTests.length?'Repeated: '+[...new Set(duplicateTests)].join(', '):'None detected');
   const cssBug=/<textarea[^>]*id=["']cssCode["'][^>]*>[\s\S]*?<h1\s*\{/i.test(text);
   add('Test 1 CSS default',cssBug?'bad':'ok',cssBug?'Found malformed <h1 { selector':'No malformed selector detected');
   const apiKey=/localStorage\.(?:getItem|setItem)\(["'][^"']*(?:gemini|api)[^"']*["']/i.test(text);
@@ -39,12 +42,22 @@ async function audit(){
   add('Math.random usage',random?'warn':'ok',random+' occurrence(s)');
   const srcdoc=(text.match(/\.srcdoc\s*=/g)||[]).length;
   add('iframe srcdoc usage',srcdoc?'warn':'ok',srcdoc+' occurrence(s)');
+  const fetches=[...text.matchAll(/\bfetch\s*\(/g)].length;
+  add('Network fetch calls',fetches?'warn':'ok',fetches+' occurrence(s) — review each external dependency');
+  const externalUrls=uniqueMatches(text,/(https?:\/\/[^"'\s`<>]+)/g);
+  add('External URLs',externalUrls.length?'warn':'ok',externalUrls.length?externalUrls.slice(0,12).join(' | ')+(externalUrls.length>12?' | …':''):'None detected');
   const onclick=[...text.matchAll(/onclick\s*=\s*["']\s*([A-Za-z_$][\w$]*)\s*\([^"']*["']/gi)].map(m=>m[1]);
-  const defs=new Set([...text.matchAll(/(?:function\s+|(?:const|let|var)\s+)([A-Za-z_$][\w$]*)\s*(?:=\s*\(?|\()/g)].map(m=>m[1]));
-  const handlers=[...new Set(onclick)].filter(x=>!defs.has(x)&&!['showEditor','selectEditorLanguage'].includes(x));
+  const defs=[...text.matchAll(/(?:function\s+|(?:const|let|var)\s+)([A-Za-z_$][\w$]*)\s*(?:=\s*\(?|\()/g)].map(m=>m[1]);
+  const handlers=[...new Set(onclick)].filter(x=>!new Set(defs).has(x)&&!['showEditor','selectEditorLanguage'].includes(x));
   add('Inline handler names',handlers.length?'warn':'ok',handlers.length?'Possibly missing definitions: '+handlers.join(', '):'No obvious missing handler names');
+  const fnNames=[...text.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map(m=>m[1]); const fnCounts={}; fnNames.forEach(x=>fnCounts[x]=(fnCounts[x]||0)+1); const duplicateFns=Object.entries(fnCounts).filter(([,n])=>n>1).map(([x,n])=>x+' ×'+n);
+  add('Duplicate function declarations',duplicateFns.length?'warn':'ok',duplicateFns.length?duplicateFns.join(', '):'None detected');
   const ids=[...text.matchAll(/\bid\s*=\s*["']([^"']+)["']/g)].map(m=>m[1]); const counts={}; ids.forEach(x=>counts[x]=(counts[x]||0)+1); const dup=Object.entries(counts).filter(([,n])=>n>1).map(([x,n])=>x+' ×'+n);
   add('Duplicate DOM IDs',dup.length?'warn':'ok',dup.length?dup.join(', '):'None detected');
+  const evalLike=(text.match(/\beval\s*\(|\bnew\s+Function\s*\(/g)||[]).length;
+  add('Dynamic code execution',evalLike?'bad':'ok',evalLike?evalLike+' suspicious occurrence(s)':'No eval()/new Function() detected');
+  const unsafeWrite=(text.match(/\bdocument\.write\s*\(/g)||[]).length;
+  add('document.write usage',unsafeWrite?'warn':'ok',unsafeWrite+' occurrence(s)');
   $('status').textContent='Audit complete — read-only.';
  }catch(e){$('status').textContent='Audit failed.';add('Audit execution','bad',e.message)}
 }
