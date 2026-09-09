@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coding Super Hub — Controller Audit</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;color:#111827;margin:0;padding:20px}.wrap{max-width:900px;margin:auto}.card{background:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0001}h1{margin-top:0}.ok{color:#166534}.warn{color:#92400e}.bad{color:#b91c1c}.item{padding:8px 0;border-bottom:1px solid #e5e7eb}.muted{color:#64748b}button{padding:10px 14px;border:0;border-radius:8px;background:#2563eb;color:#fff}pre{white-space:pre-wrap;overflow:auto;background:#f8fafc;padding:12px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card"><h1>🛡️ Coding Super Hub Controller Audit</h1><p class="muted">Read-only audit. This page never modifies index.html or GitHub.</p><button id="run">Run Audit</button><div id="status" class="muted">Ready.</div></div>
+<div class="card"><h2>Results</h2><div id="results"></div></div>
+<div class="card"><h2>Safety Rules</h2><pre>1. Tests 1–150 are treated as protected.
+2. No automatic overwrite of index.html.
+3. Every future change must be reviewed before commit.
+4. Backup branch must exist before a production overwrite.
+5. Browser API keys must not be used as the long-term production architecture.</pre></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function add(label,state,detail=''){const d=document.createElement('div');d.className='item '+state;d.innerHTML='<strong>'+label+'</strong>'+ (detail?' — '+detail:'');$('results').appendChild(d)}
+async function audit(){
+ $('results').textContent='';$('status').textContent='Loading index.html…';
+ try{
+  const r=await fetch('./index.html',{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); const text=await r.text();
+  const tests=[...text.matchAll(/<!--\s*TEST\s+(\d+)/gi)].map(m=>Number(m[1])).filter(Number.isFinite);
+  const uniq=[...new Set(tests)].sort((a,b)=>a-b);
+  add('index.html loads','ok',text.length.toLocaleString()+' characters');
+  add('Test markers found',uniq.length?'ok':'bad',uniq.length+' unique markers');
+  const missing=[]; for(let n=1;n<=150;n++) if(!uniq.includes(n)) missing.push(n);
+  add('Tests 1–150 present',missing.length?'bad':'ok',missing.length?'Missing: '+missing.join(', '):'All 150 markers found');
+  const cssBug=/<textarea[^>]*id=["']cssCode["'][^>]*>[\s\S]*?<h1\s*\{/i.test(text);
+  add('Test 1 CSS default',cssBug?'bad':'ok',cssBug?'Found malformed <h1 { selector':'No malformed selector detected');
+  const apiKey=/localStorage\.(?:getItem|setItem)\(["'][^"']*(?:gemini|api)[^"']*["']/i.test(text);
+  add('Client-side AI key storage',apiKey?'warn':'ok',apiKey?'AI/API key is referenced through localStorage':'No matching localStorage API-key pattern');
+  const random=(text.match(/Math\.random\s*\(/g)||[]).length;
+  add('Math.random usage',random?'warn':'ok',random+' occurrence(s)');
+  const srcdoc=(text.match(/\.srcdoc\s*=/g)||[]).length;
+  add('iframe srcdoc usage',srcdoc?'warn':'ok',srcdoc+' occurrence(s)');
+  const onclick=[...text.matchAll(/onclick\s*=\s*["']\s*([A-Za-z_$][\w$]*)\s*\([^"']*["']/gi)].map(m=>m[1]);
+  const defs=new Set([...text.matchAll(/(?:function\s+|(?:const|let|var)\s+)([A-Za-z_$][\w$]*)\s*(?:=\s*\(?|\()/g)].map(m=>m[1]));
+  const handlers=[...new Set(onclick)].filter(x=>!defs.has(x)&&!['showEditor','selectEditorLanguage'].includes(x));
+  add('Inline handler names',handlers.length?'warn':'ok',handlers.length?'Possibly missing definitions: '+handlers.join(', '):'No obvious missing handler names');
+  const ids=[...text.matchAll(/\bid\s*=\s*["']([^"']+)["']/g)].map(m=>m[1]); const counts={}; ids.forEach(x=>counts[x]=(counts[x]||0)+1); const dup=Object.entries(counts).filter(([,n])=>n>1).map(([x,n])=>x+' ×'+n);
+  add('Duplicate DOM IDs',dup.length?'warn':'ok',dup.length?dup.join(', '):'None detected');
+  $('status').textContent='Audit complete — read-only.';
+ }catch(e){$('status').textContent='Audit failed.';add('Audit execution','bad',e.message)}
+}
+$('run').addEventListener('click',audit);
+audit();
+</script>
+</body>
+</html>
