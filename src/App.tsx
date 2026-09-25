@@ -152,9 +152,9 @@ export default function App() {
       case 'Base64ConverterTool':
         return <Base64ConverterTool toolId={selectedTool.id} />;
       case 'CaseConverterTool':
-        return <CaseConverterTool />;
+        return <CaseConverterTool toolId={selectedTool.id} />;
       case 'UuidGeneratorTool':
-        return <UuidGeneratorTool />;
+        return <UuidGeneratorTool toolId={selectedTool.id} />;
       case 'HashCryptoTool':
         return <HashCryptoTool />;
       case 'RegexTesterTool':
