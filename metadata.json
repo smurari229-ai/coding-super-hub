@@ -1,0 +1,6 @@
+{
+  "name": "Coding Super Hub Explorer",
+  "description": "GitHub repository explorer and inspector for Coding Super Hub and developer projects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
