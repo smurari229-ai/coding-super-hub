@@ -28,7 +28,8 @@ interface DeveloperTool {
 
   // Simple Markdown-to-HTML parser
   const renderMarkdown = (text: string): string => {
-    let html = text
+    const escaped = text.replace(/[&<>\"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;' }[char] || char));
+    let html = escaped
       // Headings
       .replace(/^### (.*$)/gim, '<h3 class="text-base font-bold text-white mt-4 mb-2">$1</h3>')
       .replace(/^## (.*$)/gim, '<h2 class="text-lg font-bold text-white mt-5 mb-2">$1</h2>')
