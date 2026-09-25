@@ -1,211 +1,165 @@
-import React, { useState } from 'react';
-import { Copy, Check, Download, RefreshCw, Key } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Copy, Check, Download, RefreshCw } from 'lucide-react';
 
-export const UuidGeneratorTool: React.FC = () => {
-  const [version, setVersion] = useState<'v4' | 'v7' | 'nanoid'>('v4');
-  const [count, setCount] = useState<number>(5);
-  const [uppercase, setUppercase] = useState<boolean>(false);
-  const [hyphens, setHyphens] = useState<boolean>(true);
-  const [nanoidLength, setNanoidLength] = useState<number>(21);
+interface UuidGeneratorToolProps {
+  toolId?: string;
+}
+
+const NANOID_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-';
+
+function randomBytes(length: number) {
+  return crypto.getRandomValues(new Uint8Array(length));
+}
+
+function uuidV4() {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const bytes = randomBytes(16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function uuidV7() {
+  const bytes = randomBytes(16);
+  const timestamp = BigInt(Date.now());
+  for (let i = 5; i >= 0; i -= 1) {
+    bytes[i] = Number((timestamp >> BigInt((5 - i) * 8)) & 0xffn);
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x70;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function nanoid(length: number) {
+  const result: string[] = [];
+  // Rejection sampling avoids modulo bias while keeping the generator dependency-free.
+  const mask = 63;
+  const step = Math.max(16, Math.ceil(1.6 * length));
+  while (result.length < length) {
+    for (const byte of randomBytes(step)) {
+      const index = byte & mask;
+      if (index < NANOID_ALPHABET.length) result.push(NANOID_ALPHABET[index]);
+      if (result.length === length) break;
+    }
+  }
+  return result.join('');
+}
+
+export const UuidGeneratorTool: React.FC<UuidGeneratorToolProps> = ({ toolId }) => {
+  const [version, setVersion] = useState<'v4' | 'v7' | 'nanoid'>(toolId === 'nanoid-generator' ? 'nanoid' : 'v4');
+  const [count, setCount] = useState(5);
+  const [uppercase, setUppercase] = useState(false);
+  const [hyphens, setHyphens] = useState(true);
+  const [nanoidLength, setNanoidLength] = useState(21);
   const [generatedIds, setGeneratedIds] = useState<string[]>([]);
-  const [copied, setCopied] = useState<boolean>(false);
-
-  // UUID v4 generator
-  const genV4 = (): string => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-      const r = (crypto.getRandomValues(new Uint8Array(1))[0] % 16) | 0;
-      const v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    });
-  };
-
-  // UUID v7 generator (time-ordered)
-  const genV7 = (): string => {
-    const timestamp = Date.now();
-    const timeHex = timestamp.toString(16).padStart(12, '0');
-    const randomHex = Array.from(crypto.getRandomValues(new Uint8Array(10)))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-    
-    // Structure: 8-4-4-4-12
-    const part1 = timeHex.slice(0, 8);
-    const part2 = timeHex.slice(8, 12);
-    const part3 = '7' + randomHex.slice(0, 3);
-    const part4 = ((parseInt(randomHex.slice(3, 4), 16) & 0x3) | 0x8).toString(16) + randomHex.slice(4, 7);
-    const part5 = randomHex.slice(7, 19);
-
-    return `${part1}-${part2}-${part3}-${part4}-${part5}`;
-  };
-
-  // NanoID generator
-  const genNanoId = (len: number = 21): string => {
-    const chars = 'useandom-26T1983_40STOpfontrkLzF-GHIJKLMNOVWXAbcdefghijklmnopqrstuvwxyZ';
-    const randomBytes = crypto.getRandomValues(new Uint8Array(len));
-    return Array.from(randomBytes).map(b => chars[b % chars.length]).join('');
-  };
+  const [copied, setCopied] = useState(false);
 
   const generate = () => {
-    const results: string[] = [];
-    for (let i = 0; i < count; i++) {
-      let id = version === 'v7' ? genV7() : version === 'nanoid' ? genNanoId(nanoidLength) : genV4();
-      if (!hyphens && version !== 'nanoid') {
-        id = id.replace(/-/g, '');
-      }
-      if (uppercase) {
-        id = id.toUpperCase();
-      }
-      results.push(id);
-    }
+    const safeCount = Math.min(100, Math.max(1, count));
+    const safeLength = Math.min(64, Math.max(1, nanoidLength));
+    const results = Array.from({ length: safeCount }, () => {
+      let id = version === 'v7' ? uuidV7() : version === 'nanoid' ? nanoid(safeLength) : uuidV4();
+      if (!hyphens && version !== 'nanoid') id = id.replace(/-/g, '');
+      return uppercase ? id.toUpperCase() : id;
+    });
     setGeneratedIds(results);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     generate();
   }, [version, count, uppercase, hyphens, nanoidLength]);
 
-  const handleCopyAll = () => {
-    navigator.clipboard.writeText(generatedIds.join('\n'));
+  const copyAll = async () => {
+    await navigator.clipboard.writeText(generatedIds.join('\n'));
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    window.setTimeout(() => setCopied(false), 1800);
   };
 
-  const handleDownload = () => {
-    const blob = new Blob([generatedIds.join('\n')], { type: 'text/plain' });
+  const download = () => {
+    const blob = new Blob([generatedIds.join('\n')], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${version}-ids.txt`;
-    a.click();
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${version}-ids.txt`;
+    anchor.click();
     URL.revokeObjectURL(url);
   };
 
   return (
     <div className="space-y-4">
-      {/* Controls Bar */}
       <div className="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: 'v4', label: 'UUID v4 (Random)' },
-              { id: 'v7', label: 'UUID v7 (Time-Sorted)' },
-              { id: 'nanoid', label: 'NanoID (Compact)' },
-            ].map((v) => (
-              <button
-                key={v.id}
-                onClick={() => setVersion(v.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  version === v.id
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                }`}
-              >
-                {v.label}
+              { id: 'v4', label: 'UUID v4' },
+              { id: 'v7', label: 'UUID v7' },
+              { id: 'nanoid', label: 'NanoID' },
+            ].map((item) => (
+              <button key={item.id} onClick={() => setVersion(item.id as typeof version)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${version === item.id ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
+                {item.label}
               </button>
             ))}
           </div>
-
-          <button
-            onClick={generate}
-            className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Regenerate</span>
+          <button onClick={generate} className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5" /> Regenerate
           </button>
         </div>
 
-        {/* Options Row */}
-        <div className="flex flex-wrap items-center gap-6 pt-3 border-t border-slate-800/80 text-xs text-slate-300">
-          <div className="flex items-center gap-2">
-            <label className="text-slate-400">Count:</label>
-            <select
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value))}
-              className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-none"
-            >
-              {[1, 5, 10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
+        <div className="flex flex-wrap items-center gap-5 pt-3 border-t border-slate-800/80 text-xs text-slate-300">
+          <label className="flex items-center gap-2">Count
+            <select aria-label="Number of identifiers" value={count} onChange={(e) => setCount(Number(e.target.value))} className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white">
+              {[1, 5, 10, 25, 50, 100].map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
-          </div>
+          </label>
 
           {version !== 'nanoid' && (
             <>
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={hyphens}
-                  onChange={(e) => setHyphens(e.target.checked)}
-                  className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"
-                />
-                <span>Include Hyphens</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={hyphens} onChange={(e) => setHyphens(e.target.checked)} />
+                Include Hyphens
               </label>
-
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={uppercase}
-                  onChange={(e) => setUppercase(e.target.checked)}
-                  className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"
-                />
-                <span>UPPERCASE</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={uppercase} onChange={(e) => setUppercase(e.target.checked)} />
+                UPPERCASE
               </label>
             </>
           )}
 
           {version === 'nanoid' && (
-            <div className="flex items-center gap-2">
-              <label className="text-slate-400">Length:</label>
-              <input
-                type="number"
-                min={8}
-                max={64}
-                value={nanoidLength}
-                onChange={(e) => setNanoidLength(Number(e.target.value))}
-                className="w-16 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-none"
-              />
-            </div>
+            <label className="flex items-center gap-2">
+              Length
+              <input aria-label="NanoID length" type="number" min={1} max={64} value={nanoidLength} onChange={(e) => setNanoidLength(Number(e.target.value))} className="w-16 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white" />
+            </label>
           )}
         </div>
       </div>
 
-      {/* Output List */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-          <span>Generated {generatedIds.length} identifiers</span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopyAll}
-              className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied All' : 'Copy All'}</span>
-            </button>
-            <button
-              onClick={handleDownload}
-              className="text-slate-400 hover:text-slate-200 flex items-center gap-1"
-              title="Download as TXT"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs space-y-1.5 max-h-80 overflow-y-auto selection:bg-indigo-500">
-          {generatedIds.map((id, index) => (
-            <div key={index} className="flex items-center justify-between py-1 px-2 rounded hover:bg-slate-900 group">
-              <span className="text-slate-200">{id}</span>
-              <button
-                onClick={() => navigator.clipboard.writeText(id)}
-                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-white transition-opacity"
-                title="Copy single ID"
-              >
-                <Copy className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
+      <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+        <span>{generatedIds.length} identifiers · browser cryptography only</span>
+        <div className="flex items-center gap-3">
+          <button onClick={copyAll} disabled={!generatedIds.length} className="text-indigo-400 hover:text-indigo-300 disabled:opacity-40 flex items-center gap-1">
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />} {copied ? 'Copied' : 'Copy All'}
+          </button>
+          <button onClick={download} disabled={!generatedIds.length} className="text-slate-400 hover:text-slate-200 disabled:opacity-40 flex items-center gap-1">
+            <Download className="w-3.5 h-3.5" /> Export
+          </button>
         </div>
       </div>
+
+      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs space-y-1.5 max-h-80 overflow-y-auto">
+        {generatedIds.map((id, index) => (
+          <div key={`${id}-${index}`} className="flex items-center justify-between gap-3 py-1 px-2 rounded hover:bg-slate-900">
+            <span className="text-slate-200 break-all select-all">{id}</span>
+            <button onClick={() => navigator.clipboard.writeText(id)} className="text-slate-500 hover:text-white shrink-0" aria-label={`Copy identifier ${index + 1}`}>
+              <Copy className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-[11px] text-slate-500 px-1">All identifiers are generated locally. Do not treat generated IDs as authentication credentials or secrets.</p>
     </div>
   );
 };
