@@ -103,7 +103,6 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
               {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'])}
               {select('align-items', align, setAlign, ['stretch','flex-start','center','flex-end','baseline'])}
               {select('align-content', alignContent, setAlignContent, ['stretch','flex-start','center','flex-end','space-between','space-around'])}
-              {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'])}
               {select('flex-wrap', wrap, setWrap, ['nowrap','wrap','wrap-reverse'])}
               {select('flex-basis', basis, setBasis, ['auto','0','25%','50%','100px'])}
               <label className="space-y-1 text-xs text-slate-400"><span>flex-grow: {grow}</span><input type="range" min="0" max="4" value={grow} onChange={e => setGrow(Number(e.target.value))} className="w-full" /></label>
