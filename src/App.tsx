@@ -404,7 +404,7 @@ export default function App() {
 
             {currentDirectoryTools.length > 48 && (
               <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800 text-center text-xs text-slate-400">
-                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 540 tools instantly.
+                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 535 tools instantly.
               </div>
             )}
           </section>
