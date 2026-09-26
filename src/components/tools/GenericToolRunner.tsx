@@ -49,7 +49,8 @@ const toHex = (value: string) =>
   Array.from(new TextEncoder().encode(value), byte => byte.toString(16).padStart(2, '0')).join(' ');
 
 const fromHex = (value: string) => {
-  const clean = value.replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '');
+  const clean = value.replace(/0x/gi, '').replace(/\s+/g, '');
+  if (!clean || !/^[0-9a-f]+$/i.test(clean)) throw new Error('Hex input may contain only hexadecimal digits and whitespace.');
   if (clean.length % 2) throw new Error('Hex input must contain an even number of digits.');
   return new TextDecoder().decode(new Uint8Array((clean.match(/../g) ?? []).map(pair => parseInt(pair, 16))));
 };
@@ -186,26 +187,43 @@ const parseCsv = (value: string): string[][] => {
   let row: string[] = [];
   let cell = '';
   let quoted = false;
+  let fieldStart = true;
+
+  const pushCell = () => { row.push(cell); cell = ''; fieldStart = true; };
+  const pushRow = () => { pushCell(); rows.push(row); row = []; };
 
   for (let i = 0; i < value.length; i += 1) {
     const char = value[i];
     const next = value[i + 1];
-    if (char === '"' && quoted && next === '"') { cell += '"'; i += 1; continue; }
-    if (char === '"') { quoted = !quoted; continue; }
-    if (char === ',' && !quoted) { row.push(cell); cell = ''; continue; }
-    if (char === '\n' && !quoted) { row.push(cell); rows.push(row); row = []; cell = ''; continue; }
-    if (char !== '\r') cell += char;
+
+    if (quoted) {
+      if (char === '"' && next === '"') { cell += '"'; i += 1; continue; }
+      if (char === '"') { quoted = false; fieldStart = false; continue; }
+      cell += char;
+      continue;
+    }
+
+    if (char === '"' && fieldStart) { quoted = true; fieldStart = false; continue; }
+    if (char === '"') throw new Error('Malformed CSV: unexpected quote inside an unquoted field.');
+    if (char === ',' ) { pushCell(); continue; }
+    if (char === '\n') { pushRow(); continue; }
+    if (char !== '\r') { cell += char; fieldStart = false; }
   }
-  if (cell || row.length) { row.push(cell); rows.push(row); }
-  return rows.filter(rowItem => rowItem.some(Boolean));
+
+  if (quoted) throw new Error('Malformed CSV: unterminated quoted field.');
+  if (cell || row.length || value.endsWith(',')) pushRow();
+  return rows.filter(rowItem => rowItem.length > 1 || rowItem[0] !== '');
 };
 
 const csvToJson = (value: string) => {
   const rows = parseCsv(value);
   if (rows.length < 2) throw new Error('CSV needs a header row and at least one data row.');
   const headers = rows[0].map(valueItem => valueItem.trim());
+  if (headers.some(header => !header)) throw new Error('CSV header names cannot be empty.');
+  if (new Set(headers).size !== headers.length) throw new Error('CSV header names must be unique.');
+  if (rows.slice(1).some(row => row.length > headers.length)) throw new Error('Malformed CSV: a data row has more fields than the header row.');
   const data = rows.slice(1).map(row => Object.fromEntries(headers.map((key, index) => {
-    const raw = (row[index] ?? '').trim();
+    const raw = row[index] ?? '';
     if (raw === 'true') return [key, true];
     if (raw === 'false') return [key, false];
     if (/^-?\d+(\.\d+)?$/.test(raw)) return [key, Number(raw)];
