@@ -47,12 +47,6 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   };
   const [csp, setCsp] = useState<Record<string,string>>(defaultCsp);
 
-    'default-src': "'self'", 'script-src': "'self'", 'style-src': "'self' 'unsafe-inline'",
-    'img-src': "'self' data:", 'font-src': "'self'", 'connect-src': "'self'",
-    'media-src': "'self'", 'object-src': "'none'", 'frame-src': "'none'",
-    'frame-ancestors': "'none'", 'base-uri': "'self'", 'form-action': "'self'",
-  });
-
   const reset = () => {
     setCopied(false); setCopyError('');
     setPassword('');
@@ -169,7 +163,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   const rateHeaders = `RateLimit-Limit: ${limit}\nRateLimit-Remaining: ${remaining}\nRateLimit-Reset: ${reset}\nRetry-After: ${retryAfter}`;
 
   const label = (text: string, child: React.ReactNode) => <label className="space-y-1 text-xs text-slate-400"><span>{text}</span>{child}</label>;
-  const box = (value: string) => <pre className="overflow-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs leading-relaxed text-emerald-300">{value || 'No result yet.'}</pre>;
+  const box = (value: string) => <div><pre className="overflow-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs leading-relaxed text-emerald-300">{value || 'No result yet.'}</pre>{copyError && <p className="mt-2 text-[11px] text-amber-300">{copyError}</p>}</div>;
 
   if (id === 'password-entropy-meter') return (
     <div className="space-y-4">
@@ -211,11 +205,11 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   );
 
   if (id === 'rate-limit-header-builder') return (
-    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={reset} onChange={e=>setReset(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}{resetButton}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={reset} onChange={e=>setReset(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
   );
 
   if (id === 'csp-generator') return (
-    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{Object.keys(csp).map(key=>label(key, <input value={csp[key]} onChange={e=>setCsp(prev=>({...prev,[key]:e.target.value}))} className={inputClass}/>))}</div>{resetButton}{box('Content-Security-Policy: '+cspValue)}{box('<meta http-equiv="Content-Security-Policy" content="'+cspValue.replace(/"/g,'&quot;')+'">')}<div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-400"><strong className="text-slate-200">What it does:</strong> each directive limits a resource category or embedding/navigation behavior. Review every source against your actual application before deployment; this generator cannot establish universal safety.</div><button onClick={()=>copyText(cspValue,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy header value'}</button></div>
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{Object.keys(csp).map(key=>label(key, <input value={csp[key]} onChange={e=>setCsp(prev=>({...prev,[key]:e.target.value}))} className={inputClass}/>))}</div>{box('Content-Security-Policy: '+cspValue)}{box('<meta http-equiv="Content-Security-Policy" content="'+cspValue.replace(/"/g,'&quot;')+'">')}<div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-400"><strong className="text-slate-200">What it does:</strong> each directive limits a resource category or embedding/navigation behavior. Review every source against your actual application before deployment; this generator cannot establish universal safety.</div><button onClick={()=>copyText(cspValue,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy header value'}</button></div>
   );
 
   if (id === 'security-headers-analyzer') return (
