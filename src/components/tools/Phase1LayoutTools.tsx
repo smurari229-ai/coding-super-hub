@@ -62,9 +62,13 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   }, [isGrid, direction, justify, align, alignContent, justifyContent, wrap, gap, rowGap, columnGap, grow, shrink, basis, columns, rows, minmax, gridAlign]);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(css);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(css);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   };
 
   const reset = () => {
@@ -112,7 +116,7 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
           <div className={cx("min-w-0 overflow-auto rounded-xl border border-slate-800 bg-slate-900 p-4", isGrid ? "grid" : "flex")}
             style={isGrid
               ? { gridTemplateColumns: minmax ? `repeat(${columns}, minmax(0,1fr))` : `repeat(${columns},1fr)`, gridTemplateRows: `repeat(${rows}, minmax(52px, auto))`, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px`, alignItems: gridAlign, justifyItems: gridAlign, alignContent, justifyContent }
-              : { flexDirection: direction, justifyContent: justify, alignItems: align, alignContent, justifyContent: justify, flexWrap: wrap, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px` }}>
+              : { flexDirection: direction, justifyContent: justify, alignItems: align, alignContent, flexWrap: wrap, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px` }}>
             {Array.from({ length: isGrid ? columns * rows : 6 }, (_, i) => (
               <div key={i} className="flex min-h-14 min-w-16 items-center justify-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 text-xs font-semibold text-indigo-200"
                 style={!isGrid ? { flexGrow: grow, flexShrink: shrink, flexBasis: basis } : undefined}>Item {i + 1}</div>
