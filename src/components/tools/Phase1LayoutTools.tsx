@@ -11,6 +11,8 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   const [direction, setDirection] = useState<'row' | 'row-reverse' | 'column' | 'column-reverse'>('row');
   const [justify, setJustify] = useState('center');
   const [align, setAlign] = useState('center');
+  const [alignContent, setAlignContent] = useState('stretch');
+  const [justifyContent, setJustifyContent] = useState('stretch');
   const [wrap, setWrap] = useState<'nowrap' | 'wrap' | 'wrap-reverse'>('wrap');
   const [gap, setGap] = useState(16);
   const [rowGap, setRowGap] = useState(16);
@@ -31,6 +33,8 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   display: grid;
   grid-template-columns: ${col};
   grid-template-rows: repeat(${rows}, auto);
+  align-content: ${alignContent};
+  justify-content: ${justifyContent};
   gap: ${gap}px;
   row-gap: ${rowGap}px;
   column-gap: ${columnGap}px;
@@ -43,6 +47,8 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   flex-direction: ${direction};
   justify-content: ${justify};
   align-items: ${align};
+  align-content: ${alignContent};
+  justify-content: ${justify};
   flex-wrap: ${wrap};
   gap: ${gap}px;
   row-gap: ${rowGap}px;
@@ -54,7 +60,7 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   flex-shrink: ${shrink};
   flex-basis: ${basis};
 }`;
-  }, [isGrid, direction, justify, align, wrap, gap, rowGap, columnGap, grow, shrink, basis, columns, rows, minmax, gridAlign]);
+  }, [isGrid, direction, justify, align, alignContent, justifyContent, wrap, gap, rowGap, columnGap, grow, shrink, basis, columns, rows, minmax, gridAlign]);
 
   const copy = async () => {
     await navigator.clipboard.writeText(css);
@@ -63,7 +69,7 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   };
 
   const reset = () => {
-    setDirection('row'); setJustify('center'); setAlign('center'); setWrap('wrap');
+    setDirection('row'); setJustify('center'); setAlign('center'); setAlignContent('stretch'); setJustifyContent('stretch'); setWrap('wrap');
     setGap(16); setRowGap(16); setColumnGap(16); setGrow(0); setShrink(1); setBasis('auto');
     setColumns(3); setRows(2); setMinmax(true); setGridAlign('stretch');
   };
@@ -86,11 +92,15 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
               <label className="space-y-1 text-xs text-slate-400"><span>Columns: {columns}</span><input type="range" min="1" max="8" value={columns} onChange={e => setColumns(Number(e.target.value))} className="w-full" /></label>
               <label className="space-y-1 text-xs text-slate-400"><span>Rows: {rows}</span><input type="range" min="1" max="6" value={rows} onChange={e => setRows(Number(e.target.value))} className="w-full" /></label>
               <label className="flex items-center gap-2 text-xs text-slate-300"><input type="checkbox" checked={minmax} onChange={e => setMinmax(e.target.checked)} /> Use minmax(0, 1fr)</label>
-              {select('Alignment', gridAlign, setGridAlign, ['stretch', 'start', 'center', 'end'])}
+              {select('Item alignment', gridAlign, setGridAlign, ['stretch', 'start', 'center', 'end'])}
+              {select('align-content', alignContent, setAlignContent, ['stretch','start','center','end','space-between','space-around'])}
+              {select('justify-content', justifyContent, setJustifyContent, ['start','center','end','space-between','space-around','space-evenly'])}
             </> : <>
               {select('flex-direction', direction, setDirection, ['row','row-reverse','column','column-reverse'])}
               {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'])}
               {select('align-items', align, setAlign, ['stretch','flex-start','center','flex-end','baseline'])}
+              {select('align-content', alignContent, setAlignContent, ['stretch','flex-start','center','flex-end','space-between','space-around'])}
+              {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'])}
               {select('flex-wrap', wrap, setWrap, ['nowrap','wrap','wrap-reverse'])}
               {select('flex-basis', basis, setBasis, ['auto','0','25%','50%','100px'])}
               <label className="space-y-1 text-xs text-slate-400"><span>flex-grow: {grow}</span><input type="range" min="0" max="4" value={grow} onChange={e => setGrow(Number(e.target.value))} className="w-full" /></label>
@@ -102,8 +112,8 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
           </div>
           <div className={cx("min-w-0 overflow-auto rounded-xl border border-slate-800 bg-slate-900 p-4", isGrid ? "grid" : "flex")}
             style={isGrid
-              ? { gridTemplateColumns: minmax ? `repeat(${columns}, minmax(0,1fr))` : `repeat(${columns},1fr)`, gridTemplateRows: `repeat(${rows}, minmax(52px, auto))`, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px`, alignItems: gridAlign, justifyItems: gridAlign }
-              : { flexDirection: direction, justifyContent: justify, alignItems: align, flexWrap: wrap, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px` }}>
+              ? { gridTemplateColumns: minmax ? `repeat(${columns}, minmax(0,1fr))` : `repeat(${columns},1fr)`, gridTemplateRows: `repeat(${rows}, minmax(52px, auto))`, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px`, alignItems: gridAlign, justifyItems: gridAlign, alignContent, justifyContent }
+              : { flexDirection: direction, justifyContent: justify, alignItems: align, alignContent, justifyContent: justify, flexWrap: wrap, gap: `${gap}px`, rowGap: `${rowGap}px`, columnGap: `${columnGap}px` }}>
             {Array.from({ length: isGrid ? columns * rows : 6 }, (_, i) => (
               <div key={i} className="flex min-h-14 min-w-16 items-center justify-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 text-xs font-semibold text-indigo-200"
                 style={!isGrid ? { flexGrow: grow, flexShrink: shrink, flexBasis: basis } : undefined}>Item {i + 1}</div>
