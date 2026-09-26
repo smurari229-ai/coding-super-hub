@@ -31,6 +31,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   const [retryAfter, setRetryAfter] = useState(60);
   const [url, setUrl] = useState('https://user:secret@example.com:8443/search?q=hello&lang=en#docs');
   const [json, setJson] = useState('{"name":"Ada","age":36,"active":true,"skills":["TypeScript","CSS"],"profile":{"city":"Mumbai"}}');
+  const [headerInput, setHeaderInput] = useState('Strict-Transport-Security: max-age=31536000; includeSubDomains\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin');
   const [csp, setCsp] = useState<Record<string,string>>({
     'default-src': "'self'", 'script-src': "'self'", 'style-src': "'self' 'unsafe-inline'",
     'img-src': "'self' data:", 'font-src': "'self'", 'connect-src': "'self'",
@@ -100,6 +101,16 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   }, [url]);
 
   const cspValue = useMemo(() => Object.entries(csp).filter(([, value]) => value.trim()).map(([key, value]) => key + ' ' + value.trim()).join('; '), [csp]);
+  const headerAnalysis = useMemo(() => {
+    const expected = ['strict-transport-security','x-content-type-options','referrer-policy','permissions-policy','content-security-policy','cross-origin-opener-policy','cross-origin-resource-policy','cross-origin-embedder-policy'];
+    const present = new Set<string>();
+    headerInput.split(/\r?\n/).forEach(line => {
+      const index = line.indexOf(':');
+      if (index > 0) present.add(line.slice(0, index).trim().toLowerCase());
+    });
+    return expected.map(name => ({ name, present: present.has(name) }));
+  }, [headerInput]);
+
   const securityHeaders = useMemo(() => [
     "Strict-Transport-Security: max-age=31536000; includeSubDomains",
     "X-Content-Type-Options: nosniff",
@@ -177,14 +188,19 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   );
 
   if (id === 'security-headers-analyzer') return (
-    <div className="space-y-4">{box(securityHeaders)}<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{[
+    <div className="space-y-4">
+      {label('Response headers to analyze', <textarea value={headerInput} onChange={e=>setHeaderInput(e.target.value)} rows={8} className={inputClass + ' font-mono'} placeholder="Header-Name: value" />)}
+      {box(headerAnalysis.map(item => (item.present ? '✓ Present: ' : '✗ Missing: ') + item.name).join('\n'))}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{[
       ['HSTS','Requests HTTPS persistence in supporting browsers; preload/subdomain choices need deployment review.'],
       ['X-Content-Type-Options','Prevents MIME sniffing when set to nosniff.'],
       ['Referrer-Policy','Controls how much referrer information browsers send.'],
       ['Permissions-Policy','Restricts selected browser capabilities; directives depend on application needs.'],
       ['CSP','Restricts resource sources and embedding/navigation according to directives.'],
       ['COOP/CORP/COEP','Cross-origin isolation controls with compatibility and resource-loading implications.'],
-    ].map(([name,desc])=><div key={name} className="rounded-xl border border-slate-800 p-3"><strong className="text-sm text-white">{name}</strong><p className="mt-1 text-[11px] leading-relaxed text-slate-400">{desc}</p></div>)}</div><p className="text-[11px] text-amber-300">This is a configuration aid, not a universal security guarantee. Test headers against the actual application and browser compatibility requirements.</p></div>
+    ].map(([name,desc])=><div key={name} className="rounded-xl border border-slate-800 p-3"><strong className="text-sm text-white">{name}</strong><p className="mt-1 text-[11px] leading-relaxed text-slate-400">{desc}</p></div>)}</div>
+      <p className="text-[11px] text-amber-300">This analyzer checks header presence only; it does not validate directive semantics or guarantee security. Test against the actual application and browser compatibility requirements.</p>
+    </div>
   );
 
   return <div className="rounded-2xl border border-slate-800 p-4 text-xs text-slate-500">This Phase 1 security tool has no renderer registered yet.</div>;
