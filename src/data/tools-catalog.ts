@@ -68,6 +68,15 @@ export const CATEGORIES: CategoryMeta[] = [
 ];
 
 // Helper to create tool definitions
+const inferActionType = (id: string, name: string, description: string): ToolItem['actionType'] => {
+  const haystack = (id + ' ' + name + ' ' + description).toLowerCase();
+  if (/(generator|generate|random|mock|fake-data|boilerplate|builder|creator|banner|manifest)/.test(haystack)) return 'generate';
+  if (/(validator|validate|lint|tester|tester|checker|debugger)/.test(haystack)) return 'validate';
+  if (/(calculator|calculate|converter|convert|percentage|gcd|lcm|factorial|prime|byte)/.test(haystack)) return 'calculate';
+  if (/(analyzer|analyser|inspector|inspect|explorer|statistics|frequency)/.test(haystack)) return 'inspect';
+  return 'transform';
+};
+
 function t(
   id: string, 
   name: string, 
@@ -82,6 +91,7 @@ function t(
     category,
     description,
     tags,
+    actionType: options.actionType ?? inferActionType(id, name, description),
     ...options
   };
 }
