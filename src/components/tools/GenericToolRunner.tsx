@@ -581,7 +581,10 @@ function runTool(tool: ToolItem, input: string): RunnerResult {
       const url = new URL(input);
       return { output: [
         'Protocol: ' + url.protocol,
+        'Username: ' + (url.username || '(none)'),
+        'Password present: ' + (url.password ? 'yes (hidden)' : 'no'),
         'Host: ' + url.hostname,
+        'Origin: ' + url.origin,
         'Port: ' + (url.port || '(default)'),
         'Path: ' + url.pathname,
         'Query: ' + url.search,
@@ -593,9 +596,20 @@ function runTool(tool: ToolItem, input: string): RunnerResult {
     if (id === 'json-schema-generator') {
       const value = JSON.parse(input);
       const infer = (item: unknown): unknown => {
-        if (Array.isArray(item)) return { type: 'array', items: item.length ? infer(item[0]) : {} };
+        if (Array.isArray(item)) {
+          if (!item.length) return { type: 'array', items: {} };
+          const objects = item.filter(child => child && typeof child === 'object' && !Array.isArray(child)) as Record<string, unknown>[];
+          if (objects.length) {
+            const keys = Array.from(new Set(objects.flatMap(child => Object.keys(child))));
+            return { type: 'array', items: { type: 'object', properties: Object.fromEntries(keys.map(key => [key, infer(objects.find(child => key in child)?.[key])])), required: keys.filter(key => objects.every(child => key in child)) } };
+          }
+          return { type: 'array', items: infer(item[0]) };
+        }
         if (item === null) return { type: 'null' };
-        if (typeof item === 'object') return { type: 'object', properties: Object.fromEntries(Object.entries(item).map(([key, child]) => [key, infer(child)])) };
+        if (typeof item === 'object') {
+          const entries = Object.entries(item);
+          return { type: 'object', properties: Object.fromEntries(entries.map(([key, child]) => [key, infer(child)])), required: entries.map(([key]) => key) };
+        }
         return { type: typeof item };
       };
       return { output: JSON.stringify({ $schema: 'https://json-schema.org/draft/2020-12/schema', ...infer(value) }, null, 2) };
