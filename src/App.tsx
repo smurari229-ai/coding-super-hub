@@ -32,6 +32,8 @@ import { DevCalculatorsTool } from './components/tools/DevCalculatorsTool';
 import { CodePlaygroundTool } from './components/tools/CodePlaygroundTool';
 import { AiCopilotTool } from './components/tools/AiCopilotTool';
 import { GenericToolRunner } from './components/tools/GenericToolRunner';
+import { Phase1LayoutTools } from './components/tools/Phase1LayoutTools';
+import { Phase1SecurityTools } from './components/tools/Phase1SecurityTools';
 
 import { 
   Star, 
@@ -146,6 +148,25 @@ export default function App() {
 
   // Render the appropriate execution runner
   const renderToolComponent = () => {
+    if (selectedTool.id === 'css-flexbox-playground' || selectedTool.id === 'css-grid-generator') {
+      return <Phase1LayoutTools tool={selectedTool} />;
+    }
+
+    const phase1SecurityIds = [
+      'csp-generator',
+      'security-headers-analyzer',
+      'password-entropy-meter',
+      'hash-identifier',
+      'cookie-flags-generator',
+      'rate-limit-header-builder',
+      'url-parser-inspector',
+      'json-schema-generator',
+    ];
+
+    if (phase1SecurityIds.includes(selectedTool.id)) {
+      return <Phase1SecurityTools tool={selectedTool} />;
+    }
+
     switch (selectedTool.dedicatedComponent) {
       case 'JsonFormatterTool':
         return <JsonFormatterTool toolId={selectedTool.id} />;
