@@ -328,7 +328,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* Directory Explorer (500+ Tools) */}
+          {/* Directory Explorer (535 Tools) */}
           <section className="space-y-4 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
               <div>
@@ -404,7 +404,7 @@ export default function App() {
 
             {currentDirectoryTools.length > 48 && (
               <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800 text-center text-xs text-slate-400">
-                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 540 tools instantly.
+                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 535 tools instantly.
               </div>
             )}
           </section>

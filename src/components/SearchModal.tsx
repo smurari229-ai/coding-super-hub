@@ -75,7 +75,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search 500+ developer tools by name, tag, or category..."
+            placeholder="Search 535 developer tools by name, tag, or category..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -163,7 +163,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             <span>↵ to select</span>
             <span>ESC to close</span>
           </div>
-          <span>{filtered.length} of 500+ tools</span>
+          <span>{filtered.length} of 535 tools</span>
         </div>
       </div>
     </div>
