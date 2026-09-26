@@ -4,16 +4,23 @@ import { ToolItem } from '../../types/tools';
 
 type Props = { tool: ToolItem };
 
-const copyText = async (value: string, setCopied: (v: boolean) => void) => {
-  await navigator.clipboard.writeText(value);
-  setCopied(true);
-  window.setTimeout(() => setCopied(false), 1500);
+const copyText = async (value: string, setCopied: (v: boolean) => void, setError: (v: string) => void) => {
+  try {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setError('');
+    window.setTimeout(() => setCopied(false), 1500);
+  } catch {
+    setCopied(false);
+    setError('Clipboard access is unavailable. Copy the output manually.');
+  }
 };
 
 const inputClass = "w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-200";
 
 export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState('');
   const [password, setPassword] = useState('');
   const [cookieName, setCookieName] = useState('session');
   const [cookieValue, setCookieValue] = useState('example');
@@ -32,12 +39,32 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   const [url, setUrl] = useState('https://user:secret@example.com:8443/search?q=hello&lang=en#docs');
   const [json, setJson] = useState('{"name":"Ada","age":36,"active":true,"skills":["TypeScript","CSS"],"profile":{"city":"Mumbai"}}');
   const [headerInput, setHeaderInput] = useState('Strict-Transport-Security: max-age=31536000; includeSubDomains\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin');
-  const [csp, setCsp] = useState<Record<string,string>>({
+  const defaultCsp: Record<string,string> = {
+    'default-src': "'self'", 'script-src': "'self'", 'style-src': "'self' 'unsafe-inline'",
+    'img-src': "'self' data:", 'font-src': "'self'", 'connect-src': "'self'",
+    'media-src': "'self'", 'object-src': "'none'", 'frame-src': "'none'",
+    'frame-ancestors': "'none'", 'base-uri': "'self'", 'form-action': "'self'",
+  };
+  const [csp, setCsp] = useState<Record<string,string>>(defaultCsp);
+
     'default-src': "'self'", 'script-src': "'self'", 'style-src': "'self' 'unsafe-inline'",
     'img-src': "'self' data:", 'font-src': "'self'", 'connect-src': "'self'",
     'media-src': "'self'", 'object-src': "'none'", 'frame-src': "'none'",
     'frame-ancestors': "'none'", 'base-uri': "'self'", 'form-action': "'self'",
   });
+
+  const reset = () => {
+    setCopied(false); setCopyError('');
+    setPassword('');
+    setCookieName('session'); setCookieValue('example'); setSecure(true); setHttpOnly(true);
+    setSameSite('Strict'); setDomain(''); setPath('/'); setMaxAge(''); setExpires(''); setPartitioned(false);
+    setLimit(100); setRemaining(90); setReset(60); setRetryAfter(60);
+    setUrl('https://user:secret@example.com:8443/search?q=hello&lang=en#docs');
+    setJson('{"name":"Ada","age":36,"active":true,"skills":["TypeScript","CSS"],"profile":{"city":"Mumbai"}}');
+    setHeaderInput('Strict-Transport-Security: max-age=31536000; includeSubDomains\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin');
+    setCsp(defaultCsp);
+  };
+  const resetButton = <button onClick={reset} className="flex items-center gap-1 rounded-lg bg-slate-800 px-3 py-2 text-xs text-slate-300"><RefreshCw className="h-3.5 w-3.5" />Reset</button>;
 
   const id = tool.id;
 
@@ -127,11 +154,15 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
     if (secure) out += '; Secure';
     if (httpOnly) out += '; HttpOnly';
     if (sameSite !== 'None') out += '; SameSite=' + sameSite; else out += '; SameSite=None';
+    if (sameSite === 'None' && !secure && !out.includes('; Secure')) out += '; Secure';
     if (domain.trim()) out += '; Domain=' + domain.trim();
     if (path.trim()) out += '; Path=' + path.trim();
     if (maxAge.trim()) out += '; Max-Age=' + maxAge.trim();
     if (expires.trim()) out += '; Expires=' + expires.trim();
-    if (partitioned) out += '; Partitioned';
+    if (partitioned) {
+      out += '; Partitioned';
+      if (!secure && !out.includes('; Secure')) out += '; Secure';
+    }
     return out;
   }, [cookieName,cookieValue,secure,httpOnly,sameSite,domain,path,maxAge,expires,partitioned]);
 
@@ -143,7 +174,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   if (id === 'password-entropy-meter') return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-        {label('Password (processed locally; never stored by this component)', <input type="password" autoComplete="off" value={password} onChange={e=>setPassword(e.target.value)} className={inputClass} placeholder="Type a password to estimate entropy" />)}
+        {resetButton}{label('Password (processed locally; never stored by this component)', <input type="password" autoComplete="off" value={password} onChange={e=>setPassword(e.target.value)} className={inputClass} placeholder="Type a password to estimate entropy" />)}
         <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">{entropy.classes.map(c=><div key={c.name} className="rounded-xl border border-slate-800 p-3 text-xs"><div className="text-slate-400">{c.name}</div><div className="font-semibold text-white">{c.ok ? 'Detected' : 'Not detected'}</div></div>)}</div>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3"><div className="rounded-xl bg-slate-900 p-3"><div className="text-xs text-slate-500">Length</div><div className="text-lg font-bold">{password.length}</div></div><div className="rounded-xl bg-slate-900 p-3"><div className="text-xs text-slate-500">Estimated pool</div><div className="text-lg font-bold">{entropy.pool || 0}</div></div><div className="rounded-xl bg-slate-900 p-3"><div className="text-xs text-slate-500">Entropy</div><div className="text-lg font-bold">{entropy.bits.toFixed(1)} bits</div></div></div>
         <div className="mt-3 text-xs text-slate-400">Estimated combinations: {entropy.combinations ? entropy.combinations.toLocaleString() : '0'}. Strength: {entropy.bits >= 80 ? 'high' : entropy.bits >= 60 ? 'moderate' : entropy.bits >= 40 ? 'low' : 'very low'}.</div>
@@ -154,17 +185,17 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
 
   if (id === 'hash-identifier') return (
     <div className="space-y-4"><div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-      {label('Hash string (kept client-side)', <input type="text" value={password} onChange={e=>setPassword(e.target.value)} className={inputClass} placeholder="Paste a hash value" />)}
+      {resetButton}{label('Hash string (kept client-side)', <input type="text" value={password} onChange={e=>setPassword(e.target.value)} className={inputClass} placeholder="Paste a hash value" />)}
       <div className="mt-4">{hashMatches.length ? hashMatches.map(m=><div key={m.name} className="mb-2 rounded-xl border border-slate-800 p-3"><strong className="text-white">{m.name}</strong><div className="text-xs text-slate-400">{m.reason}</div></div>) : <div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-500">No structurally recognized format. Some algorithms share identical lengths; matches are possibilities, not proof.</div>}</div>
     </div></div>
   );
 
   if (id === 'json-schema-generator') return (
-    <div className="space-y-3">{label('JSON sample', <textarea value={json} onChange={e=>setJson(e.target.value)} rows={12} className={inputClass + ' font-mono'} />)}{box(schema)}<p className="text-[11px] text-slate-500">Nested objects and arrays are recursively represented. Arrays infer their item shape from the first item; heterogeneous arrays may need manual schema refinement.</p></div>
+    <div className="space-y-3">{resetButton}{label('JSON sample', <textarea value={json} onChange={e=>setJson(e.target.value)} rows={12} className={inputClass + ' font-mono'} />)}{box(schema)}<p className="text-[11px] text-slate-500">Nested objects and arrays are recursively represented. Arrays infer their item shape from the first item; heterogeneous arrays may need manual schema refinement.</p></div>
   );
 
   if (id === 'url-parser-inspector') return (
-    <div className="space-y-4">{label('URL', <input value={url} onChange={e=>setUrl(e.target.value)} className={inputClass} />)}
+    <div className="space-y-4">{resetButton}{label('URL', <input value={url} onChange={e=>setUrl(e.target.value)} className={inputClass} />)}
       {parsedUrl.ok && parsedUrl.value ? <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{[
         ['Protocol', parsedUrl.value.protocol], ['Username', parsedUrl.value.username || '(none)'], ['Password', parsedUrl.value.password ? '(present; hidden)' : '(none)'],
         ['Hostname', parsedUrl.value.hostname], ['Port', parsedUrl.value.port || '(default)'], ['Pathname', parsedUrl.value.pathname], ['Origin', parsedUrl.value.origin], ['Hash', parsedUrl.value.hash || '(none)']
@@ -173,23 +204,23 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   );
 
   if (id === 'cookie-flags-generator') return (
-    <div className="space-y-4">{label('Cookie name', <input value={cookieName} onChange={e=>setCookieName(e.target.value)} className={inputClass} />)}
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div>{label('Cookie name', <input value={cookieName} onChange={e=>setCookieName(e.target.value)} className={inputClass} />)}
       {label('Cookie value', <input value={cookieValue} onChange={e=>setCookieValue(e.target.value)} className={inputClass} />)}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{[['Secure',secure,setSecure],['HttpOnly',httpOnly,setHttpOnly],['Partitioned',partitioned,setPartitioned]].map(([name,value,setter])=><label key={String(name)} className="flex items-center gap-2 rounded-xl border border-slate-800 p-3 text-xs text-slate-300"><input type="checkbox" checked={Boolean(value)} onChange={e=>(setter as (v:boolean)=>void)(e.target.checked)} />{String(name)}</label>)}</div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('SameSite', <select value={sameSite} onChange={e=>setSameSite(e.target.value)} className={inputClass}><option>Strict</option><option>Lax</option><option>None</option></select>)}{label('Domain', <input value={domain} onChange={e=>setDomain(e.target.value)} className={inputClass} />)}{label('Path', <input value={path} onChange={e=>setPath(e.target.value)} className={inputClass} />)}{label('Max-Age', <input value={maxAge} onChange={e=>setMaxAge(e.target.value)} className={inputClass} />)}{label('Expires', <input value={expires} onChange={e=>setExpires(e.target.value)} className={inputClass} />)}</div>{box(cookie)}<button onClick={()=>copyText(cookie,setCopied)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check className="h-3.5 w-3.5"/>:<Copy className="h-3.5 w-3.5"/>}{copied?'Copied':'Copy Set-Cookie'}</button></div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('SameSite', <select value={sameSite} onChange={e=>setSameSite(e.target.value)} className={inputClass}><option>Strict</option><option>Lax</option><option>None</option></select>)}{label('Domain', <input value={domain} onChange={e=>setDomain(e.target.value)} className={inputClass} />)}{label('Path', <input value={path} onChange={e=>setPath(e.target.value)} className={inputClass} />)}{label('Max-Age', <input value={maxAge} onChange={e=>setMaxAge(e.target.value)} className={inputClass} />)}{label('Expires', <input value={expires} onChange={e=>setExpires(e.target.value)} className={inputClass} />)}</div>{box(cookie)}{resetButton}<button onClick={()=>copyText(cookie,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check className="h-3.5 w-3.5"/>:<Copy className="h-3.5 w-3.5"/>}{copied?'Copied':'Copy Set-Cookie'}</button></div>
   );
 
   if (id === 'rate-limit-header-builder') return (
-    <div className="space-y-4"><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={reset} onChange={e=>setReset(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={reset} onChange={e=>setReset(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}{resetButton}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
   );
 
   if (id === 'csp-generator') return (
-    <div className="space-y-4"><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{Object.keys(csp).map(key=>label(key, <input value={csp[key]} onChange={e=>setCsp(prev=>({...prev,[key]:e.target.value}))} className={inputClass}/>))}</div>{box('Content-Security-Policy: '+cspValue)}{box('<meta http-equiv="Content-Security-Policy" content="'+cspValue.replace(/"/g,'&quot;')+'">')}<div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-400"><strong className="text-slate-200">What it does:</strong> each directive limits a resource category or embedding/navigation behavior. Review every source against your actual application before deployment; this generator cannot establish universal safety.</div><button onClick={()=>copyText(cspValue,setCopied)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy header value'}</button></div>
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{Object.keys(csp).map(key=>label(key, <input value={csp[key]} onChange={e=>setCsp(prev=>({...prev,[key]:e.target.value}))} className={inputClass}/>))}</div>{resetButton}{box('Content-Security-Policy: '+cspValue)}{box('<meta http-equiv="Content-Security-Policy" content="'+cspValue.replace(/"/g,'&quot;')+'">')}<div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-400"><strong className="text-slate-200">What it does:</strong> each directive limits a resource category or embedding/navigation behavior. Review every source against your actual application before deployment; this generator cannot establish universal safety.</div><button onClick={()=>copyText(cspValue,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy header value'}</button></div>
   );
 
   if (id === 'security-headers-analyzer') return (
     <div className="space-y-4">
-      {label('Response headers to analyze', <textarea value={headerInput} onChange={e=>setHeaderInput(e.target.value)} rows={8} className={inputClass + ' font-mono'} placeholder="Header-Name: value" />)}
+      {resetButton}{label('Response headers to analyze', <textarea value={headerInput} onChange={e=>setHeaderInput(e.target.value)} rows={8} className={inputClass + ' font-mono'} placeholder="Header-Name: value" />)}
       {box(headerAnalysis.map(item => (item.present ? '✓ Present: ' : '✗ Missing: ') + item.name).join('\n'))}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{[
       ['HSTS','Requests HTTPS persistence in supporting browsers; preload/subdomain choices need deployment review.'],
