@@ -339,7 +339,7 @@ const base32Decode = (value: string) => {
 const defaultInput = (tool: ToolItem) => {
   if (tool.defaultInput) return tool.defaultInput;
   const id = tool.id;
-  if (id.includes('json')) return '{\n  "name": "Coding Super Hub",\n  "tools": 540,\n  "active": true\n}';
+  if (id.includes('json')) return '{\n  "name": "Coding Super Hub",\n  "tools": 535,\n  "active": true\n}';
   if (id.includes('xml')) return '<root><tool id="json">Formatter</tool><status>ready</status></root>';
   if (id.includes('sql')) return 'SELECT id, username, email FROM users WHERE active = true ORDER BY created_at DESC;';
   if (id.includes('css')) return '.container { display: flex; justify-content: center; gap: 16px; }';
