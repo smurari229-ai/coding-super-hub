@@ -229,6 +229,95 @@ const jsonToCsv = (value: string) => {
   )].join('\n');
 };
 
+
+const toHexDump = (value: string) => {
+  const bytes = new TextEncoder().encode(value);
+  const lines: string[] = [];
+  for (let offset = 0; offset < bytes.length; offset += 16) {
+    const chunk = bytes.slice(offset, offset + 16);
+    const hex = Array.from(chunk, byte => byte.toString(16).padStart(2, '0')).join(' ');
+    const ascii = Array.from(chunk, byte => byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.').join('');
+    lines.push(offset.toString(16).padStart(8, '0') + '  ' + hex.padEnd(47, ' ') + '  |' + ascii.padEnd(16, ' ') + '|');
+  }
+  return lines.join('\n');
+};
+
+const markdownToHtml = (value: string) => {
+  let html = escapeHtml(value);
+  html = html.replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+    .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
+    .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2">$1</a>');
+  return html.split(/\n{2,}/).map(block => /^<h[1-6]>/.test(block.trim()) ? block : '<p>' + block.replace(/\n/g, '<br>') + '</p>').join('\n');
+};
+
+const htmlToMarkdown = (value: string) => value
+  .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n')
+  .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n')
+  .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n')
+  .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
+  .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
+  .replace(/<a[^>]+href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[$2]($1)')
+  .replace(/<br\s*\/?>(?=.)/gi, '\n')
+  .replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n')
+  .replace(/<[^>]+>/g, '')
+  .replace(/&nbsp;/gi, ' ')
+  .replace(/&amp;/gi, '&')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
+
+const numberToWords = (value: number): string => {
+  if (!Number.isInteger(value) || !Number.isFinite(value) || Math.abs(value) >= 1e15) throw new Error('Enter an integer between -999,999,999,999,999 and 999,999,999,999,999.');
+  if (value === 0) return 'zero';
+  const small = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  const underThousand = (n: number): string => {
+    const parts: string[] = [];
+    if (n >= 100) { parts.push(small[Math.floor(n / 100)] + ' hundred'); n %= 100; }
+    if (n >= 20) { parts.push(tens[Math.floor(n / 10)]); n %= 10; }
+    if (n > 0) parts.push(small[n]);
+    return parts.join(' ');
+  };
+  const scales: [number,string][] = [[1e12,'trillion'],[1e9,'billion'],[1e6,'million'],[1e3,'thousand']];
+  const convert = (n: number): string => {
+    const parts: string[] = [];
+    for (const [scale, name] of scales) {
+      if (n >= scale) { parts.push(underThousand(Math.floor(n / scale)) + ' ' + name); n %= scale; }
+    }
+    if (n) parts.push(underThousand(n));
+    return parts.join(' ');
+  };
+  return value < 0 ? 'minus ' + convert(Math.abs(value)) : convert(value);
+};
+
+const base32Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const base32Encode = (value: string) => {
+  const bytes = new TextEncoder().encode(value);
+  let buffer = 0, bits = 0, out = '';
+  for (const byte of bytes) {
+    buffer = (buffer << 8) | byte; bits += 8;
+    while (bits >= 5) { bits -= 5; out += base32Alphabet[(buffer >>> bits) & 31]; }
+  }
+  if (bits) out += base32Alphabet[(buffer << (5 - bits)) & 31];
+  return out;
+};
+const base32Decode = (value: string) => {
+  const clean = value.toUpperCase().replace(/=+$/,'').replace(/\s+/g,'');
+  let buffer = 0, bits = 0; const bytes: number[] = [];
+  for (const char of clean) {
+    const index = base32Alphabet.indexOf(char);
+    if (index < 0) throw new Error('Invalid Base32 character.');
+    buffer = (buffer << 5) | index; bits += 5;
+    if (bits >= 8) { bits -= 8; bytes.push((buffer >>> bits) & 255); }
+  }
+  return new TextDecoder().decode(new Uint8Array(bytes));
+};
+
 const defaultInput = (tool: ToolItem) => {
   if (tool.defaultInput) return tool.defaultInput;
   const id = tool.id;
@@ -259,6 +348,74 @@ function runTool(tool: ToolItem, input: string): RunnerResult {
     if (!text && !has('generate', 'random', 'uuid', 'lorem', 'password')) {
       return { output: '', error: 'Enter some input first.' };
     }
+
+
+    if (id === 'json-to-ts-interface') {
+      const value = JSON.parse(input);
+      if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Root JSON value must be an object.');
+      const interfaces: string[] = [];
+      const infer = (item: unknown, name: string): string => {
+        if (Array.isArray(item)) return item.length ? infer(item[0], name) + '[]' : 'unknown[]';
+        if (item === null) return 'null';
+        if (typeof item === 'object') {
+          const entries = Object.entries(item as Record<string, unknown>);
+          const fields = entries.map(([key, child]) => {
+            const safe = /^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key);
+            return '  ' + safe + ': ' + infer(child, name + key.replace(/\W/g, '')) + ';';
+          });
+          interfaces.push('export interface ' + name + ' {\n' + fields.join('\n') + '\n}');
+          return name;
+        }
+        return typeof item;
+      };
+      infer(value, 'Root');
+      return { output: interfaces.reverse().join('\n\n') };
+    }
+    if (id === 'csv-to-markdown') {
+      const rows = parseCsv(input);
+      if (!rows.length) throw new Error('Enter CSV data.');
+      const width = Math.max(...rows.map(row => row.length));
+      const normalized = rows.map(row => Array.from({length: width}, (_, i) => row[i] ?? ''));
+      const esc = (v: string) => v.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+      return { output: ['| ' + normalized[0].map(esc).join(' | ') + ' |','| ' + normalized[0].map(() => '---').join(' | ') + ' |',...normalized.slice(1).map(row => '| ' + row.map(esc).join(' | ') + ' |')].join('\n') };
+    }
+    if (id === 'markdown-to-html') return { output: markdownToHtml(input) };
+    if (id === 'html-to-markdown') return { output: htmlToMarkdown(input) };
+    if (id === 'hex-dump-generator') return { output: toHexDump(input) };
+    if (id === 'strip-diacritics') return { output: input.normalize('NFKD').replace(/[\u0300-\u036f]/g, '') };
+    if (id === 'slug-to-text') return { output: input.replace(/[-_]+/g, ' ').trim().replace(/\b\w/g, char => char.toUpperCase()) };
+    if (id === 'tab-to-space') return { output: input.replace(/\t/g, '    ') };
+    if (id === 'space-to-tab') return { output: input.replace(/^( {4})/gm, '\t') };
+    if (id === 'string-masker') return { output: input.replace(/\b[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, value => value.slice(0, 1) + '***@' + value.split('@')[1]).replace(/\b(?:\d[ -]?){10,16}\b/g, value => '****' + value.replace(/\D/g,'').slice(-4)) };
+    if (id === 'count-lines') {
+      const lines = input.split(/\r?\n/);
+      return { output: 'Total lines: ' + lines.length + '\nNon-empty lines: ' + lines.filter(line => line.trim()).length + '\nComment lines: ' + lines.filter(line => /^\s*(?:\/\/|#|<!--)/.test(line)).length + '\nUTF-8 bytes: ' + new TextEncoder().encode(input).length };
+    }
+    if (id === 'newline-converter') return { output: input.replace(/\r\n/g, '\n').replace(/\n/g, has('crlf') || text.toLowerCase() === 'crlf' ? '\r\n' : '\n') };
+    if (id === 'string-pad-align') {
+      const width = Math.max(...input.split('\n').map(line => line.length));
+      return { output: input.split('\n').map(line => line.padEnd(width)).join('\n') };
+    }
+    if (id === 'string-wrapper') {
+      const width = Math.min(240, Math.max(10, Number(text.match(/\d+/)?.[0] ?? 80)));
+      const source = input.replace(/\s+/g, ' ').trim();
+      const wrapped = source.match(new RegExp('.{1,' + width + '}(?:\s|$)', 'g'))?.map(line => line.trim()).join('\n') ?? source;
+      return { output: wrapped };
+    }
+    if (id === 'repeat-string') {
+      const count = Math.min(1000, Math.max(1, Number(text.match(/\d+/)?.[0] ?? 3)));
+      return { output: Array(count).fill(input).join('') };
+    }
+    if (id === 'number-to-words') return { output: numberToWords(Number(text.replace(/,/g,''))) };
+    if (id === 'base32-encoder') return { output: has('decode') ? base32Decode(input) : base32Encode(input) };
+    if (id === 'quoted-printable-decoder') {
+      const binary = input.replace(/=([0-9A-F]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex,16))).replace(/=\r?\n/g,'');
+      return { output: new TextDecoder().decode(Uint8Array.from(binary, char => char.charCodeAt(0))) };
+    }
+    if (id === 'escape-json-string') return { output: JSON.stringify(input).slice(1,-1) };
+    if (id === 'escape-sql-string') return { output: input.replace(/\\/g,'\\\\').replace(/'/g,"''") };
+    if (id === 'string-splitter') return { output: JSON.stringify(input.split(/[,|\n]+/).map(item => item.trim()).filter(Boolean), null, 2) };
+    if (id === 'string-joiner') return { output: input.split(/\r?\n/).join(', ') };
 
     if (has('json-formatter', 'json-prett')) return { output: prettyJson(input) };
     if (has('json-minif')) return { output: minifyJson(input) };
