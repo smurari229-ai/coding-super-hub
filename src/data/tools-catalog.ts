@@ -15,7 +15,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'Hashing, encryption, password generators, tokens, and CSP analyzers',
     icon: 'Shield',
     accentColor: 'emerald',
-    count: 65
+    count: 64
   },
   {
     id: 'web-frontend',
@@ -23,7 +23,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'CSS generators, color palettes, HTML meta, OpenGraph, and UI helpers',
     icon: 'Layout',
     accentColor: 'amber',
-    count: 105
+    count: 102
   },
   {
     id: 'data-formats',
@@ -63,7 +63,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'QR codes, dev scratchpad, cheatsheets, and developer quick utilities',
     icon: 'Sparkles',
     accentColor: 'orange',
-    count: 55
+    count: 54
   }
 ];
 
