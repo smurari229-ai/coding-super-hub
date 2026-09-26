@@ -328,7 +328,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* Directory Explorer (500+ Tools) */}
+          {/* Directory Explorer (535 Tools) */}
           <section className="space-y-4 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
               <div>
