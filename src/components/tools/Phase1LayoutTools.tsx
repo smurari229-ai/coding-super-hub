@@ -48,7 +48,6 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
   justify-content: ${justify};
   align-items: ${align};
   align-content: ${alignContent};
-  justify-content: ${justify};
   flex-wrap: ${wrap};
   gap: ${gap}px;
   row-gap: ${rowGap}px;
