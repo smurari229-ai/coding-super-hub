@@ -34,7 +34,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   const [partitioned, setPartitioned] = useState(false);
   const [limit, setLimit] = useState(100);
   const [remaining, setRemaining] = useState(90);
-  const [reset, setReset] = useState(60);
+  const [resetSeconds, setResetSeconds] = useState(60);
   const [retryAfter, setRetryAfter] = useState(60);
   const [url, setUrl] = useState('https://user:secret@example.com:8443/search?q=hello&lang=en#docs');
   const [json, setJson] = useState('{"name":"Ada","age":36,"active":true,"skills":["TypeScript","CSS"],"profile":{"city":"Mumbai"}}');
@@ -52,7 +52,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
     setPassword('');
     setCookieName('session'); setCookieValue('example'); setSecure(true); setHttpOnly(true);
     setSameSite('Strict'); setDomain(''); setPath('/'); setMaxAge(''); setExpires(''); setPartitioned(false);
-    setLimit(100); setRemaining(90); setReset(60); setRetryAfter(60);
+    setLimit(100); setRemaining(90); setResetSeconds(60); setRetryAfter(60);
     setUrl('https://user:secret@example.com:8443/search?q=hello&lang=en#docs');
     setJson('{"name":"Ada","age":36,"active":true,"skills":["TypeScript","CSS"],"profile":{"city":"Mumbai"}}');
     setHeaderInput('Strict-Transport-Security: max-age=31536000; includeSubDomains\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin');
@@ -160,7 +160,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
     return out;
   }, [cookieName,cookieValue,secure,httpOnly,sameSite,domain,path,maxAge,expires,partitioned]);
 
-  const rateHeaders = `RateLimit-Limit: ${limit}\nRateLimit-Remaining: ${remaining}\nRateLimit-Reset: ${reset}\nRetry-After: ${retryAfter}`;
+  const rateHeaders = `RateLimit-Limit: ${limit}\nRateLimit-Remaining: ${remaining}\nRateLimit-Reset: ${resetSeconds}\nRetry-After: ${retryAfter}`;
 
   const label = (text: string, child: React.ReactNode) => <label className="space-y-1 text-xs text-slate-400"><span>{text}</span>{child}</label>;
   const box = (value: string) => <div><pre className="overflow-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs leading-relaxed text-emerald-300">{value || 'No result yet.'}</pre>{copyError && <p className="mt-2 text-[11px] text-amber-300">{copyError}</p>}</div>;
@@ -205,7 +205,7 @@ export const Phase1SecurityTools: React.FC<Props> = ({ tool }) => {
   );
 
   if (id === 'rate-limit-header-builder') return (
-    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={reset} onChange={e=>setReset(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
+    <div className="space-y-4"><div className="flex justify-end">{resetButton}</div><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{label('Limit', <input type="number" min="0" value={limit} onChange={e=>setLimit(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Remaining', <input type="number" min="0" value={remaining} onChange={e=>setRemaining(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Reset (seconds)', <input type="number" min="0" value={resetSeconds} onChange={e=>setResetSeconds(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}{label('Retry-After (seconds)', <input type="number" min="0" value={retryAfter} onChange={e=>setRetryAfter(Math.max(0,Number(e.target.value)))} className={inputClass}/>)}</div>{box(rateHeaders)}<p className="text-[11px] text-slate-500">These headers describe server-side rate-limit state; this browser tool does not enforce a rate limit.</p><button onClick={()=>copyText(rateHeaders,setCopied,setCopyError)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white">{copied?<Check/>:<Copy/>}{copied?'Copied':'Copy'}</button></div>
   );
 
   if (id === 'csp-generator') return (
