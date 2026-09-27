@@ -56,7 +56,7 @@ export const AiCopilotTool: React.FC = () => {
 
     try {
       if (provider === 'gemini') {
-        const key = apiKey.trim() || (window as any).__GEMINI_KEY__ || process.env.GEMINI_API_KEY || '';
+        const key = apiKey.trim() || (window as { __GEMINI_KEY__?: string }).__GEMINI_KEY__ || '';
         if (!key) {
           // If no custom key provided, produce an intelligent high-precision local analysis
           setTimeout(() => {
