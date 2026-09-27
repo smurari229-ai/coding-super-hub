@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getProStatus, getAiLimit } from '../../lib/pro';
 import { Sparkles, Bot, Send, Copy, Check, Key, Cpu, Zap, AlertCircle } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 
@@ -23,7 +24,22 @@ export const AiCopilotTool: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const canRun = () => {
+    const pro = getProStatus().active;
+    if (pro) return true;
+    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
+    const used = Number(localStorage.getItem(key) || '0');
+    const limit = getAiLimit(false);
+    if (used >= limit) {
+      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot usage.`);
+      return false;
+    }
+    localStorage.setItem(key, String(used + 1));
+    return true;
+  };
+
   const handleGenerate = async () => {
+    if (!canRun()) return;
     setLoading(true);
     setError(null);
     setResponse('');
