@@ -101,18 +101,12 @@ export function clearCheckoutReturn(): void {
  * Verifies a Lemon Squeezy order through the Vercel server function.
  * The browser never receives or sends the Lemon Squeezy API secret.
  */
-export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
-  const checkout = getCheckoutReturn();
-  if (!checkout) return null;
-
-  clearCheckoutReturn();
-
-  if (checkout.result !== 'success') return null;
-  if (checkout.provider !== 'lemon-squeezy' || !checkout.orderId) return null;
+export async function verifyLemonOrder(orderId: string): Promise<ProStatus | null> {
+  if (!orderId) return null;
 
   try {
     const response = await fetch(
-      `/api/verify-lemon-order?order_id=${encodeURIComponent(checkout.orderId)}`,
+      `/api/verify-lemon-order?order_id=${encodeURIComponent(orderId)}`,
       { headers: { Accept: 'application/json' } }
     );
 
@@ -134,6 +128,18 @@ export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
   } catch {
     return null;
   }
+}
+
+export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
+  const checkout = getCheckoutReturn();
+  if (!checkout) return null;
+
+  clearCheckoutReturn();
+
+  if (checkout.result !== 'success') return null;
+  if (checkout.provider !== 'lemon-squeezy' || !checkout.orderId) return null;
+
+  return verifyLemonOrder(checkout.orderId);
 }
 
 export const FREE_AI_DAILY_LIMIT = 10;
