@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { getProStatus, setProStatus, verifyLemonOrder } from '../../lib/pro';
+import { getProStatus, setProStatus, verifyLemonOrder, verifyStripeSession } from '../../lib/pro';
 
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
@@ -101,6 +101,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
       url.searchParams.delete('plan');
       url.searchParams.delete('provider');
       url.searchParams.delete('order_id');
+      url.searchParams.delete('session_id');
       window.history.replaceState({}, document.title, url.toString());
     }
   }, []);
