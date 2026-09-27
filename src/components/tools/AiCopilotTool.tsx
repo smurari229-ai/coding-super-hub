@@ -39,6 +39,12 @@ export const AiCopilotTool: React.FC = () => {
   };
 
   const handleGenerate = async () => {
+    if (provider !== 'gemini') {
+      setError(`${provider.toUpperCase()} integration is not connected yet. Use Gemini for the currently supported built-in Copilot flow.`);
+      return;
+    }
+
+
     if (!canRun()) return;
     setLoading(true);
     setError(null);
