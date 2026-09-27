@@ -58,6 +58,7 @@ export default async function handler(request: Request): Promise<Response> {
         variant_id?: number;
         status?: string;
         refunded?: boolean;
+        first_order_item?: { variant_id?: number };
       };
     };
   };
@@ -75,7 +76,11 @@ export default async function handler(request: Request): Promise<Response> {
 
   const attributes = payload.data?.attributes;
   const payloadStoreId = String(attributes?.store_id ?? '');
-  const variantId = String(attributes?.variant_id ?? '');
+  const variantId = String(
+    attributes?.variant_id ??
+      attributes?.first_order_item?.variant_id ??
+      ''
+  );
 
   if (!eventName || !payload.data?.type || !payload.data?.id) {
     return json({ received: false, error: 'Incomplete webhook payload.' }, 400);
@@ -83,11 +88,6 @@ export default async function handler(request: Request): Promise<Response> {
 
   if (payloadStoreId !== storeId) {
     return json({ received: false, error: 'Webhook store mismatch.' }, 403);
-  }
-
-  const knownVariant = variantId === monthlyVariant || variantId === lifetimeVariant;
-  if (!knownVariant) {
-    return json({ received: false, error: 'Unknown Pro variant.' }, 400);
   }
 
   const supportedEvents = new Set([
@@ -108,6 +108,16 @@ export default async function handler(request: Request): Promise<Response> {
 
   if (!supportedEvents.has(eventName)) {
     return json({ received: true, ignored: true, event: eventName });
+  }
+
+  // Order payloads expose the variant through first_order_item; subscription
+  // payloads expose variant_id directly. Subscription-invoice events may not
+  // expose a variant_id in the invoice object, so they are accepted after the
+  // signed store-level validation but are not treated as an entitlement grant.
+  const variantIsKnown = !variantId || variantId === monthlyVariant || variantId === lifetimeVariant;
+
+  if (!variantIsKnown) {
+    return json({ received: true, ignored: true, event: eventName, reason: 'Non-Pro variant' });
   }
 
   // This endpoint intentionally does not grant or revoke browser-local Pro access.
