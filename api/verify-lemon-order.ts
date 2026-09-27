@@ -7,8 +7,7 @@ const json = (body: Record<string, unknown>, status = 200) =>
     },
   });
 
-export default {
-  async fetch(request: Request) {
+export default async function handler(request: Request): Promise<Response> {
     if (request.method !== 'GET') {
       return json({ verified: false, error: 'Method not allowed' }, 405);
     }
@@ -78,5 +77,4 @@ export default {
     } catch {
       return json({ verified: false, error: 'Payment provider unavailable.' }, 502);
     }
-  },
-};
+}
