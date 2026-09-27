@@ -55,8 +55,8 @@ export const AFFILIATE_DEALS: AffiliateDeal[] = [
     dealText: 'Check current pricing and offers',
     badge: 'Developer Favorite',
     rating: 4.9,
-    referralUrl: 'https://cursor.com/',
-    isAffiliate: false
+    referralUrl: affiliateUrl('VITE_AFFILIATE_CURSOR_URL', 'https://cursor.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_CURSOR_URL')
   },
   {
     id: 'openai-api',
