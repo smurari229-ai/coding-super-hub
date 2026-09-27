@@ -8,6 +8,13 @@ export interface ProStatus {
   activatedAt?: string;
 }
 
+export interface CheckoutReturn {
+  result: 'success' | 'cancel';
+  provider?: 'lemon-squeezy' | 'stripe';
+  plan?: 'monthly' | 'lifetime';
+  orderId?: string;
+}
+
 export function getProStatus(): ProStatus {
   if (typeof window === 'undefined') return { active: false };
 
@@ -52,41 +59,82 @@ export function setProStatus(
 }
 
 /**
- * Checkout providers redirect back to the app with csh_pro=success/cancel.
- * This creates a browser-local entitlement as requested for the client-only
- * architecture. It is intentionally not presented as tamper-proof billing
- * verification; a future server/webhook entitlement service should replace it.
+ * Reads the payment-provider return parameters without granting Pro access.
+ * Entitlement is granted only after server-side payment verification.
  */
-export function consumeCheckoutResult(): ProStatus | null {
+export function getCheckoutReturn(): CheckoutReturn | null {
   if (typeof window === 'undefined') return null;
 
   const url = new URL(window.location.href);
   const result = url.searchParams.get('csh_pro');
-
   if (result !== 'success' && result !== 'cancel') return null;
 
-  if (result === 'success') {
-    const rawPlan = url.searchParams.get('plan');
-    const rawProvider = url.searchParams.get('provider');
+  const rawPlan = url.searchParams.get('plan');
+  const rawProvider = url.searchParams.get('provider');
 
-    const plan: ProStatus['plan'] =
-      rawPlan === 'monthly' || rawPlan === 'lifetime' ? rawPlan : undefined;
-    const provider: ProStatus['provider'] =
-      rawProvider === 'stripe' || rawProvider === 'lemon-squeezy'
-        ? rawProvider
-        : undefined;
+  const plan: CheckoutReturn['plan'] =
+    rawPlan === 'monthly' || rawPlan === 'lifetime' ? rawPlan : undefined;
+  const provider: CheckoutReturn['provider'] =
+    rawProvider === 'stripe' || rawProvider === 'lemon-squeezy'
+      ? rawProvider
+      : undefined;
 
-    setProStatus(true, { plan, provider });
-  }
+  return {
+    result,
+    plan,
+    provider,
+    orderId: url.searchParams.get('order_id') || undefined,
+  };
+}
 
+export function clearCheckoutReturn(): void {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
   url.searchParams.delete('csh_pro');
   url.searchParams.delete('plan');
   url.searchParams.delete('provider');
+  url.searchParams.delete('order_id');
   window.history.replaceState({}, document.title, url.toString());
-
-  return result === 'success' ? getProStatus() : { active: false };
 }
 
+/**
+ * Verifies a Lemon Squeezy order through the Vercel server function.
+ * The browser never receives or sends the Lemon Squeezy API secret.
+ */
+export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
+  const checkout = getCheckoutReturn();
+  if (!checkout) return null;
+
+  clearCheckoutReturn();
+
+  if (checkout.result !== 'success') return null;
+  if (checkout.provider !== 'lemon-squeezy' || !checkout.orderId) return null;
+
+  try {
+    const response = await fetch(
+      `/api/verify-lemon-order?order_id=${encodeURIComponent(checkout.orderId)}`,
+      { headers: { Accept: 'application/json' } }
+    );
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      verified?: boolean;
+      plan?: 'monthly' | 'lifetime';
+    };
+
+    if (!data.verified || !data.plan) return null;
+
+    setProStatus(true, {
+      plan: data.plan,
+      provider: 'lemon-squeezy',
+    });
+
+    return getProStatus();
+  } catch {
+    return null;
+  }
+}
 
 export const FREE_AI_DAILY_LIMIT = 10;
 export const PRO_AI_DAILY_LIMIT = Number.POSITIVE_INFINITY;
