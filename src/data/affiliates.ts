@@ -1,37 +1,49 @@
 import { AffiliateDeal } from '../types/tools';
 
+const env = (key: string): string | undefined => {
+  const value = import.meta.env[key] as string | undefined;
+  return value?.trim() || undefined;
+};
+
+const affiliateUrl = (key: string, officialUrl: string) =>
+  env(key) ?? officialUrl;
+
+const hasAffiliateUrl = (key: string) => Boolean(env(key));
+
 export const AFFILIATE_DEALS: AffiliateDeal[] = [
   // Hosting & Cloud
   {
     id: 'digitalocean',
     name: 'DigitalOcean Cloud',
     category: 'Hosting & Cloud',
-    description: 'Reliable cloud infrastructure, Droplets, Managed Kubernetes, and App Platform with $200 free credit.',
-    dealText: '$200 Free Cloud Credits (60 Days)',
+    description: 'Reliable cloud infrastructure, Droplets, Managed Kubernetes, and App Platform.',
+    dealText: '$200 promotional credit may be available for eligible new users',
     badge: 'Popular for VPS',
     rating: 4.8,
-    referralUrl: 'https://m.do.co/c/codinghub200',
-    code: 'DOCLOUD200'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_DIGITALOCEAN_URL', 'https://www.digitalocean.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_DIGITALOCEAN_URL')
   },
   {
     id: 'render',
     name: 'Render Cloud Application Hosting',
     category: 'Hosting & Cloud',
-    description: 'Fastest way to build and run all your web apps and static sites with free SSL, global CDN, and auto-deploys.',
-    dealText: 'Free Tier + $150 Startup Credits',
+    description: 'Managed hosting for web services, static sites, databases, and scheduled jobs.',
+    dealText: 'Check current free-tier and partner offers',
     badge: 'Zero DevOps',
     rating: 4.9,
-    referralUrl: 'https://render.com/?ref=coding-super-hub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_RENDER_URL', 'https://render.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_RENDER_URL')
   },
   {
     id: 'railway',
     name: 'Railway Deployment Platform',
     category: 'Hosting & Cloud',
-    description: 'Develop locally, deploy instantly with instant PostgreSQL, Redis, Docker, and full-stack environments.',
-    dealText: '$5 Free Starter Credit Every Month',
+    description: 'Deploy applications and databases with an integrated developer workflow.',
+    dealText: 'Referral credits may be available',
     badge: 'Instant DB & Apps',
     rating: 4.7,
-    referralUrl: 'https://railway.app?referralCode=supersuite'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_RAILWAY_URL', 'https://railway.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_RAILWAY_URL')
   },
 
   // AI & Copilots
@@ -39,63 +51,69 @@ export const AFFILIATE_DEALS: AffiliateDeal[] = [
     id: 'cursor',
     name: 'Cursor AI Code Editor',
     category: 'AI & Copilots',
-    description: 'The AI-first Code Editor built on VS Code. Multi-file edits, codebase chat, and instant terminal fix.',
-    dealText: 'Free Pro Trial (14 Days) with Claude 3.5 Sonnet',
+    description: 'AI-first code editor with codebase-aware assistance and multi-file workflows.',
+    dealText: 'Check current pricing and offers',
     badge: 'Developer Favorite',
     rating: 4.9,
-    referralUrl: 'https://cursor.com/?ref=codingsuperhub'
+    referralUrl: 'https://cursor.com/',
+    isAffiliate: false
   },
   {
     id: 'openai-api',
     name: 'OpenAI API Platform',
     category: 'AI & Copilots',
-    description: 'State-of-the-art GPT-4o, Reasoning o1/o3 models, Vision, and Whisper audio models with flexible pay-per-token.',
-    dealText: 'Instant API Access + Playground',
-    badge: 'Frontier AI',
+    description: 'API platform for text, reasoning, vision, audio, and developer applications.',
+    dealText: 'API access + developer platform',
+    badge: 'AI Platform',
     rating: 4.8,
-    referralUrl: 'https://platform.openai.com'
+    referralUrl: 'https://platform.openai.com/',
+    isAffiliate: false
   },
   {
     id: 'google-gemini',
-    name: 'Google Gemini 2.5 Flash / Pro',
+    name: 'Google AI Studio',
     category: 'AI & Copilots',
-    description: '1 Million+ token context window, multimodal reasoning, lightning-fast inference, and generous free tier.',
-    dealText: 'Generous Free Tier on AI Studio',
-    badge: 'Best Value & Speed',
+    description: 'Build and test applications with Google Gemini models.',
+    dealText: 'Check current free-tier availability',
+    badge: 'AI Platform',
     rating: 4.9,
-    referralUrl: 'https://aistudio.google.com'
+    referralUrl: 'https://aistudio.google.com/',
+    isAffiliate: false
   },
 
   // Database & Backend
   {
     id: 'supabase',
-    name: 'Supabase (Firebase Alternative)',
+    name: 'Supabase',
     category: 'Database & Backend',
-    description: 'Open source Firebase alternative with dedicated PostgreSQL database, Authentication, Instant APIs, and Edge Functions.',
-    dealText: 'Generous Free Plan (500MB DB, 50K MAU)',
-    badge: 'Top Open Source DB',
+    description: 'Postgres database, authentication, storage, APIs, and edge functions.',
+    dealText: 'Check current free plan',
+    badge: 'Open Source DB',
     rating: 4.9,
-    referralUrl: 'https://supabase.com/?ref=codingsuperhub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_SUPABASE_URL', 'https://supabase.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_SUPABASE_URL')
   },
   {
     id: 'neon',
     name: 'Neon Serverless Postgres',
     category: 'Database & Backend',
-    description: 'Serverless PostgreSQL with instant scale-to-zero, instant database branching for CI/CD, and bottomless storage.',
-    dealText: 'Free Tier with Unlimited DB Branches',
+    description: 'Serverless PostgreSQL with branching and scale-to-zero workflows.',
+    dealText: 'Check current free plan and partner offers',
     badge: 'Scale to Zero',
     rating: 4.8,
-    referralUrl: 'https://neon.tech/?ref=codingsuperhub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_NEON_URL', 'https://neon.tech/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_NEON_URL')
   },
   {
     id: 'upstash',
     name: 'Upstash Serverless Redis & Kafka',
     category: 'Database & Backend',
-    description: 'Serverless Redis and Kafka with per-request pricing, global replication, and REST API support for Next.js / Edge.',
-    dealText: '10,000 Free Commands / Day',
+    description: 'Serverless Redis and Kafka designed for request-based and edge workloads.',
+    dealText: 'Check current free tier',
     badge: 'Edge-Ready Cache',
     rating: 4.8,
-    referralUrl: 'https://upstash.com/?ref=codingsuperhub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_UPSTASH_URL', 'https://upstash.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_UPSTASH_URL')
   },
 
   // Dev Tools & IDEs
@@ -103,21 +121,23 @@ export const AFFILIATE_DEALS: AffiliateDeal[] = [
     id: 'jetbrains',
     name: 'JetBrains All Products Pack',
     category: 'Dev Tools & IDEs',
-    description: 'IntelliJ IDEA, WebStorm, PyCharm, and CLion. The ultimate professional IDE toolset for serious engineers.',
-    dealText: '30-Day Free Trial + Student Discounts',
+    description: 'Professional IDEs including IntelliJ IDEA, WebStorm, PyCharm, and CLion.',
+    dealText: '30-day trial and current discounts',
     badge: 'Pro IDE Standard',
     rating: 4.9,
-    referralUrl: 'https://www.jetbrains.com'
+    referralUrl: 'https://www.jetbrains.com/',
+    isAffiliate: false
   },
   {
     id: 'warp',
-    name: 'Warp Terminal for Mac & Linux',
+    name: 'Warp Terminal',
     category: 'Dev Tools & IDEs',
-    description: 'The intelligent terminal with AI command search, block-based history, and collaborative workflow sharing.',
-    dealText: '100% Free for Individual Developers',
+    description: 'Modern terminal with AI-assisted workflows and collaborative features.',
+    dealText: 'Referral rewards may be available in-app',
     badge: 'Modern Terminal',
     rating: 4.8,
-    referralUrl: 'https://www.warp.dev/?ref=codingsuperhub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_WARP_URL', 'https://www.warp.dev/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_WARP_URL')
   },
 
   // Security & Auth
@@ -125,20 +145,22 @@ export const AFFILIATE_DEALS: AffiliateDeal[] = [
     id: 'clerk',
     name: 'Clerk User Authentication',
     category: 'Security & Auth',
-    description: 'Complete user management and authentication suite for React, Next.js, and Mobile with ready-made UI components.',
-    dealText: 'Free up to 10,000 Monthly Active Users',
-    badge: 'Best Next.js Auth',
+    description: 'Authentication and user-management infrastructure for modern applications.',
+    dealText: 'Check current creator/partner opportunities',
+    badge: 'Developer Auth',
     rating: 4.9,
-    referralUrl: 'https://clerk.com/?ref=codingsuperhub'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_CLERK_URL', 'https://clerk.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_CLERK_URL')
   },
   {
     id: 'cloudflare',
     name: 'Cloudflare Edge & Security',
     category: 'Security & Auth',
-    description: 'Global CDN, DDoS mitigation, DNS with 0-second propagation, SSL certificates, and Cloudflare Workers.',
-    dealText: 'Free DDoS & Global CDN Plan',
-    badge: 'Internet Backbone',
+    description: 'CDN, DNS, application security, Workers, and edge infrastructure.',
+    dealText: 'Check current partner programs',
+    badge: 'Internet Infrastructure',
     rating: 4.9,
-    referralUrl: 'https://www.cloudflare.com'
+    referralUrl: affiliateUrl('VITE_AFFILIATE_CLOUDFLARE_URL', 'https://www.cloudflare.com/'),
+    isAffiliate: hasAffiliateUrl('VITE_AFFILIATE_CLOUDFLARE_URL')
   }
 ];
