@@ -86,3 +86,17 @@ export function consumeCheckoutResult(): ProStatus | null {
 
   return result === 'success' ? getProStatus() : { active: false };
 }
+
+
+export const FREE_AI_DAILY_LIMIT = 10;
+export const PRO_AI_DAILY_LIMIT = Number.POSITIVE_INFINITY;
+export const FREE_BATCH_LIMIT = 100;
+export const PRO_BATCH_LIMIT = 10000;
+
+export function getAiLimit(pro: boolean): number {
+  return pro ? PRO_AI_DAILY_LIMIT : FREE_AI_DAILY_LIMIT;
+}
+
+export function getBatchLimit(pro: boolean): number {
+  return pro ? PRO_BATCH_LIMIT : FREE_BATCH_LIMIT;
+}
