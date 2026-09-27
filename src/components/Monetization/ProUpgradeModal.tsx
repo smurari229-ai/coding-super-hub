@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { consumeCheckoutResult, setProStatus } from '../../lib/pro';
+import { getProStatus, setProStatus } from '../../lib/pro';
 
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
@@ -33,13 +33,16 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
   );
 
   useEffect(() => {
-    const result = consumeCheckoutResult();
-    if (result?.active) {
-      setStatusMsg('Payment return received. Pro is active in this browser.');
+    const existing = getProStatus();
+    if (existing.active) {
+      setStatusMsg('Pro is active on this browser.');
     } else if (window.location.search.includes('csh_pro=cancel')) {
       setStatusMsg('Checkout was cancelled. No Pro entitlement was changed.');
       const url = new URL(window.location.href);
       url.searchParams.delete('csh_pro');
+      url.searchParams.delete('plan');
+      url.searchParams.delete('provider');
+      url.searchParams.delete('order_id');
       window.history.replaceState({}, document.title, url.toString());
     }
   }, []);
@@ -60,13 +63,21 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
     setStatusMsg('Opening secure checkout…');
 
     window.setTimeout(() => {
-      const url = new URL(checkoutUrl);
-      url.searchParams.set('csh_plan', billingCycle);
-      url.searchParams.set('csh_provider', provider);
+      if (provider === 'lemon-squeezy') {
+        const lemon = (window as unknown as {
+          LemonSqueezy?: {
+            Url?: { Open?: (url: string) => void };
+          };
+        }).LemonSqueezy;
 
-      // Configure the provider's success/cancel redirect back to this app.
-      // The app will read csh_pro=success or csh_pro=cancel on return.
-      window.location.assign(url.toString());
+        if (lemon?.Url?.Open) {
+          lemon.Url.Open(checkoutUrl);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      window.location.assign(checkoutUrl);
     }, 350);
   };
 
