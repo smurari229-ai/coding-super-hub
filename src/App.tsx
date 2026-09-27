@@ -9,7 +9,7 @@ import { AffiliateHubModal } from './components/Monetization/AffiliateHubModal';
 import { ProUpgradeModal } from './components/Monetization/ProUpgradeModal';
 import { SponsorModal } from './components/Monetization/SponsorModal';
 import { TransparencyModal } from './components/Monetization/TransparencyModal';
-import { getProStatus, consumeCheckoutResult, PRO_EVENT } from './lib/pro';
+import { getProStatus, verifyCheckoutReturn, PRO_EVENT } from './lib/pro';
 
 import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
 import { Base64ConverterTool } from './components/tools/Base64ConverterTool';
@@ -88,9 +88,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Handle a provider redirect once when the app returns from checkout.
-    const checkoutResult = consumeCheckoutResult();
-    if (checkoutResult?.active) setIsPro(true);
+    // Legacy/hosted checkout returns are verified server-side before Pro is granted.
+    void verifyCheckoutReturn().then((verified) => {
+      if (verified?.active) setIsPro(true);
+    });
 
     const handleProChange = () => setIsPro(getProStatus().active);
     window.addEventListener(PRO_EVENT, handleProChange);
