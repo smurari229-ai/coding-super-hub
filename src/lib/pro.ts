@@ -6,6 +6,8 @@ export interface ProStatus {
   plan?: 'monthly' | 'lifetime';
   provider?: 'lemon-squeezy' | 'stripe' | 'manual';
   activatedAt?: string;
+  orderId?: string;
+  sessionId?: string;
 }
 
 export interface CheckoutReturn {
@@ -125,6 +127,7 @@ export async function verifyLemonOrder(orderId: string): Promise<ProStatus | nul
     setProStatus(true, {
       plan: data.plan,
       provider: 'lemon-squeezy',
+      orderId,
     });
 
     return getProStatus();
@@ -154,12 +157,32 @@ export async function verifyStripeSession(sessionId: string): Promise<ProStatus 
     setProStatus(true, {
       plan: data.plan,
       provider: 'stripe',
+      sessionId,
     });
 
     return getProStatus();
   } catch {
     return null;
   }
+}
+
+export async function refreshStoredProStatus(): Promise<ProStatus | null> {
+  const current = getProStatus();
+  if (!current.active) return null;
+
+  if (current.provider === 'lemon-squeezy' && current.orderId) {
+    const verified = await verifyLemonOrder(current.orderId);
+    if (!verified?.active) setProStatus(false);
+    return verified;
+  }
+
+  if (current.provider === 'stripe' && current.sessionId) {
+    const verified = await verifyStripeSession(current.sessionId);
+    if (!verified?.active) setProStatus(false);
+    return verified;
+  }
+
+  return current;
 }
 
 export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
