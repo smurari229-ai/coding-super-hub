@@ -9,8 +9,8 @@ import { AffiliateHubModal } from './components/Monetization/AffiliateHubModal';
 import { ProUpgradeModal } from './components/Monetization/ProUpgradeModal';
 import { SponsorModal } from './components/Monetization/SponsorModal';
 import { TransparencyModal } from './components/Monetization/TransparencyModal';
+import { getProStatus, consumeCheckoutResult, PRO_EVENT } from './lib/pro';
 
-// Dedicated Tool Components
 import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
 import { Base64ConverterTool } from './components/tools/Base64ConverterTool';
 import { CaseConverterTool } from './components/tools/CaseConverterTool';
@@ -33,24 +33,13 @@ import { CodePlaygroundTool } from './components/tools/CodePlaygroundTool';
 import { AiCopilotTool } from './components/tools/AiCopilotTool';
 import { GenericToolRunner } from './components/tools/GenericToolRunner';
 
-import { 
-  Star, 
-  Share2, 
-  Sparkles, 
-  Check, 
-  ExternalLink, 
-  ShieldCheck, 
-  Layers, 
-  Terminal,
-  Grid,
-  Search,
-  Zap,
-  Tag
-} from 'lucide-react';
+import { Star, Share2, Check, Grid, Search } from 'lucide-react';
 
 export default function App() {
-  const [selectedTool, setSelectedTool] = useState<ToolItem>(TOOLS_CATALOG[0]); // JSON Formatter
+  const [selectedTool, setSelectedTool] = useState<ToolItem>(TOOLS_CATALOG[0]);
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all' | 'favorites'>('all');
+  const [isPro, setIsPro] = useState(() => getProStatus().active);
+
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('csh_favorites');
@@ -69,7 +58,6 @@ export default function App() {
     }
   });
 
-  // Modal States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
@@ -79,7 +67,6 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
-  // Sync favorites
   const toggleFavorite = (id: string) => {
     setFavorites(prev => {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
@@ -88,7 +75,6 @@ export default function App() {
     });
   };
 
-  // Switch active tool & track history
   const handleSelectTool = (tool: ToolItem) => {
     setSelectedTool(tool);
     setRecentTools(prev => {
@@ -101,7 +87,16 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Keyboard shortcut listener
+  useEffect(() => {
+    // Handle a provider redirect once when the app returns from checkout.
+    const checkoutResult = consumeCheckoutResult();
+    if (checkoutResult?.active) setIsPro(true);
+
+    const handleProChange = () => setIsPro(getProStatus().active);
+    window.addEventListener(PRO_EVENT, handleProChange);
+    return () => window.removeEventListener(PRO_EVENT, handleProChange);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
@@ -131,7 +126,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filter tools for the bottom directory grid
   const currentDirectoryTools = TOOLS_CATALOG.filter(t => {
     if (selectedCategory === 'all') return true;
     if (selectedCategory === 'favorites') return favorites.includes(t.id);
@@ -144,54 +138,33 @@ export default function App() {
     setTimeout(() => setShareCopied(false), 2000);
   };
 
-  // Render the appropriate execution runner
   const renderToolComponent = () => {
     switch (selectedTool.dedicatedComponent) {
-      case 'JsonFormatterTool':
-        return <JsonFormatterTool toolId={selectedTool.id} />;
-      case 'Base64ConverterTool':
-        return <Base64ConverterTool toolId={selectedTool.id} />;
-      case 'CaseConverterTool':
-        return <CaseConverterTool />;
-      case 'UuidGeneratorTool':
-        return <UuidGeneratorTool />;
-      case 'HashCryptoTool':
-        return <HashCryptoTool />;
-      case 'RegexTesterTool':
-        return <RegexTesterTool />;
-      case 'TextDiffTool':
-        return <TextDiffTool />;
-      case 'JwtDecoderTool':
-        return <JwtDecoderTool />;
-      case 'MarkdownEditorTool':
-        return <MarkdownEditorTool />;
-      case 'ColorPaletteTool':
-        return <ColorPaletteTool />;
-      case 'CssShadowGeneratorTool':
-        return <CssShadowGeneratorTool />;
-      case 'HtmlMetaGeneratorTool':
-        return <HtmlMetaGeneratorTool />;
-      case 'DataConverterTool':
-        return <DataConverterTool toolId={selectedTool.id} />;
-      case 'TimestampConverterTool':
-        return <TimestampConverterTool />;
-      case 'QrCodeGeneratorTool':
-        return <QrCodeGeneratorTool />;
-      case 'HttpStatusExplorerTool':
-        return <HttpStatusExplorerTool />;
-      case 'GitIgnoreGeneratorTool':
-        return <GitIgnoreGeneratorTool />;
-      case 'DevCalculatorsTool':
-        return <DevCalculatorsTool toolId={selectedTool.id} />;
-      case 'CodePlaygroundTool':
-        return <CodePlaygroundTool />;
-      case 'AiCopilotTool':
-        return <AiCopilotTool />;
+      case 'JsonFormatterTool': return <JsonFormatterTool toolId={selectedTool.id} />;
+      case 'Base64ConverterTool': return <Base64ConverterTool toolId={selectedTool.id} />;
+      case 'CaseConverterTool': return <CaseConverterTool />;
+      case 'UuidGeneratorTool': return <UuidGeneratorTool />;
+      case 'HashCryptoTool': return <HashCryptoTool />;
+      case 'RegexTesterTool': return <RegexTesterTool />;
+      case 'TextDiffTool': return <TextDiffTool />;
+      case 'JwtDecoderTool': return <JwtDecoderTool />;
+      case 'MarkdownEditorTool': return <MarkdownEditorTool />;
+      case 'ColorPaletteTool': return <ColorPaletteTool />;
+      case 'CssShadowGeneratorTool': return <CssShadowGeneratorTool />;
+      case 'HtmlMetaGeneratorTool': return <HtmlMetaGeneratorTool />;
+      case 'DataConverterTool': return <DataConverterTool toolId={selectedTool.id} />;
+      case 'TimestampConverterTool': return <TimestampConverterTool />;
+      case 'QrCodeGeneratorTool': return <QrCodeGeneratorTool />;
+      case 'HttpStatusExplorerTool': return <HttpStatusExplorerTool />;
+      case 'GitIgnoreGeneratorTool': return <GitIgnoreGeneratorTool />;
+      case 'DevCalculatorsTool': return <DevCalculatorsTool toolId={selectedTool.id} />;
+      case 'CodePlaygroundTool': return <CodePlaygroundTool />;
+      case 'AiCopilotTool': return <AiCopilotTool />;
       default:
         return (
           <GenericToolRunner
             tool={selectedTool}
-            onOpenAiCopilot={(code) => {
+            onOpenAiCopilot={() => {
               const copilot = TOOLS_CATALOG.find(t => t.id === 'ai-code-copilot');
               if (copilot) handleSelectTool(copilot);
             }}
@@ -204,7 +177,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white flex flex-col">
-      {/* Global Top Navbar */}
       <Navbar
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenPlayground={() => {
@@ -222,9 +194,7 @@ export default function App() {
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
       />
 
-      {/* Main Body Layout (Sidebar + Content Workspace) */}
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Desktop Sidebar & Mobile Drawer */}
         <div className={`${isSidebarOpen ? 'block' : 'hidden'} md:block fixed md:static inset-0 z-30 bg-slate-950/80 md:bg-transparent`}>
           <div className="h-full" onClick={(e) => e.stopPropagation()}>
             <Sidebar
@@ -240,17 +210,13 @@ export default function App() {
               onOpenTransparency={() => setIsTransparencyOpen(true)}
               onOpenPro={() => setIsProOpen(true)}
               onOpenSponsor={() => setIsSponsorOpen(true)}
+              isPro={isPro}
             />
           </div>
         </div>
 
-        {/* Central Execution Workspace */}
         <main className="flex-1 p-4 md:p-8 space-y-8 min-w-0">
-          
-          {/* Active Tool Viewport */}
           <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 md:p-7 shadow-xl space-y-6">
-            
-            {/* Tool Header & Meta */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
@@ -262,20 +228,12 @@ export default function App() {
                       Popular
                     </span>
                   )}
-                  <span className="text-xs text-slate-500 font-mono">
-                    id: {selectedTool.id}
-                  </span>
+                  <span className="text-xs text-slate-500 font-mono">id: {selectedTool.id}</span>
                 </div>
-
-                <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">
-                  {selectedTool.name}
-                </h1>
-                <p className="text-xs md:text-sm text-slate-400 max-w-2xl leading-relaxed">
-                  {selectedTool.description}
-                </p>
+                <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{selectedTool.name}</h1>
+                <p className="text-xs md:text-sm text-slate-400 max-w-2xl leading-relaxed">{selectedTool.description}</p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center gap-2 self-start sm:self-center">
                 <button
                   onClick={() => toggleFavorite(selectedTool.id)}
@@ -301,13 +259,9 @@ export default function App() {
               </div>
             </div>
 
-            {/* Live Interactive Engine Component */}
-            <div className="pt-2">
-              {renderToolComponent()}
-            </div>
+            <div className="pt-2">{renderToolComponent()}</div>
           </section>
 
-          {/* Directory Explorer (500+ Tools) */}
           <section className="space-y-4 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
               <div>
@@ -318,9 +272,7 @@ export default function App() {
                      selectedCategory === 'favorites' ? 'Starred Favorites' :
                      CATEGORIES.find(c => c.id === selectedCategory)?.name || 'Tools'}
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
-                    {currentDirectoryTools.length}
-                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">{currentDirectoryTools.length}</span>
                 </h2>
                 <p className="text-xs text-slate-400">Click any card to launch it instantly in the workspace above</p>
               </div>
@@ -336,7 +288,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Grid of Tools */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {currentDirectoryTools.slice(0, 48).map((tool) => {
                 const isActive = tool.id === selectedTool.id;
@@ -367,9 +318,7 @@ export default function App() {
                           <Star className={`w-3.5 h-3.5 ${isFav ? 'text-amber-400 fill-amber-400' : ''}`} />
                         </button>
                       </div>
-                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                        {tool.description}
-                      </p>
+                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{tool.description}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-[10px] text-slate-500 font-mono">
@@ -387,43 +336,15 @@ export default function App() {
               </div>
             )}
           </section>
-
         </main>
       </div>
 
-      {/* Modals */}
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectTool={handleSelectTool}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
-      />
-
-      <KeyboardShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
-
-      <AffiliateHubModal
-        isOpen={isAffiliateOpen}
-        onClose={() => setIsAffiliateOpen(false)}
-      />
-
-      <ProUpgradeModal
-        isOpen={isProOpen}
-        onClose={() => setIsProOpen(false)}
-      />
-
-      <SponsorModal
-        isOpen={isSponsorOpen}
-        onClose={() => setIsSponsorOpen(false)}
-      />
-
-      <TransparencyModal
-        isOpen={isTransparencyOpen}
-        onClose={() => setIsTransparencyOpen(false)}
-      />
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSelectTool={handleSelectTool} favorites={favorites} onToggleFavorite={toggleFavorite} />
+      <KeyboardShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+      <AffiliateHubModal isOpen={isAffiliateOpen} onClose={() => setIsAffiliateOpen(false)} />
+      <ProUpgradeModal isOpen={isProOpen} onClose={() => setIsProOpen(false)} />
+      <SponsorModal isOpen={isSponsorOpen} onClose={() => setIsSponsorOpen(false)} />
+      <TransparencyModal isOpen={isTransparencyOpen} onClose={() => setIsTransparencyOpen(false)} />
     </div>
   );
 }
