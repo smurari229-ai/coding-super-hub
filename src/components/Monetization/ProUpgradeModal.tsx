@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { getProStatus, setProStatus } from '../../lib/pro';
+import { getProStatus, setProStatus, verifyLemonOrder } from '../../lib/pro';
 
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
@@ -31,6 +31,64 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
     () => CHECKOUT_URLS[provider][billingCycle],
     [provider, billingCycle]
   );
+
+  useEffect(() => {
+    if (!document.getElementById('lemon-squeezy-js')) {
+      const script = document.createElement('script');
+      script.id = 'lemon-squeezy-js';
+      script.src = 'https://app.lemonsqueezy.com/js/lemon.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+
+    const lemon = (window as unknown as {
+      LemonSqueezy?: {
+        Setup?: (options: {
+          eventHandler: (event: {
+            event?: string;
+            data?: { id?: string };
+          }) => void;
+        }) => void;
+      };
+    }).LemonSqueezy;
+
+    const setup = () => {
+      const current = (window as unknown as {
+        LemonSqueezy?: {
+          Setup?: (options: {
+            eventHandler: (event: {
+              event?: string;
+              data?: { id?: string };
+            }) => void;
+          }) => void;
+        };
+      }).LemonSqueezy;
+
+      current?.Setup?.({
+        eventHandler: (event) => {
+          if (event.event !== 'Checkout.Success' || !event.data?.id) return;
+
+          setIsLoading(true);
+          setStatusMsg('Payment received. Verifying your Pro order…');
+
+          void verifyLemonOrder(event.data.id).then((verified) => {
+            setIsLoading(false);
+            setStatusMsg(
+              verified?.active
+                ? 'Payment verified. Pro is now active.'
+                : 'Payment completed, but Pro verification is still pending. Please refresh shortly.'
+            );
+          });
+        },
+      });
+    };
+
+    if (lemon?.Setup) {
+      setup();
+    } else {
+      window.setTimeout(setup, 300);
+    }
+  }, []);
 
   useEffect(() => {
     const existing = getProStatus();
