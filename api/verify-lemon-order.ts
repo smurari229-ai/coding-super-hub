@@ -25,7 +25,7 @@ export default {
       return json({ verified: false, error: 'Payment verification is not configured.' }, 503);
     }
 
-    if (!orderId || !/^\\d+$/.test(orderId)) {
+    if (!orderId || !/^\d+$/.test(orderId)) {
       return json({ verified: false, error: 'Invalid order id.' }, 400);
     }
 
