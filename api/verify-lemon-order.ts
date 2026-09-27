@@ -70,8 +70,47 @@ export default async function handler(request: Request): Promise<Response> {
         expectedPlan !== null;
 
     if (!verified) {
-        return json({ verified: false, error: 'Order is not an eligible paid Pro order.' }, 403);
+      return json({ verified: false, error: 'Order is not an eligible paid Pro order.' }, 403);
+    }
+
+    if (expectedPlan === 'monthly') {
+      const subscriptionResponse = await fetch(
+        `https://api.lemonsqueezy.com/v1/subscriptions?filter[order_id]=${encodeURIComponent(orderId)}&page[size]=1`,
+        {
+          headers: {
+            Accept: 'application/vnd.api+json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+        }
+      );
+
+      if (!subscriptionResponse.ok) {
+        return json({ verified: false, error: 'Subscription verification failed.' }, 502);
       }
+
+      const subscriptionPayload = (await subscriptionResponse.json()) as {
+        data?: Array<{
+          attributes?: {
+            status?: string;
+            variant_id?: number;
+          };
+        }>;
+      };
+
+      const subscription = subscriptionPayload.data?.[0]?.attributes;
+      const subscriptionStatus = subscription?.status;
+      const subscriptionVariant = String(subscription?.variant_id ?? '');
+
+      const subscriptionValid =
+        subscriptionVariant === monthlyVariant &&
+        ['on_trial', 'active', 'paused', 'past_due', 'unpaid', 'cancelled'].includes(
+          subscriptionStatus ?? ''
+        );
+
+      if (!subscriptionValid) {
+        return json({ verified: false, error: 'Monthly Pro subscription is no longer active.' }, 403);
+      }
+    }
 
     return json({ verified: true, plan: expectedPlan });
   } catch {
