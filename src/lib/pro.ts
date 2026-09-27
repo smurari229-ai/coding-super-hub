@@ -13,6 +13,7 @@ export interface CheckoutReturn {
   provider?: 'lemon-squeezy' | 'stripe';
   plan?: 'monthly' | 'lifetime';
   orderId?: string;
+  sessionId?: string;
 }
 
 export function getProStatus(): ProStatus {
@@ -84,6 +85,7 @@ export function getCheckoutReturn(): CheckoutReturn | null {
     plan,
     provider,
     orderId: url.searchParams.get('order_id') || undefined,
+    sessionId: url.searchParams.get('session_id') || undefined,
   };
 }
 
@@ -94,6 +96,7 @@ export function clearCheckoutReturn(): void {
   url.searchParams.delete('plan');
   url.searchParams.delete('provider');
   url.searchParams.delete('order_id');
+  url.searchParams.delete('session_id');
   window.history.replaceState({}, document.title, url.toString());
 }
 
@@ -130,6 +133,35 @@ export async function verifyLemonOrder(orderId: string): Promise<ProStatus | nul
   }
 }
 
+export async function verifyStripeSession(sessionId: string): Promise<ProStatus | null> {
+  if (!sessionId) return null;
+
+  try {
+    const response = await fetch(
+      `/api/verify-stripe-session?session_id=${encodeURIComponent(sessionId)}`,
+      { headers: { Accept: 'application/json' } }
+    );
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      verified?: boolean;
+      plan?: 'monthly' | 'lifetime';
+    };
+
+    if (!data.verified || !data.plan) return null;
+
+    setProStatus(true, {
+      plan: data.plan,
+      provider: 'stripe',
+    });
+
+    return getProStatus();
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
   const checkout = getCheckoutReturn();
   if (!checkout) return null;
@@ -137,9 +169,15 @@ export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
   clearCheckoutReturn();
 
   if (checkout.result !== 'success') return null;
-  if (checkout.provider !== 'lemon-squeezy' || !checkout.orderId) return null;
+  if (checkout.provider === 'lemon-squeezy' && checkout.orderId) {
+    return verifyLemonOrder(checkout.orderId);
+  }
 
-  return verifyLemonOrder(checkout.orderId);
+  if (checkout.provider === 'stripe' && checkout.sessionId) {
+    return verifyStripeSession(checkout.sessionId);
+  }
+
+  return null;
 }
 
 export const FREE_AI_DAILY_LIMIT = 10;
