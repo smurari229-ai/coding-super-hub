@@ -38,11 +38,11 @@ export const AiCopilotTool: React.FC = () => {
       const active = getProStatus().active;
       setIsPro(active);
       setAiUsed(getTodayAiUsage());
-      if (active && error?.startsWith('Free limit reached')) setError(null);
+      if (active) setError((current) => current?.startsWith('Free limit reached') ? null : current);
     };
     window.addEventListener(PRO_EVENT, handleProStatusChanged);
     return () => window.removeEventListener(PRO_EVENT, handleProStatusChanged);
-  }, [error]);
+  }, []);
 
   const aiLimit = getAiLimit(isPro);
   const remainingRuns = isPro ? Number.POSITIVE_INFINITY : Math.max(0, aiLimit - aiUsed);
