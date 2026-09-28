@@ -554,3 +554,11 @@ Main baseline: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 | `base64-audio-player` | Base64 Audio Data URI Player | `misc-productivity` | `GenericToolRunner` | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_RUN | NOT_RUN |
 | `css-loading-bar-indeterminate` | Material Indeterminate Linear Progress Bar | `misc-productivity` | `GenericToolRunner` | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_RUN | NOT_RUN |
 | `website-launch-checklist` | Production Website Launch Checklist | `misc-productivity` | `GenericToolRunner` | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_RUN | NOT_RUN |
+
+## Phase 2 static semantic findings
+
+- Catalog registration remains **535**; no new tool IDs were added.
+- Confirmed generic-engine implementation gaps: `mime-types-lookup`, `api-request-builder`, `kubernetes-pod-yaml`, `curl-command-builder`, `bencode-decoder`, `csv-to-sqlite-ddl`, `webhook-tester-format`, `s3-bucket-policy-builder`, and `github-profile-generator` have specialized catalog descriptions but no ID-specific algorithm branch in `GenericToolRunner.runTool()`; they therefore reach the explicit unregistered-algorithm fallback.
+- These entries are recorded as **FAIL** rather than PASS because the defect is deterministically established by source inspection.
+- Remaining tools retain their prior runtime/semantic status until actual execution evidence exists.
+- The complete 535-tool semantic execution gate remains **NOT_RUN**.
