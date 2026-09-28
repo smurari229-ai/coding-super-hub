@@ -91,6 +91,7 @@ console.log('Sandbox loaded successfully!');`;
   const [css, setCss] = useState<string>(defaultCss);
   const [js, setJs] = useState<string>(defaultJs);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const MAX_PLAYGROUND_SOURCE_LENGTH = 20000;
 
   const runCode = () => {
     if (!iframeRef.current) return;
@@ -119,9 +120,10 @@ console.log('Sandbox loaded successfully!');`;
 
   useEffect(() => {
     const handleMsg = (e: MessageEvent) => {
-      if (e.data && e.data.type === 'CONSOLE_LOG') {
-        setLogs(prev => [...prev.slice(-30), e.data.message]);
-      }
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      if (!e.data || typeof e.data !== 'object' || e.data.type !== 'CONSOLE_LOG') return;
+      if (typeof e.data.message !== 'string') return;
+      setLogs(prev => [...prev.slice(-30), e.data.message.slice(0, 2000)]);
     };
     window.addEventListener('message', handleMsg);
     runCode();
@@ -189,6 +191,7 @@ console.log('Sandbox loaded successfully!');`;
             <textarea
               value={html}
               onChange={(e) => setHtml(e.target.value)}
+              maxLength={MAX_PLAYGROUND_SOURCE_LENGTH}
               rows={16}
               className="w-full p-4 font-mono text-xs text-slate-100 bg-slate-950 rounded-2xl border border-slate-800 focus:outline-none focus:border-indigo-500 leading-relaxed shadow-inner"
               spellCheck={false}
@@ -199,6 +202,7 @@ console.log('Sandbox loaded successfully!');`;
             <textarea
               value={css}
               onChange={(e) => setCss(e.target.value)}
+              maxLength={MAX_PLAYGROUND_SOURCE_LENGTH}
               rows={16}
               className="w-full p-4 font-mono text-xs text-indigo-300 bg-slate-950 rounded-2xl border border-slate-800 focus:outline-none focus:border-indigo-500 leading-relaxed shadow-inner"
               spellCheck={false}
@@ -209,6 +213,7 @@ console.log('Sandbox loaded successfully!');`;
             <textarea
               value={js}
               onChange={(e) => setJs(e.target.value)}
+              maxLength={MAX_PLAYGROUND_SOURCE_LENGTH}
               rows={16}
               className="w-full p-4 font-mono text-xs text-amber-300 bg-slate-950 rounded-2xl border border-slate-800 focus:outline-none focus:border-indigo-500 leading-relaxed shadow-inner"
               spellCheck={false}
