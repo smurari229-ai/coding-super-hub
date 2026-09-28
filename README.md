@@ -129,7 +129,7 @@ npm run build
 * **Data & Formats (55 Tools)**: JSON ↔ CSV, CSV ↔ JSON, JSON ↔ YAML, SQL query formatter & INSERT generator, Unix Epoch converter, Number Base (Bin/Oct/Dec/Hex), MongoDB ObjectId generator, and GeoJSON validator.
 * **DevOps & Network (75 Tools)**: Complete HTTP status explorer, Multi-stack .gitignore builder, Dockerfile generator, Docker Compose builder, Nginx server block builder, cURL-to-Fetch converter, Subnet CIDR calculator, and Linux/Git cheatsheets.
 * **Math & Calculators (55 Tools)**: 4-type percentage calculator, Unit converters (Length, Weight, Temp, Bytes), GCD/LCM, Factorials, Fibonacci, Prime number checker, and Bitwise operation visualizer.
-* **Code Snippets & Sandbox (45 Tools)**: Live HTML/CSS/JS Sandbox with real-time iframe execution, AI Code Copilot (Gemini, OpenAI, Claude, Grok), React custom hooks library, debounce/throttle, and async retry utilities.
+* **Code Snippets & Sandbox (45 Tools)**: Live HTML/CSS/JS Sandbox with real-time iframe execution, AI Code Copilot (Gemini; other model providers are not currently implemented), React custom hooks library, debounce/throttle, and async retry utilities.
 * **Productivity & Misc (54 Tools)**: High-resolution QR code generator with SVG/PNG download, Developer scratchpad, GitHub README badge builder, open-source license selector, and production launch checklist.
 
 ---
