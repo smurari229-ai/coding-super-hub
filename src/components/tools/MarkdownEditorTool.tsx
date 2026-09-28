@@ -7,9 +7,9 @@ export const MarkdownEditorTool: React.FC = () => {
 An all-in-one production toolbox for **developers**, **designers**, and **DevOps engineers**.
 
 ### Key Advantages:
-- ⚡ **500+ Essential Utilities**: Fast, zero-friction developer tools.
-- 🔒 **100% Client-Side Privacy**: Your code and keys never touch a server.
-- 🤖 **Multi-Provider AI Copilot**: Gemini, OpenAI, and Claude integrated.
+- ⚡ **535 Developer Tools**: Fast, zero-friction utilities across coding, security, data, DevOps, and productivity.
+- 🔒 **Privacy-aware Tooling**: Many deterministic utilities run locally; AI Copilot sends submitted code/prompts to the configured server-side Gemini provider.
+- 🤖 **AI Copilot**: Server-protected Google Gemini integration.
 
 \`\`\`typescript
 interface DeveloperTool {
