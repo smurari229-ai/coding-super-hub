@@ -1,4 +1,8 @@
 export const PRO_STORAGE_KEY = 'csh_pro_status';
+
+// localStorage is only a persistence hint. Pro access is granted in-memory
+// after a server-side payment verification succeeds in this page session.
+let verifiedProStatus: ProStatus = { active: false };
 export const PRO_EVENT = 'csh:pro-status-changed';
 
 export interface ProStatus {
@@ -19,6 +23,10 @@ export interface CheckoutReturn {
 }
 
 export function getProStatus(): ProStatus {
+  return verifiedProStatus;
+}
+
+function getStoredProStatus(): ProStatus {
   if (typeof window === 'undefined') return { active: false };
 
   try {
@@ -52,10 +60,12 @@ export function setProStatus(
   try {
     if (active) {
       localStorage.setItem(PRO_STORAGE_KEY, JSON.stringify(status));
+      verifiedProStatus = status;
     } else {
       localStorage.removeItem(PRO_STORAGE_KEY);
+      verifiedProStatus = { active: false };
     }
-    window.dispatchEvent(new CustomEvent(PRO_EVENT, { detail: status }));
+    window.dispatchEvent(new CustomEvent(PRO_EVENT, { detail: verifiedProStatus }));
   } catch {
     // Storage can be disabled by privacy settings; the app remains usable.
   }
@@ -167,8 +177,13 @@ export async function verifyStripeSession(sessionId: string): Promise<ProStatus 
 }
 
 export async function refreshStoredProStatus(): Promise<ProStatus | null> {
-  const current = getProStatus();
-  if (!current.active) return null;
+  const stored = getStoredProStatus();
+  if (!stored.active) {
+    verifiedProStatus = { active: false };
+    return null;
+  }
+
+  const current = stored;
 
   if (current.provider === 'lemon-squeezy' && current.orderId) {
     const verified = await verifyLemonOrder(current.orderId);
@@ -182,7 +197,9 @@ export async function refreshStoredProStatus(): Promise<ProStatus | null> {
     return verified;
   }
 
-  return current;
+  // Unknown/manual browser-local states are never treated as verified.
+  setProStatus(false);
+  return null;
 }
 
 export async function verifyCheckoutReturn(): Promise<ProStatus | null> {
