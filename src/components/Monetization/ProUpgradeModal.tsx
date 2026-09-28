@@ -140,10 +140,6 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
     }, 350);
   };
 
-  const handleManualActivation = () => {
-    setProStatus(true, { plan: billingCycle, provider: 'manual' });
-    setStatusMsg('Pro enabled locally for testing. Remove this testing action before public launch.');
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
@@ -273,15 +269,6 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
               Checkout is handled by {provider === 'lemon-squeezy' ? 'Lemon Squeezy' : 'Stripe'}.
             </p>
           </div>
-
-          {import.meta.env.DEV && (
-            <button
-              onClick={handleManualActivation}
-              className="w-full text-[10px] text-slate-500 hover:text-slate-300 underline"
-            >
-              Dev-only: enable Pro locally for UI testing
-            </button>
-          )}
         </div>
       </div>
     </div>
