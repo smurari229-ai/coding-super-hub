@@ -187,7 +187,7 @@ export const TOOLS_CATALOG: ToolItem[] = [
   t('bencode-decoder', 'BitTorrent Bencode Parser', 'text-string', 'Decode Bencoded .torrent metadata files and strings into readable JSON', ['bencode', 'torrent', 'decode', 'p2p']),
 
   // ==========================================
-  // 2. CRYPTO & SECURITY (65 Tools)
+  // 2. CRYPTO & SECURITY (64 Tools)
   // ==========================================
   t('sha256-hash', 'SHA-256 Hash Generator', 'crypto-security', 'Calculate cryptographic SHA-256 checksums using native WebCrypto API', ['sha256', 'hash', 'checksum', 'crypto'], { isPopular: true, dedicatedComponent: 'HashCryptoTool' }),
   t('sha512-hash', 'SHA-512 Hash Generator', 'crypto-security', 'Generate 512-bit SHA-2 cryptographic message digests', ['sha512', 'hash', 'digest', 'security'], { dedicatedComponent: 'HashCryptoTool' }),
@@ -255,7 +255,7 @@ export const TOOLS_CATALOG: ToolItem[] = [
   t('signed-url-builder-spec', 'HMAC Signed URL Spec Helper', 'crypto-security', 'Construct timestamped and signed query URLs for temporary download access', ['signed-url', 's3', 'hmac', 'expiry', 'security']),
 
   // ==========================================
-  // 3. WEB & FRONTEND (105 Tools)
+  // 3. WEB & FRONTEND (102 Tools)
   // ==========================================
   t('color-palette-generator', 'Color Palette & Shades Generator', 'web-frontend', 'Generate harmonious color palettes (HEX, RGB, HSL) with 50-950 Tailwind shade steps', ['color', 'palette', 'tailwind', 'shades', 'hex'], { isPopular: true, dedicatedComponent: 'ColorPaletteTool' }),
   t('contrast-checker', 'WCAG Contrast Checker (AA / AAA)', 'web-frontend', 'Calculate contrast ratios between text and background with compliance ratings for WCAG 2.1', ['contrast', 'wcag', 'accessibility', 'a11y', 'color'], { isPopular: true, dedicatedComponent: 'ColorPaletteTool' }),
@@ -607,7 +607,7 @@ export const TOOLS_CATALOG: ToolItem[] = [
   t('canvas-draw-image-cover', 'Canvas drawImage "object-fit: cover"', 'code-snippets', 'Draw images onto HTML5 <canvas> elements with automatic cropping maintaining aspect ratio', ['canvas', 'images', 'crop', 'graphics']),
 
   // ==========================================
-  // 8. PRODUCTIVITY & MISC (55 Tools)
+  // 8. PRODUCTIVITY & MISC (54 Tools)
   // ==========================================
   t('qr-code-generator', 'High-Res QR Code Generator', 'misc-productivity', 'Generate customizable QR codes with high error correction, custom colors, and SVG/PNG download', ['qr', 'barcode', 'generator', 'mobile', 'download'], { isPopular: true, dedicatedComponent: 'QrCodeGeneratorTool' }),
   t('developer-scratchpad', 'Developer Scratchpad & Quick Notes', 'misc-productivity', 'Persistent, auto-saving plain text and code notepad saved directly in your browser localStorage', ['notes', 'scratchpad', 'notepad', 'local', 'editor'], { isPopular: true }),
