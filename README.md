@@ -27,7 +27,7 @@
 │   ├── types/
 │   │   └── tools.ts             # TypeScript definitions for tools, categories, and affiliates
 │   ├── data/
-│   │   ├── tools-catalog.ts     # Central metadata catalog containing all 540 tools
+│   │   ├── tools-catalog.ts     # Central metadata catalog containing all 535 tools
 │   │   └── affiliates.ts        # Curated developer affiliate deals & promotional vouchers
 │   ├── components/
 │   │   ├── Navbar.tsx           # Global header with Search trigger, Pro CTA, and theme toggle
@@ -60,7 +60,7 @@
 │   │       ├── GitIgnoreGeneratorTool.tsx # Multi-stack .gitignore & Dockerfile builder
 │   │       ├── DevCalculatorsTool.tsx     # Percentages, units, GCD/LCM, prime checks
 │   │       ├── CodePlaygroundTool.tsx     # Live HTML/CSS/JS sandbox with console output
-│   │       ├── AiCopilotTool.tsx          # Multi-model AI bug fixer and refactorer
+│   │       ├── AiCopilotTool.tsx          # Gemini server-protected AI bug fixer and refactorer
 │   │       └── GenericToolRunner.tsx      # Universal runner engine for tools without dedicated components
 │   ├── App.tsx                  # Master application orchestrator
 │   ├── main.tsx                 # React DOM entry point
