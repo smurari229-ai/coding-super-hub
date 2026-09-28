@@ -198,6 +198,7 @@ export default function App() {
         onOpenSponsor={() => setIsSponsorOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        isPro={isPro}
       />
 
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
