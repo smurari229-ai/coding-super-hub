@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getProStatus, getAiLimit } from '../../lib/pro';
 import { Sparkles, Bot, Copy, Check, AlertCircle } from 'lucide-react';
 
 type Task = 'fix' | 'explain' | 'optimize' | 'tests' | 'convert';
@@ -30,7 +31,27 @@ export const AiCopilotTool: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const canRun = () => {
+    if (getProStatus().active) return true;
+    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
+    const used = Number(localStorage.getItem(key) || '0');
+    const limit = getAiLimit(false);
+    if (used >= limit) {
+      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot usage.`);
+      return false;
+    }
+    return true;
+  };
+
+  const consumeFreeRun = () => {
+    if (getProStatus().active) return;
+    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
+    const used = Number(localStorage.getItem(key) || '0');
+    localStorage.setItem(key, String(used + 1));
+  };
+
   const handleGenerate = async () => {
+    if (!canRun()) return;
     setLoading(true);
     setError(null);
     setResponse('');
@@ -53,6 +74,7 @@ export const AiCopilotTool: React.FC = () => {
       }
 
       setResponse(typeof data?.text === 'string' ? data.text : 'No response returned from the AI provider.');
+      consumeFreeRun();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate AI response');
     } finally {
