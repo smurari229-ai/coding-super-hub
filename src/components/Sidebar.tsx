@@ -57,8 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : 'text-slate-300 hover:text-white hover:bg-slate-900'
             }`}
           >
-            <div className="flex items-center gap-2.5"><Sparkles className="w-4 h-4" /><span>All 500+ Developer Tools</span></div>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">540</span>
+            <div className="flex items-center gap-2.5"><Sparkles className="w-4 h-4" /><span>All 535 Developer Tools</span></div>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">535</span>
           </button>
 
           <button
