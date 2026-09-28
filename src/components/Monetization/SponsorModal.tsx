@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
 import { X, Heart, Coffee, Github, Copy, Check, ExternalLink } from 'lucide-react';
 
+const BUY_ME_A_COFFEE_URL =
+  (import.meta.env.VITE_BUYMEACOFFEE_URL as string | undefined)?.trim() ||
+  'https://buymeacoffee.com/smurari';
+
+const GITHUB_SPONSORS_URL =
+  (import.meta.env.VITE_GITHUB_SPONSORS_URL as string | undefined)?.trim() ||
+  'https://github.com/sponsors/smurari229-ai';
+
+const UPI_ID =
+  (import.meta.env.VITE_UPI_ID as string | undefined)?.trim() ||
+  'smurari229@okaxis';
+
 interface SponsorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -11,16 +23,19 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
 
   if (!isOpen) return null;
 
-  const handleCopyUpi = () => {
-    navigator.clipboard.writeText('smurari229@okaxis');
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
+  const handleCopyUpi = async () => {
+    try {
+      await navigator.clipboard.writeText(UPI_ID);
+      setCopiedUpi(true);
+      window.setTimeout(() => setCopiedUpi(false), 2000);
+    } catch {
+      setCopiedUpi(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
       <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
-        {/* Header */}
         <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
@@ -36,52 +51,48 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-4">
           <p className="text-xs text-slate-300 leading-relaxed">
-            Coding Super Hub is maintained by independent developers. Every contribution helps cover hosting costs, AI inference quotas, and ongoing tool development!
+            Contributions help cover hosting, AI usage, maintenance, and new developer tools.
           </p>
 
           <div className="space-y-2.5">
-            {/* Buy Me a Coffee */}
             <a
-              href="https://buymeacoffee.com/smurari"
+              href={BUY_ME_A_COFFEE_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="p-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 flex items-center justify-between transition-colors group"
             >
               <div className="flex items-center gap-3">
                 <Coffee className="w-5 h-5 text-amber-400" />
                 <div>
                   <span className="font-semibold text-xs text-white block">Buy Me a Coffee</span>
-                  <span className="text-[11px] text-slate-400">Support with $3, $5, or custom tip</span>
+                  <span className="text-[11px] text-slate-400">One-time creator support</span>
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-colors" />
             </a>
 
-            {/* GitHub Sponsors */}
             <a
-              href="https://github.com/sponsors/smurari229-ai"
+              href={GITHUB_SPONSORS_URL}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="p-3.5 rounded-xl bg-slate-950/60 hover:bg-slate-800 border border-slate-800 flex items-center justify-between transition-colors group"
             >
               <div className="flex items-center gap-3">
                 <Github className="w-5 h-5 text-slate-200" />
                 <div>
                   <span className="font-semibold text-xs text-white block">GitHub Sponsors</span>
-                  <span className="text-[11px] text-slate-400">Sponsor monthly with public badge on GitHub</span>
+                  <span className="text-[11px] text-slate-400">Recurring or one-time sponsorship</span>
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
             </a>
 
-            {/* UPI / Direct */}
             <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="font-semibold text-xs text-white block">Direct UPI (India)</span>
-                <span className="text-[11px] text-slate-400 font-mono">smurari229@okaxis</span>
+                <span className="text-[11px] text-slate-400 font-mono">{UPI_ID}</span>
               </div>
               <button
                 onClick={handleCopyUpi}
@@ -94,7 +105,6 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
           </div>
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-end">
           <button onClick={onClose} className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs">
             Close

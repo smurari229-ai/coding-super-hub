@@ -17,7 +17,7 @@ export interface ToolItem {
   isPopular?: boolean;
   isNew?: boolean;
   isPro?: boolean;
-  dedicatedComponent?: string; // If it has a custom dedicated component
+  dedicatedComponent?: string;
   defaultInput?: string;
   placeholder?: string;
   inputLabel?: string;
@@ -43,6 +43,7 @@ export interface AffiliateDeal {
   badge?: string;
   rating: number;
   referralUrl: string;
+  isAffiliate?: boolean;
   code?: string;
 }
 

@@ -9,6 +9,7 @@ import { AffiliateHubModal } from './components/Monetization/AffiliateHubModal';
 import { ProUpgradeModal } from './components/Monetization/ProUpgradeModal';
 import { SponsorModal } from './components/Monetization/SponsorModal';
 import { TransparencyModal } from './components/Monetization/TransparencyModal';
+import { getProStatus, refreshStoredProStatus, verifyCheckoutReturn, PRO_EVENT } from './lib/pro';
 
 // Dedicated Tool Components
 import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
@@ -32,6 +33,8 @@ import { DevCalculatorsTool } from './components/tools/DevCalculatorsTool';
 import { CodePlaygroundTool } from './components/tools/CodePlaygroundTool';
 import { AiCopilotTool } from './components/tools/AiCopilotTool';
 import { GenericToolRunner } from './components/tools/GenericToolRunner';
+import { Phase1LayoutTools } from './components/tools/Phase1LayoutTools';
+import { Phase1SecurityTools } from './components/tools/Phase1SecurityTools';
 
 import { 
   Star, 
@@ -51,6 +54,7 @@ import {
 export default function App() {
   const [selectedTool, setSelectedTool] = useState<ToolItem>(TOOLS_CATALOG[0]); // JSON Formatter
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all' | 'favorites'>('all');
+  const [isPro, setIsPro] = useState(() => getProStatus().active);
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('csh_favorites');
@@ -101,6 +105,18 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    void verifyCheckoutReturn().then((verified) => {
+      if (verified?.active) setIsPro(true);
+    });
+    void refreshStoredProStatus().then((verified) => {
+      setIsPro(Boolean(verified?.active));
+    });
+    const handleProChange = () => setIsPro(getProStatus().active);
+    window.addEventListener(PRO_EVENT, handleProChange);
+    return () => window.removeEventListener(PRO_EVENT, handleProChange);
+  }, []);
+
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -138,14 +154,37 @@ export default function App() {
     return t.category === selectedCategory;
   });
 
-  const handleShareTool = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShareCopied(true);
-    setTimeout(() => setShareCopied(false), 2000);
+  const handleShareTool = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareCopied(true);
+      window.setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      setShareCopied(false);
+    }
   };
 
   // Render the appropriate execution runner
   const renderToolComponent = () => {
+    if (selectedTool.id === 'css-flexbox-playground' || selectedTool.id === 'css-grid-generator') {
+      return <Phase1LayoutTools tool={selectedTool} />;
+    }
+
+    const phase1SecurityIds = [
+      'csp-generator',
+      'security-headers-analyzer',
+      'password-entropy-meter',
+      'hash-identifier',
+      'cookie-flags-generator',
+      'rate-limit-header-builder',
+      'url-parser-inspector',
+      'json-schema-generator',
+    ];
+
+    if (phase1SecurityIds.includes(selectedTool.id)) {
+      return <Phase1SecurityTools tool={selectedTool} />;
+    }
+
     switch (selectedTool.dedicatedComponent) {
       case 'JsonFormatterTool':
         return <JsonFormatterTool toolId={selectedTool.id} />;
@@ -240,6 +279,7 @@ export default function App() {
               onOpenTransparency={() => setIsTransparencyOpen(true)}
               onOpenPro={() => setIsProOpen(true)}
               onOpenSponsor={() => setIsSponsorOpen(true)}
+              isPro={isPro}
             />
           </div>
         </div>
@@ -307,7 +347,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* Directory Explorer (500+ Tools) */}
+          {/* Directory Explorer (535 Tools) */}
           <section className="space-y-4 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800">
               <div>
@@ -383,7 +423,7 @@ export default function App() {
 
             {currentDirectoryTools.length > 48 && (
               <div className="p-4 rounded-2xl bg-slate-900/40 border border-slate-800 text-center text-xs text-slate-400">
-                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 540 tools instantly.
+                Showing top 48 of {currentDirectoryTools.length} tools. Use <kbd className="px-1.5 py-0.5 rounded bg-slate-950 font-mono border border-slate-800">⌘K</kbd> to search all 535 tools instantly.
               </div>
             )}
           </section>

@@ -11,9 +11,9 @@
 
 ## ⚡ What Makes Coding Super Hub Different?
 
-1. **540 Real, Production-Grade Tools**: Categorized across 8 departments (Text & Strings, Crypto & Security, Web & Frontend, Data & Formats, DevOps & Network, Math & Algorithms, Code Snippets & Sandbox, Productivity).
-2. **100% Client-Side Privacy**: All cryptographic hashing, JWT decoding, JSON formatting, and regex computations execute locally in the browser sandbox. No sensitive code, tokens, or passwords leave the user's machine.
-3. **Multi-Model AI Copilot**: Native Google Gemini 2.5 Flash / Pro integration, plus support for custom OpenAI GPT-4o, Claude 3.5 Sonnet, and Grok keys for code explanations, bug fixing, test generation, and refactoring.
+1. **535 Registered Developer Tools**: Categorized across 8 departments (Text & Strings, Crypto & Security, Web & Frontend, Data & Formats, DevOps & Network, Math & Algorithms, Code Snippets & Sandbox, Productivity).
+2. **Privacy-aware local tooling**: Many deterministic utilities (such as hashing, JWT decoding, JSON formatting, and regex work) run locally in the browser. AI Copilot is different: code/prompts submitted to it are sent to the configured server-side Gemini provider for inference.
+3. **AI Copilot**: Server-protected Google Gemini 2.5 Flash integration for code explanations, bug fixing, test generation, optimization, and TypeScript conversion. Other model providers are not currently implemented.
 4. **Live Code Sandbox**: Real-time multi-tab HTML/CSS/JS execution engine with sandboxed `<iframe>` isolation, device viewport toggles (desktop/mobile), and real-time console log interceptor.
 5. **Built-in Monetization Stack**: Non-intrusive developer ads, curated affiliate resource center (DigitalOcean, Supabase, Cursor, Railway, etc.), Stripe / Lemon Squeezy-ready Pro upgrade modal, and creator tip jar.
 
@@ -27,7 +27,7 @@
 │   ├── types/
 │   │   └── tools.ts             # TypeScript definitions for tools, categories, and affiliates
 │   ├── data/
-│   │   ├── tools-catalog.ts     # Central metadata catalog containing all 540 tools
+│   │   ├── tools-catalog.ts     # Central metadata catalog containing all 535 tools
 │   │   └── affiliates.ts        # Curated developer affiliate deals & promotional vouchers
 │   ├── components/
 │   │   ├── Navbar.tsx           # Global header with Search trigger, Pro CTA, and theme toggle
@@ -60,8 +60,8 @@
 │   │       ├── GitIgnoreGeneratorTool.tsx # Multi-stack .gitignore & Dockerfile builder
 │   │       ├── DevCalculatorsTool.tsx     # Percentages, units, GCD/LCM, prime checks
 │   │       ├── CodePlaygroundTool.tsx     # Live HTML/CSS/JS sandbox with console output
-│   │       ├── AiCopilotTool.tsx          # Multi-model AI bug fixer and refactorer
-│   │       └── GenericToolRunner.tsx      # Universal runner engine for all 500+ tools
+│   │       ├── AiCopilotTool.tsx          # Gemini server-protected AI bug fixer and refactorer
+│   │       └── GenericToolRunner.tsx      # Universal runner engine for tools without dedicated components
 │   ├── App.tsx                  # Master application orchestrator
 │   ├── main.tsx                 # React DOM entry point
 │   └── index.css                # Tailwind CSS v4 entry point
@@ -107,8 +107,8 @@ npm run build
 ## 💰 Monetization Setup Checklist for the Creator
 
 1. **DigitalOcean Referral Credit**:
-   - Register at [DigitalOcean Referral Program](https://www.digitalocean.com/referral-program)
-   - Replace `https://m.do.co/c/codinghub200` in `src/data/affiliates.ts` with your affiliate link ($25 bonus per referral).
+   - Register through the official DigitalOcean referral program.
+   - Put your approved referral URL in `VITE_AFFILIATE_DIGITALOCEAN_URL` in Vercel. Do not publish placeholder or personal referral URLs as verified links.
 2. **Cursor & Supabase Affiliates**:
    - Update `referralUrl` entries in `src/data/affiliates.ts` with your personal affiliate IDs.
 3. **Stripe / Lemon Squeezy (Pro Membership)**:
@@ -117,20 +117,20 @@ npm run build
 4. **Buy Me a Coffee & GitHub Sponsors**:
    - Replace `https://buymeacoffee.com/smurari` and `smurari229@okaxis` with your actual donation handles in `src/components/Monetization/SponsorModal.tsx`.
 5. **Contextual Developer Ads**:
-   - Once traffic reaches ~10k monthly visitors, apply to **Carbon Ads** or **BuySellAds** and place their snippet inside `src/components/Monetization/AdBanner.tsx`.
+   - Configure an approved ad provider only after its account/placement is actually available. Do not claim ad revenue or provider approval before verification.
 
 ---
 
-## 📜 Complete Breakdown of 540 Tools by Department
+## 📜 Complete Breakdown of 535 Registered Tools by Department
 
 * **Text & String (85 Tools)**: JSON/YAML/XML/TOML formatters, Base64/URL/Hex/Binary/HTML converters, Case converters, Regex debugger, Diff checker, UUID/NanoID generator, Slugifier, Word frequency, Text statistics, Cron builder, and more.
-* **Crypto & Security (65 Tools)**: SHA-256, SHA-512, MD5, HMAC, Password entropy meter, CSP generator, CORS header builder, X.509 PEM decoder, TOTP 2FA calculator, Chmod calculator, and SSRF guard.
-* **Web & Frontend (105 Tools)**: Color palette generator, WCAG AA/AAA contrast checker, CSS Box Shadow & Gradient designer, Flexbox/Grid playgrounds, Glassmorphism generator, Fluid Typography (clamp) calculator, HTML Meta/OG generator, SVG tools, and responsive viewport tester.
+* **Crypto & Security (64 Tools)**: SHA-256, SHA-512, MD5, HMAC, Password entropy meter, CSP generator, CORS header builder, X.509 PEM decoder, TOTP 2FA calculator, Chmod calculator, and SSRF guard.
+* **Web & Frontend (102 Tools)**: Color palette generator, WCAG AA/AAA contrast checker, CSS Box Shadow & Gradient designer, Flexbox/Grid playgrounds, Glassmorphism generator, Fluid Typography (clamp) calculator, HTML Meta/OG generator, SVG tools, and responsive viewport tester.
 * **Data & Formats (55 Tools)**: JSON ↔ CSV, CSV ↔ JSON, JSON ↔ YAML, SQL query formatter & INSERT generator, Unix Epoch converter, Number Base (Bin/Oct/Dec/Hex), MongoDB ObjectId generator, and GeoJSON validator.
 * **DevOps & Network (75 Tools)**: Complete HTTP status explorer, Multi-stack .gitignore builder, Dockerfile generator, Docker Compose builder, Nginx server block builder, cURL-to-Fetch converter, Subnet CIDR calculator, and Linux/Git cheatsheets.
 * **Math & Calculators (55 Tools)**: 4-type percentage calculator, Unit converters (Length, Weight, Temp, Bytes), GCD/LCM, Factorials, Fibonacci, Prime number checker, and Bitwise operation visualizer.
-* **Code Snippets & Sandbox (45 Tools)**: Live HTML/CSS/JS Sandbox with real-time iframe execution, AI Code Copilot (Gemini, OpenAI, Claude, Grok), React custom hooks library, debounce/throttle, and async retry utilities.
-* **Productivity & Misc (55 Tools)**: High-resolution QR code generator with SVG/PNG download, Developer scratchpad, GitHub README badge builder, open-source license selector, and production launch checklist.
+* **Code Snippets & Sandbox (45 Tools)**: Live HTML/CSS/JS Sandbox with real-time iframe execution, AI Code Copilot (Gemini; other model providers are not currently implemented), React custom hooks library, debounce/throttle, and async retry utilities.
+* **Productivity & Misc (54 Tools)**: High-resolution QR code generator with SVG/PNG download, Developer scratchpad, GitHub README badge builder, open-source license selector, and production launch checklist.
 
 ---
 
