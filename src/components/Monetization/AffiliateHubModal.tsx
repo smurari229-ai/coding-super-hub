@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AFFILIATE_DEALS } from '../../data/affiliates';
-import { AffiliateDeal } from '../../types/tools';
 import { X, ExternalLink, Copy, Check, Search, Tag, Star, Sparkles } from 'lucide-react';
 
 interface AffiliateHubModalProps {
@@ -19,22 +18,26 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
 
   const filteredDeals = AFFILIATE_DEALS.filter(deal => {
     const matchesCat = selectedCategory === 'All' || deal.category === selectedCategory;
-    const matchesQuery = deal.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         deal.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         deal.dealText.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesQuery =
+      deal.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      deal.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      deal.dealText.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesQuery;
   });
 
-  const handleCopyCode = (id: string, code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCode = async (id: string, code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setCopiedId(null);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-        {/* Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
@@ -44,11 +47,11 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 Recommended Developer Resources &amp; Deals
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                  Verified Free Credits &amp; Discounts
+                  Transparent links
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Curated cloud services, AI engines, and developer tools with exclusive referral credits.
+                Curated developer services. Affiliate links are shown only where a verified partner URL is configured.
               </p>
             </div>
           </div>
@@ -60,7 +63,6 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
           </button>
         </div>
 
-        {/* Filters & Search */}
         <div className="p-4 border-b border-slate-800/80 bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none">
             {categories.map(cat => (
@@ -90,7 +92,6 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
           </div>
         </div>
 
-        {/* Deals Grid */}
         <div className="p-5 overflow-y-auto space-y-3 flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {filteredDeals.map((deal) => (
@@ -119,7 +120,6 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
                   </p>
                 </div>
 
-                {/* Offer Highlight */}
                 <div className="p-2.5 rounded-lg bg-indigo-950/30 border border-indigo-500/20 flex items-center justify-between text-xs">
                   <span className="font-medium text-emerald-400 flex items-center gap-1.5">
                     <Tag className="w-3.5 h-3.5" />
@@ -137,19 +137,25 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
                   )}
                 </div>
 
-                {/* CTA */}
                 <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-1 text-amber-400 text-xs font-medium">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" />
-                    <span>{deal.rating.toFixed(1)}</span>
+                  <div className="flex items-center gap-2 text-xs font-medium">
+                    <span className="flex items-center gap-1 text-amber-400">
+                      <Star className="w-3.5 h-3.5 fill-amber-400" />
+                      {deal.rating.toFixed(1)}
+                    </span>
+                    {deal.isAffiliate && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        Affiliate
+                      </span>
+                    )}
                   </div>
                   <a
                     href={deal.referralUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer sponsored"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all shadow-sm shadow-indigo-600/20"
                   >
-                    <span>Visit Partner</span>
+                    <span>{deal.isAffiliate ? 'Visit partner' : 'Visit official site'}</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -158,17 +164,8 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between text-xs text-slate-400">
-          <p>
-            Transparency note: Links contain referral identifiers that support maintaining this 100% free tool.
-          </p>
-          <button
-            onClick={onClose}
-            className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200"
-          >
-            Close
-          </button>
+        <div className="p-4 border-t border-slate-800 bg-slate-950/60 text-xs text-slate-400">
+          Some links may earn Coding Super Hub a commission when an eligible purchase or signup is completed. This never changes the price you pay.
         </div>
       </div>
     </div>
