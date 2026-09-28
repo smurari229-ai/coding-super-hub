@@ -9,6 +9,9 @@ interface GenericToolRunnerProps {
 
 type RunnerResult = { output: string; error?: string };
 
+const MAX_GENERIC_INPUT_LENGTH = 20_000;
+const MAX_GENERIC_OUTPUT_LENGTH = 50_000;
+
 const MORSE: Record<string, string> = {
   A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.',
   H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.',
@@ -745,8 +748,17 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
   const [copied, setCopied] = useState(false);
 
   const execute = (value = input) => {
+    if (value.length > MAX_GENERIC_INPUT_LENGTH) {
+      setOutput('');
+      setError(`Input exceeds the ${MAX_GENERIC_INPUT_LENGTH.toLocaleString()} character limit.`);
+      return;
+    }
+
     const result = runTool(tool, value);
-    setOutput(result.output);
+    const boundedOutput = result.output.length > MAX_GENERIC_OUTPUT_LENGTH
+      ? result.output.slice(0, MAX_GENERIC_OUTPUT_LENGTH) + '\n\n[Output truncated at the 50,000 character safety limit.]'
+      : result.output;
+    setOutput(boundedOutput);
     setError(result.error ?? '');
   };
 
@@ -820,10 +832,11 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-1.5">
           <div className="flex justify-between px-1 text-xs text-slate-400">
-            <span>{tool.inputLabel ?? 'Input'}</span><span>{input.length} chars</span>
+            <span>{tool.inputLabel ?? 'Input'}</span><span>{input.length}/{MAX_GENERIC_INPUT_LENGTH.toLocaleString()} chars</span>
           </div>
           <textarea
             value={input}
+            maxLength={MAX_GENERIC_INPUT_LENGTH}
             onChange={event => setInput(event.target.value)}
             rows={12}
             spellCheck={false}
