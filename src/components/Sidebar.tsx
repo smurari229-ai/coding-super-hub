@@ -2,21 +2,9 @@ import React from 'react';
 import { CATEGORIES } from '../data/tools-catalog';
 import { ToolCategory, ToolItem } from '../types/tools';
 import { AdBanner } from './Monetization/AdBanner';
-import { 
-  Type, 
-  Shield, 
-  Layout, 
-  Database, 
-  Server, 
-  Calculator, 
-  Code2, 
-  Sparkles, 
-  Star, 
-  Clock, 
-  ExternalLink,
-  ShieldCheck,
-  Tag,
-  Zap
+import {
+  Type, Shield, Layout, Database, Server, Calculator, Code2, Sparkles,
+  Star, Clock, ShieldCheck, Tag
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,6 +17,7 @@ interface SidebarProps {
   onOpenTransparency: () => void;
   onOpenPro: () => void;
   onOpenSponsor: () => void;
+  isPro?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -40,7 +29,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAffiliates,
   onOpenTransparency,
   onOpenPro,
-  onOpenSponsor
+  onOpenSponsor,
+  isPro = false
 }) => {
   const getCategoryIcon = (id: ToolCategory) => {
     switch (id) {
@@ -58,7 +48,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside className="w-72 shrink-0 border-r border-slate-800 bg-slate-950/60 p-4 flex flex-col justify-between overflow-y-auto space-y-6 h-[calc(100vh-4rem)] sticky top-16 scrollbar-none">
       <div className="space-y-5">
-        {/* All & Favorites */}
         <div className="space-y-1">
           <button
             onClick={() => onSelectCategory('all')}
@@ -68,13 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : 'text-slate-300 hover:text-white hover:bg-slate-900'
             }`}
           >
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-4 h-4" />
-              <span>All 500+ Developer Tools</span>
-            </div>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">
-              540
-            </span>
+            <div className="flex items-center gap-2.5"><Sparkles className="w-4 h-4" /><span>All 500+ Developer Tools</span></div>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">540</span>
           </button>
 
           <button
@@ -85,17 +69,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : 'text-slate-300 hover:text-white hover:bg-slate-900'
             }`}
           >
-            <div className="flex items-center gap-2.5">
-              <Star className="w-4 h-4 text-amber-400" />
-              <span>Starred Favorites</span>
-            </div>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">
-              {favorites.length}
-            </span>
+            <div className="flex items-center gap-2.5"><Star className="w-4 h-4 text-amber-400" /><span>Starred Favorites</span></div>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/20">{favorites.length}</span>
           </button>
         </div>
 
-        {/* Categories Section */}
         <div className="space-y-1">
           <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold px-2 block mb-1">
             Tool Categories
@@ -112,19 +90,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     : 'text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
-                  {getCategoryIcon(cat.id)}
-                  <span>{cat.name}</span>
-                </div>
-                <span className="text-[10px] font-mono text-slate-500">
-                  {cat.count}
-                </span>
+                <div className="flex items-center gap-2.5">{getCategoryIcon(cat.id)}<span>{cat.name}</span></div>
+                <span className="text-[10px] font-mono text-slate-500">{cat.count}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Recent Tools History */}
         {recentTools.length > 0 && (
           <div className="space-y-1 pt-2 border-t border-slate-800/80">
             <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold px-2 block mb-1 flex items-center gap-1.5">
@@ -143,13 +115,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Bottom: Ad Banner & Links */}
       <div className="space-y-3 pt-3 border-t border-slate-800/80">
-        <AdBanner 
-          onOpenAffiliates={onOpenAffiliates} 
-          onOpenPro={onOpenPro} 
-          onOpenSponsor={onOpenSponsor} 
-        />
+        {!isPro && (
+          <AdBanner
+            onOpenAffiliates={onOpenAffiliates}
+            onOpenPro={onOpenPro}
+            onOpenSponsor={onOpenSponsor}
+            isPro={isPro}
+          />
+        )}
 
         <div className="space-y-1 text-[11px] text-slate-500 px-1">
           <button
@@ -160,13 +134,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>Monetization &amp; Privacy Policy</span>
           </button>
 
-          <button
-            onClick={onOpenAffiliates}
-            className="flex items-center gap-1.5 hover:text-slate-300 transition-colors w-full text-left py-0.5"
-          >
-            <Tag className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Recommended Cloud &amp; AI VPS</span>
-          </button>
+          {!isPro && (
+            <button
+              onClick={onOpenAffiliates}
+              className="flex items-center gap-1.5 hover:text-slate-300 transition-colors w-full text-left py-0.5"
+            >
+              <Tag className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Recommended Cloud &amp; AI VPS</span>
+            </button>
+          )}
+
+          {isPro && (
+            <div className="px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+              Pro active — ads hidden
+            </div>
+          )}
         </div>
       </div>
     </aside>
