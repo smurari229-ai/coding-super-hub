@@ -25,10 +25,14 @@ export const AffiliateHubModal: React.FC<AffiliateHubModalProps> = ({ isOpen, on
     return matchesCat && matchesQuery;
   });
 
-  const handleCopyCode = (id: string, code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCode = async (id: string, code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setCopiedId(null);
+    }
   };
 
   return (
