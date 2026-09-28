@@ -20,7 +20,7 @@ AI request → `/api/ai` → method/body/input limits → in-memory rate limit �
 - Cross-device favorites/history.
 - Durable AI quota and usage ledger.
 - Subscription entitlement enforcement.
-- Payment webhooks.
+- Lemon Squeezy signed webhook verification (without durable entitlement persistence).
 - Project generator.
 - GitHub repository write integration.
 - Durable analytics pipeline.
