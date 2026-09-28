@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { getProStatus, getAiLimit } from '../../lib/pro';
+import React, { useEffect, useState } from 'react';
+import { getProStatus, getAiLimit, PRO_EVENT } from '../../lib/pro';
 import { Sparkles, Bot, Send, Copy, Check, Key, Cpu, Zap, AlertCircle } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+
+const FREE_AI_USAGE_KEY = () => `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
+
+const getTodayAiUsage = (): number => {
+  if (typeof window === 'undefined') return 0;
+  return Number(localStorage.getItem(FREE_AI_USAGE_KEY()) || '0');
+};
 
 export const AiCopilotTool: React.FC = () => {
   const [provider, setProvider] = useState<'gemini' | 'openai' | 'claude' | 'grok'>('gemini');
@@ -23,6 +30,23 @@ export const AiCopilotTool: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPro, setIsPro] = useState(() => getProStatus().active);
+  const [aiUsed, setAiUsed] = useState(() => getTodayAiUsage());
+
+  useEffect(() => {
+    const handleProStatusChanged = () => {
+      const active = getProStatus().active;
+      setIsPro(active);
+      setAiUsed(getTodayAiUsage());
+      if (active && error?.startsWith('Free limit reached')) setError(null);
+    };
+    window.addEventListener(PRO_EVENT, handleProStatusChanged);
+    return () => window.removeEventListener(PRO_EVENT, handleProStatusChanged);
+  }, [error]);
+
+  const aiLimit = getAiLimit(isPro);
+  const remainingRuns = isPro ? Number.POSITIVE_INFINITY : Math.max(0, aiLimit - aiUsed);
+  const limitReached = !isPro && aiUsed >= aiLimit;
 
   const canRun = () => {
     const pro = getProStatus().active;
@@ -31,10 +55,11 @@ export const AiCopilotTool: React.FC = () => {
     const used = Number(localStorage.getItem(key) || '0');
     const limit = getAiLimit(false);
     if (used >= limit) {
-      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot usage.`);
+      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot.`);
       return false;
     }
     localStorage.setItem(key, String(used + 1));
+    setAiUsed(used + 1);
     return true;
   };
 
@@ -169,6 +194,20 @@ describe('findDuplicates', () => {
 
   return (
     <div className="space-y-4">
+      {/* AI Plan Status */}
+      <div className={`rounded-xl border px-3.5 py-2.5 text-xs font-semibold flex items-center justify-between gap-3 ${isPro ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300' : limitReached ? 'bg-rose-500/10 border-rose-500/25 text-rose-300' : 'bg-indigo-500/10 border-indigo-500/25 text-indigo-300'}`}>
+        <span>
+          {isPro
+            ? 'Pro — Unlimited AI Copilot'
+            : limitReached
+              ? 'Upgrade to Pro for unlimited runs'
+              : `Free plan: ${remainingRuns} of 10 AI runs left today`}
+        </span>
+        {!isPro && limitReached && (
+          <span className="text-[10px] text-rose-300/80 whitespace-nowrap">Go Pro in the top bar</span>
+        )}
+      </div>
+
       {/* Provider & Model Select */}
       <div className="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -254,7 +293,7 @@ describe('findDuplicates', () => {
         />
         <button
           onClick={handleGenerate}
-          disabled={loading}
+          disabled={loading || limitReached}
           className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-md shadow-indigo-600/20 shrink-0"
         >
           {loading ? (
