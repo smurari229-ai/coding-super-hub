@@ -9,6 +9,7 @@ import { AffiliateHubModal } from './components/Monetization/AffiliateHubModal';
 import { ProUpgradeModal } from './components/Monetization/ProUpgradeModal';
 import { SponsorModal } from './components/Monetization/SponsorModal';
 import { TransparencyModal } from './components/Monetization/TransparencyModal';
+import { getProStatus, refreshStoredProStatus, verifyCheckoutReturn, PRO_EVENT } from './lib/pro';
 
 // Dedicated Tool Components
 import { JsonFormatterTool } from './components/tools/JsonFormatterTool';
@@ -53,6 +54,7 @@ import {
 export default function App() {
   const [selectedTool, setSelectedTool] = useState<ToolItem>(TOOLS_CATALOG[0]); // JSON Formatter
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all' | 'favorites'>('all');
+  const [isPro, setIsPro] = useState(() => getProStatus().active);
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('csh_favorites');
@@ -103,6 +105,18 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    void verifyCheckoutReturn().then((verified) => {
+      if (verified?.active) setIsPro(true);
+    });
+    void refreshStoredProStatus().then((verified) => {
+      setIsPro(Boolean(verified?.active));
+    });
+    const handleProChange = () => setIsPro(getProStatus().active);
+    window.addEventListener(PRO_EVENT, handleProChange);
+    return () => window.removeEventListener(PRO_EVENT, handleProChange);
+  }, []);
+
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -140,10 +154,14 @@ export default function App() {
     return t.category === selectedCategory;
   });
 
-  const handleShareTool = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setShareCopied(true);
-    setTimeout(() => setShareCopied(false), 2000);
+  const handleShareTool = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareCopied(true);
+      window.setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      setShareCopied(false);
+    }
   };
 
   // Render the appropriate execution runner
@@ -261,6 +279,7 @@ export default function App() {
               onOpenTransparency={() => setIsTransparencyOpen(true)}
               onOpenPro={() => setIsProOpen(true)}
               onOpenSponsor={() => setIsSponsorOpen(true)}
+              isPro={isPro}
             />
           </div>
         </div>
