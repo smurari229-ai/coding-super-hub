@@ -93,6 +93,7 @@ export default async function handler(request: Request): Promise<Response> {
           attributes?: {
             status?: string;
             variant_id?: number;
+            ends_at?: string | null;
           };
         }>;
       };
@@ -100,12 +101,19 @@ export default async function handler(request: Request): Promise<Response> {
       const subscription = subscriptionPayload.data?.[0]?.attributes;
       const subscriptionStatus = subscription?.status;
       const subscriptionVariant = String(subscription?.variant_id ?? '');
+      const cancelledEndsAt = subscription?.ends_at
+        ? Date.parse(subscription.ends_at)
+        : Number.NaN;
+      const cancelledStillValid =
+        subscriptionStatus !== 'cancelled' ||
+        (Number.isFinite(cancelledEndsAt) && cancelledEndsAt > Date.now());
 
       const subscriptionValid =
         subscriptionVariant === monthlyVariant &&
         ['on_trial', 'active', 'paused', 'past_due', 'unpaid', 'cancelled'].includes(
           subscriptionStatus ?? ''
-        );
+        ) &&
+        cancelledStillValid;
 
       if (!subscriptionValid) {
         return json({ verified: false, error: 'Monthly Pro subscription is no longer active.' }, 403);
