@@ -415,6 +415,365 @@ const bitwiseOps = (value: string) => {
 
 type Handler = (tool: ToolItem, input: string) => string | null;
 
+
+const roiBatch8: Handler = (tool, input) => {
+  const nums = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  const requireNums = (count: number, message: string) => {
+    if (nums.length < count || nums.slice(0, count).some(value => !Number.isFinite(value))) throw new Error(message);
+  };
+  switch (tool.id) {
+    case 'duplicate-line-remover': {
+      const lines = input.split(/\r?\n/).filter(Boolean);
+      if (!lines.length) throw new Error('Enter at least one line.');
+      return Array.from(new Set(lines)).join('\n');
+    }
+    case 'text-line-sorter': {
+      const lines = input.split(/\r?\n/).filter(Boolean);
+      if (!lines.length) throw new Error('Enter at least one line.');
+      return lines.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })).join('\n');
+    }
+    case 'text-reverser':
+      if (!input) throw new Error('Enter text to reverse.');
+      return input.split(/\r?\n/).reverse().map(line => Array.from(line).reverse().join('')).join('\n');
+    case 'string-trimmer':
+      return input.split(/\r?\n/).map(line => line.trim().replace(/\s+/g, ' ')).filter(Boolean).join('\n');
+    case 'string-pad-align': {
+      const width = Math.max(1, Math.min(200, Math.trunc(nums[0] ?? 20)));
+      const lines = input.split(/\r?\n/).slice(0, 500);
+      if (!lines.length) throw new Error('Enter lines to align.');
+      return lines.map(line => line.padEnd(width)).join('\n');
+    }
+    case 'text-prefix-suffix': {
+      const lines = input.split(/\r?\n/);
+      if (lines.length < 3) throw new Error('Use three lines: prefix, suffix, then text.');
+      const [prefix, suffix, ...body] = lines;
+      return body.join('\n').split(/\r?\n/).map(line => prefix + line + suffix).join('\n');
+    }
+    case 'remove-empty-lines':
+      return input.split(/\r?\n/).filter(line => line.trim()).join('\n');
+    case 'newline-converter': {
+      const mode = input.split(/\r?\n/, 1)[0].trim().toLowerCase();
+      const body = input.slice(input.indexOf('\n') + 1);
+      if (!['lf', 'crlf'].includes(mode)) throw new Error('First line must be LF or CRLF; remaining lines are the text.');
+      return body.replace(/\r?\n/g, mode === 'crlf' ? '\r\n' : '\n');
+    }
+    case 'camel-to-title':
+      return caseWords(input).map(word => word[0]?.toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    case 'snake-to-camel': {
+      const parts = input.trim().split(/[_\s-]+/).filter(Boolean).map(part => part.toLowerCase());
+      if (!parts.length) throw new Error('Enter a snake_case identifier.');
+      return parts[0] + parts.slice(1).map(part => part[0].toUpperCase() + part.slice(1)).join('');
+    }
+    case 'string-find-replace': {
+      const lines = input.split(/\r?\n/);
+      if (lines.length < 3) throw new Error('Use three lines: search, replacement, then text.');
+      const search = lines[0];
+      if (!search) throw new Error('Search text cannot be empty.');
+      return lines.slice(2).join('\n').split(search).join(lines[1]);
+    }
+    case 'text-statistics': {
+      const ws = words(input);
+      const chars = Array.from(input).length;
+      const sentences = input.split(/[.!?]+/).filter(Boolean).length;
+      const paragraphs = input.split(/\n\s*\n/).filter(p => p.trim()).length;
+      return ['Characters: ' + chars, 'Words: ' + ws.length, 'Sentences: ' + sentences, 'Paragraphs: ' + paragraphs,
+        'Reading time (~200 wpm): ' + Math.max(1, Math.ceil(ws.length / 200)) + ' min'].join('\n');
+    }
+    case 'slug-to-text':
+      return input.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+    case 'strip-diacritics':
+      return input.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+    case 'pluralize-singularize': {
+      const word = input.trim();
+      if (!word) throw new Error('Enter an English noun.');
+      const lower = word.toLowerCase();
+      const plural = /[^aeiou]y$/i.test(lower) ? lower.slice(0, -1) + 'ies'
+        : /(s|x|z|ch|sh)$/i.test(lower) ? lower + 'es' : lower + 's';
+      const singular = /ies$/i.test(lower) ? lower.slice(0, -3) + 'y'
+        : /(?:ches|shes|xes|zes|ses)$/i.test(lower) ? lower.slice(0, -2) : lower.replace(/s$/i, '');
+      return 'Plural: ' + plural + '\nSingular: ' + singular;
+    }
+    case 'json-key-sorter': {
+      const data = JSON.parse(input);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Input must be a JSON object.');
+      const sortObject = (value: unknown): unknown => Array.isArray(value) ? value.map(sortObject)
+        : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, sortObject(v)]))
+        : value;
+      return JSON.stringify(sortObject(data), null, 2);
+    }
+    case 'percentage-calculator': {
+      requireNums(2, 'Enter two numbers, e.g. 20 150.');
+      const [a, b] = nums;
+      if (b === 0) throw new Error('Second value cannot be zero for percentage-of calculation.');
+      return ['X% of Y: ' + (a * b / 100), 'X is ' + (a / b * 100) + '% of Y', 'Change X→Y: ' + (a === 0 ? 'undefined' : ((b - a) / Math.abs(a) * 100) + '%')].join('\n');
+    }
+    case 'discount-calculator': {
+      requireNums(2, 'Enter original price and discount percentage.');
+      const [price, discount] = nums;
+      if (price < 0 || discount < 0 || discount > 100) throw new Error('Use a non-negative price and a discount from 0 to 100%.');
+      const saved = price * discount / 100;
+      return 'Savings: ' + saved.toFixed(2) + '\nSale price: ' + (price - saved).toFixed(2);
+    }
+    case 'gcd-lcm-calculator': {
+      requireNums(2, 'Enter two integers.');
+      const a = Math.trunc(nums[0]), b = Math.trunc(nums[1]);
+      const gcd = (x: number, y: number): number => { x = Math.abs(x); y = Math.abs(y); while (y) [x, y] = [y, x % y]; return x; };
+      const g = gcd(a, b);
+      return 'GCD: ' + g + '\nLCM: ' + (g ? Math.abs(a * b) / g : 0);
+    }
+    case 'prime-number-checker': {
+      requireNums(1, 'Enter an integer.');
+      const n = Math.trunc(nums[0]);
+      if (n < 2) return n + ' is not prime.';
+      for (let i = 2; i * i <= n; i++) if (n % i === 0) return n + ' is not prime. Factor: ' + i;
+      return n + ' is prime.';
+    }
+    case 'factorial-calculator': {
+      requireNums(1, 'Enter a non-negative integer.');
+      const n = Math.trunc(nums[0]);
+      if (n < 0 || n > 170) throw new Error('Enter an integer from 0 to 170.');
+      let value = 1; for (let i = 2; i <= n; i++) value *= i;
+      return n + '! = ' + value;
+    }
+    case 'fibonacci-sequence': {
+      requireNums(1, 'Enter a sequence length.');
+      const count = Math.trunc(nums[0]);
+      if (count < 1 || count > 100) throw new Error('Enter a sequence length from 1 to 100.');
+      const seq: number[] = []; let a = 0, b = 1;
+      for (let i = 0; i < count; i++) { seq.push(a); [a, b] = [b, a + b]; }
+      return seq.join(', ');
+    }
+    case 'unit-converter-temperature': {
+      requireNums(1, 'Enter a temperature.');
+      const c = nums[0];
+      return ['Celsius: ' + c, 'Fahrenheit: ' + (c * 9 / 5 + 32), 'Kelvin: ' + (c + 273.15)].join('\n');
+    }
+    case 'bitwise-operations-calc': {
+      requireNums(2, 'Enter two integers.');
+      const a = Math.trunc(nums[0]), b = Math.trunc(nums[1]);
+      return ['AND: ' + (a & b), 'OR: ' + (a | b), 'XOR: ' + (a ^ b), 'NOT A: ' + (~a), 'A<<B: ' + (a << b), 'A>>B: ' + (a >> b)].join('\n');
+    }
+    case 'emi-loan-calculator': {
+      requireNums(3, 'Enter principal, annual interest %, and months.');
+      const [p, rate, months] = nums;
+      if (p <= 0 || rate < 0 || months <= 0) throw new Error('Principal and months must be positive; interest cannot be negative.');
+      const r = rate / 1200;
+      const payment = r === 0 ? p / months : p * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
+      return 'Monthly EMI: ' + payment.toFixed(2) + '\nTotal payment: ' + (payment * months).toFixed(2);
+    }
+    case 'mixed-number-calculator': {
+      requireNums(3, 'Enter whole number, numerator, denominator.');
+      const whole = Math.trunc(nums[0]), numerator = Math.trunc(nums[1]), denominator = Math.trunc(nums[2]);
+      if (denominator === 0 || numerator < 0) throw new Error('Denominator must be non-zero and numerator non-negative.');
+      return 'Improper fraction: ' + (whole * denominator + numerator) + '/' + denominator;
+    }
+    case 'bitwise-not-inverter': {
+      requireNums(1, 'Enter an integer.');
+      const n = Math.trunc(nums[0]);
+      return 'NOT: ' + (~n) + '\nUnsigned 32-bit: ' + (~n >>> 0);
+    }
+    case 'cookie-flags-generator': {
+      const name = input.trim() || 'session';
+      return name + '=VALUE; Path=/; Secure; HttpOnly; SameSite=Lax';
+    }
+    case 'basic-auth-header': {
+      const lines = input.split(/\r?\n/);
+      if (lines.length < 2 || !lines[0] || !lines[1]) throw new Error('Use username on line 1 and password on line 2.');
+      return 'Authorization: Basic ' + encodeBase64Utf8(lines[0] + ':' + lines[1]);
+    }
+    case 'bearer-token-generator': {
+      requireNums(1, 'Enter token length.');
+      const length = Math.trunc(nums[0]);
+      if (length < 16 || length > 256) throw new Error('Token length must be between 16 and 256.');
+      return 'Bearer ' + randomToken(length);
+    }
+    case 'random-hex-salt': {
+      requireNums(1, 'Enter byte length.');
+      const length = Math.trunc(nums[0]);
+      if (length < 8 || length > 128) throw new Error('Byte length must be between 8 and 128.');
+      const bytes = new Uint8Array(length); crypto.getRandomValues(bytes);
+      return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+    case 'dmarc-record-builder': {
+      const domain = input.trim();
+      if (!domain || !/^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(domain)) throw new Error('Enter a valid domain such as example.com.');
+      return 'Host: _dmarc.' + domain + '\nTXT: v=DMARC1; p=none; rua=mailto:dmarc@' + domain;
+    }
+    case 'security-txt-generator': {
+      const contact = input.trim();
+      if (!/^https?:\/\//i.test(contact)) throw new Error('Enter a security contact URL, e.g. https://example.com/security.');
+      return 'Contact: ' + contact + '\nExpires: ' + new Date(Date.now() + 31536000000).toISOString() + '\nPreferred-Languages: en';
+    }
+    case 'rate-limit-header-builder': {
+      requireNums(2, 'Enter limit and window seconds.');
+      const limit = Math.trunc(nums[0]), windowSeconds = Math.trunc(nums[1]);
+      if (limit <= 0 || windowSeconds <= 0) throw new Error('Limit and window must be positive.');
+      return 'RateLimit-Limit: ' + limit + '\nRateLimit-Window: ' + windowSeconds;
+    }
+    case 'nonce-generator': {
+      requireNums(1, 'Enter nonce length.');
+      const length = Math.trunc(nums[0]);
+      if (length < 16 || length > 128) throw new Error('Nonce length must be between 16 and 128.');
+      return 'nonce-' + randomToken(length);
+    }
+    case 'html-boilerplate-generator':
+      return '<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>' + (input.trim() || 'Document') + '</title>\n</head>\n<body>\n  <main></main>\n</body>\n</html>';
+    case 'html-table-generator': {
+      const rows = parseCsv(input);
+      if (!rows.length) throw new Error('Enter CSV rows.');
+      const esc = (v: string) => encodeHtml(v);
+      return '<table>\\n<thead><tr>' + rows[0].map(v => '<th>' + esc(v) + '</th>').join('') + '</tr></thead>\\n<tbody>\\n' +
+        rows.slice(1).map(row => '<tr>' + row.map(v => '<td>' + esc(v) + '</td>').join('') + '</tr>').join('\n') + '\n</tbody>\\n</table>';
+    }
+    case 'html-form-builder':
+      return '<form method="post" action="/submit">\n  <label for="email">Email</label>\n  <input id="email" name="email" type="email" required>\n  <button type="submit">Submit</button>\n</form>';
+    case 'robots-txt-generator': {
+      const path = input.trim() || '/private/';
+      return 'User-agent: *\nDisallow: ' + path + '\nAllow: /';
+    }
+    case 'xml-sitemap-generator': {
+      const urls = input.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+      if (!urls.length) throw new Error('Enter at least one absolute URL.');
+      if (urls.some(url => !/^https?:\/\//i.test(url))) throw new Error('Every sitemap URL must start with http:// or https://.');
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+        urls.map(url => '  <url><loc>' + encodeHtml(url) + '</loc></url>').join('\n') + '\n</urlset>';
+    }
+    case 'web-manifest-generator': {
+      const name = input.trim() || 'Coding Super Hub';
+      return JSON.stringify({ name, short_name: name.slice(0, 12), start_url: '/', display: 'standalone', theme_color: '#111827', background_color: '#ffffff' }, null, 2);
+    }
+    case 'css-triangle-generator': {
+      const size = Math.max(1, Math.min(500, Math.trunc(nums[0] ?? 40)));
+      const color = /^#?[0-9a-f]{3,8}$/i.test((input.split(/\s+/)[1] ?? '')) ? input.split(/\s+/)[1] : '#333';
+      return '.triangle {\\n  width: 0; height: 0;\\n  border-left: ' + size / 2 + 'px solid transparent;\\n  border-right: ' + size / 2 + 'px solid transparent;\\n  border-bottom: ' + size + 'px solid ' + color + ';\\n}';
+    }
+    case 'css-ribbon-banner':
+      return '.ribbon { position: relative; display: inline-block; padding: 0.4rem 1rem; background: #111827; color: #fff; transform: rotate(-3deg); }';
+    case 'css-scrollbar-customizer':
+      return '::-webkit-scrollbar { width: 10px; }\\n::-webkit-scrollbar-thumb { background: #888; border-radius: 5px; }\\n* { scrollbar-width: thin; }';
+    case 'user-agent-parser': {
+      const ua = input.trim();
+      if (!ua) throw new Error('Enter a User-Agent string.');
+      return ['Mobile: ' + (/mobile|android|iphone|ipad/i.test(ua) ? 'yes' : 'no'), 'Browser: ' + (/edg/i.test(ua) ? 'Edge' : /chrome/i.test(ua) ? 'Chrome' : /firefox/i.test(ua) ? 'Firefox' : /safari/i.test(ua) ? 'Safari' : 'Unknown'), 'OS: ' + (/windows/i.test(ua) ? 'Windows' : /android/i.test(ua) ? 'Android' : /iphone|ipad/i.test(ua) ? 'iOS' : /mac os/i.test(ua) ? 'macOS' : /linux/i.test(ua) ? 'Linux' : 'Unknown')].join('\n');
+    }
+    case 'screen-viewport-tester': {
+      requireNums(2, 'Enter viewport width and height.');
+      return 'Viewport: ' + Math.trunc(nums[0]) + ' × ' + Math.trunc(nums[1]) + '\nAspect ratio: ' + (nums[0] / nums[1]).toFixed(3);
+    }
+    case 'git-bisect-guide':
+      return 'git bisect start\ngit bisect bad\ngit bisect good <known-good-commit>\n# test the midpoint\ngit bisect good|bad\ngit bisect reset';
+    case 'docker-ignore-generator':
+      return 'node_modules\n.git\n.gitignore\n.env\ncoverage\ndist\n*.log\n.DS_Store';
+    case 'cloudflare-page-rules-guide':
+      return 'Cache-Control: public, max-age=3600\nBrowser Cache TTL: respect existing headers\nBypass cache for: /api/*\nUse explicit cache keys for dynamic variants.';
+    case 'system-info-commands':
+      return 'uname -a\nlscpu\nfree -h\ndf -h\nlsblk\nip addr\nuptime';
+    case 'rest-naming-conventions':
+      return 'Use nouns for resources: /users, /orders/123\nUse HTTP verbs for intent: GET, POST, PATCH, DELETE\nPrefer plural resource names and consistent nesting.\nAvoid verbs such as /getUsers in resource URLs.';
+    case 'netstat-ss-commands':
+      return 'ss -tulpn\nss -lntp\nss -s\nnetstat -tulpn';
+    case 'sftp-vs-ftps-guide':
+      return 'SFTP: SSH-based file transfer, usually one encrypted connection.\nFTPS: FTP secured with TLS, separate control/data channels.\nSCP: SSH-based secure copy for simple transfers.';
+    case 'git-hook-pre-commit':
+      return '#!/bin/sh\nset -e\nnpm run lint\nnpm test\nnpm run build';
+    case 'env-example-generator': {
+      const keys = Array.from(new Set(input.split(/\r?\n/).map(line => line.match(/^\s*([A-Z][A-Z0-9_]*)\s*=/)?.[1]).filter(Boolean)));
+      if (!keys.length) throw new Error('Enter KEY=value lines to generate a sanitized .env.example.');
+      return keys.map(key => key + '=').join('\n');
+    }
+    case 'redis-command-cheatsheet':
+      return 'SET key value\nGET key\nDEL key\nEXPIRE key 3600\nTTL key\nHSET user:1 name Murari\nHGETALL user:1\nSCAN 0';
+    case 'memcached-vs-redis':
+      return 'Redis: rich data structures, persistence, streams, scripting.\nMemcached: simple volatile key/value cache, low overhead.\nChoose based on persistence, data types, and operational requirements.';
+    case 'kafka-topic-config':
+      return 'Topic: events\npartitions=3\nreplication.factor=3\nretention.ms=604800000\ncleanup.policy=delete';
+    case 'rabbitmq-queue-config':
+      return 'Exchange: app.events\nType: topic\nQueue: app.worker\nBinding key: events.#\nDurable: true';
+    case 'whois-lookup-reference':
+      return 'WHOIS/RDAP checks domain registration metadata. Prefer RDAP for structured JSON and modern registry access.\nExample: query the authoritative RDAP endpoint for the TLD.';
+    case 'traceroute-visual-guide':
+      return 'Linux/macOS: traceroute example.com\nWindows: tracert example.com\nMTR: mtr example.com\nInterpret hops, latency, packet loss, and where loss begins.';
+    case 'ip-range-expander': {
+      const match = input.trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/);
+      if (!match) throw new Error('Enter an IPv4 CIDR such as 192.168.1.0/30.');
+      const ip = match[1].split('.').map(Number), prefix = Number(match[2]);
+      if (ip.some(v => v > 255) || prefix > 32) throw new Error('Invalid IPv4 CIDR.');
+      const base = ((((ip[0] << 24) >>> 0) | (ip[1] << 16) | (ip[2] << 8) | ip[3]) >>> 0);
+      const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+      const network = (base & mask) >>> 0, count = 2 ** (32 - prefix);
+      if (count > 256) throw new Error('Refusing to expand more than 256 addresses.');
+      const toIp = (n: number) => [n >>> 24, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+      return Array.from({ length: count }, (_, i) => toIp((network + i) >>> 0)).join('\n');
+    }
+    case 'docker-run-to-compose': {
+      const match = input.match(/docker\s+run\s+(.*)/i);
+      if (!match) throw new Error('Enter a docker run command.');
+      const image = match[1].match(/(?:^|\s)([A-Za-z0-9._/-]+)(?=\s|$)/)?.[1];
+      if (!image) throw new Error('Could not detect a Docker image.');
+      const port = match[1].match(/-p\s+([0-9]+:[0-9]+)/)?.[1];
+      return 'services:\n  app:\n    image: ' + image + (port ? '\n    ports:\n      - "' + port + '"' : '') + '\n    restart: unless-stopped';
+    }
+    case 'readme-badge-generator': {
+      const name = input.trim() || 'build';
+      return '[![' + name + '](https://img.shields.io/badge/' + encodeURIComponent(name) + '-passing-brightgreen)](.)';
+    }
+    case 'contributing-md-generator':
+      return '# Contributing\n\n1. Fork the repository.\n2. Create a focused branch.\n3. Add tests for behavior changes.\n4. Run lint, tests, and build.\n5. Open a pull request with a clear summary.';
+    case 'code-of-conduct-generator':
+      return '# Code of Conduct\n\nBe respectful, constructive, and inclusive. Harassment, discrimination, and personal attacks are not acceptable. Maintainers may moderate contributions to keep collaboration safe.';
+    case 'security-policy-md-generator':
+      return '# Security Policy\n\nPlease report vulnerabilities privately to the project maintainers. Do not publish exploit details before a fix is available. Include affected versions, reproduction steps, and impact.';
+    case 'privacy-policy-template':
+      return '# Developer Privacy Notice\n\nDescribe what data the application collects, why it is processed, retention, third-party services, security controls, and user rights. Replace this template with project-specific legal text before publication.';
+    case 'terms-of-service-template':
+      return '# Terms of Service\n\nDefine acceptable use, service availability, intellectual property, payment terms, disclaimers, termination, and governing law. Replace this template with project-specific legal text before publication.';
+    case 'invoice-generator-html': {
+      const customer = input.trim() || 'Customer';
+      return '<!doctype html><html><body><h1>Invoice</h1><p>Bill to: ' + encodeHtml(customer) + '</p><table><tr><th>Description</th><th>Amount</th></tr><tr><td>Development service</td><td>________</td></tr></table></body></html>';
+    }
+    case 'hourly-rate-calculator': {
+      requireNums(2, 'Enter target annual income and annual billable hours.');
+      if (nums[1] <= 0) throw new Error('Billable hours must be positive.');
+      return 'Suggested hourly rate: ' + (nums[0] / nums[1]).toFixed(2);
+    }
+    case 'saas-mrr-arr-calculator': {
+      requireNums(2, 'Enter active customers and average monthly revenue per customer.');
+      if (nums[0] < 0 || nums[1] < 0) throw new Error('Values cannot be negative.');
+      const mrr = nums[0] * nums[1];
+      return 'MRR: ' + mrr.toFixed(2) + '\nARR: ' + (mrr * 12).toFixed(2);
+    }
+    case 'cac-ltv-ratio-calc': {
+      requireNums(3, 'Enter CAC, average revenue per customer, and gross margin %.');
+      if (nums[2] <= 0 || nums[2] > 100) throw new Error('Gross margin must be between 0 and 100%.');
+      const ltv = nums[1] / (1 - nums[2] / 100);
+      return 'Estimated LTV: ' + ltv.toFixed(2) + '\nLTV:CAC: ' + (ltv / nums[0]).toFixed(2);
+    }
+    case 'burn-rate-runway-calc': {
+      requireNums(3, 'Enter cash balance, monthly expenses, and monthly revenue.');
+      const burn = nums[1] - nums[2];
+      if (burn <= 0) return 'Net burn: 0\nRunway: not finite while cash flow is non-negative.';
+      return 'Net burn: ' + burn.toFixed(2) + '\nRunway: ' + (nums[0] / burn).toFixed(2) + ' months';
+    }
+    case 'api-pricing-tier-builder': {
+      const name = input.trim() || 'Pro';
+      return '<table><thead><tr><th>Tier</th><th>Price</th><th>Requests</th></tr></thead><tbody><tr><td>Free</td><td>$0</td><td>1,000/mo</td></tr><tr><td>' + encodeHtml(name) + '</td><td>$9/mo</td><td>50,000/mo</td></tr></tbody></table>';
+    }
+    case 'sprint-velocity-calculator': {
+      requireNums(2, 'Enter completed story points and sprint count.');
+      if (nums[1] <= 0) throw new Error('Sprint count must be positive.');
+      return 'Average velocity: ' + (nums[0] / nums[1]).toFixed(2) + ' story points/sprint';
+    }
+    case 'git-alias-collection':
+      return '[alias]\nco = checkout\nci = commit\nst = status\nbr = branch\nlg = log --oneline --decorate --graph --all';
+    case 'bash-profile-helpers':
+      return 'alias ll="ls -la"\nalias gs="git status"\nmkcd() { mkdir -p "$1" && cd "$1"; }\nextract() { tar -xf "$1"; }';
+    case 'system-font-stack-picker':
+      return 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif\nui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace\nGeorgia, Cambria, "Times New Roman", serif';
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
   (tool, input) => {
     if (!has(tool, 'case converter', 'camel case', 'snake case', 'pascal case', 'kebab case')) return null;
