@@ -76,11 +76,18 @@
 
 `npm run lint` checks TypeScript. `npm test` runs the pure engine suite with Vitest 5. `npm run build` performs the production Vite build. CI runs all three checks on pushes and pull requests.
 
+### Minimal release smoke checklist
+- [ ] Open 5 dedicated UI tools and verify their primary action.
+- [ ] Open 5 generic engine tools and verify non-empty useful output.
+- [ ] Open Playground and execute HTML/CSS/JS locally in its sandbox.
+- [ ] Open AI Copilot with `GEMINI_API_KEY` configured and verify the server route responds.
+- [ ] Open Pro modal and verify checkout/verification configuration without exposing secrets.
+
 ## 🔧 Current tool coverage
 
 The catalog contains **535 registered entries**. The current repository has **48 catalog entries mapped to dedicated React tool components**. Those dedicated entries are the verified baseline for the release audit.
 
-The generic engine now provides real deterministic algorithms for common text transforms, encoding, JSON/CSV, number bases, timestamps, UUID/random generation, generators, and selected DevOps helpers. Generic coverage is **not counted as fully verified** until the complete catalog has passed semantic execution tests.
+The generic engine currently metadata-matches **257 catalog entries** outside the 48 dedicated UI mappings, with real handlers covering text transforms, JSON/CSV/YAML, number bases, security snippets, CSS, networking, units, percentages, and bitwise helpers. These 257 are **engine-mapped, not fully semantically verified**; the remaining 230 catalog entries stay explicitly Coming soon until semantic execution evidence exists.
 
 Unsupported catalog entries never echo input as if processing succeeded. They return an explicit **“Coming soon — this catalog entry does not have a verified execution algorithm yet.”** message.
 
@@ -120,17 +127,13 @@ npm run build
 
 ## 💰 Monetization Setup Checklist for the Creator
 
-1. **DigitalOcean Referral Credit**:
-   - Register through the official DigitalOcean referral program.
-   - Put your approved referral URL in `VITE_AFFILIATE_DIGITALOCEAN_URL` in Vercel. Do not publish placeholder or personal referral URLs as verified links.
-2. **Cursor & Supabase Affiliates**:
-   - Update `referralUrl` entries in `src/data/affiliates.ts` with your personal affiliate IDs.
-3. **Stripe / Lemon Squeezy (Pro Membership)**:
-   - Create a product in Lemon Squeezy or Stripe for **$9/month** and **$79 Lifetime**.
-   - Embed your checkout URL into the `handleCheckout` function in `src/components/Monetization/ProUpgradeModal.tsx`.
-4. **Buy Me a Coffee & GitHub Sponsors**:
-   - Replace `https://buymeacoffee.com/smurari` and `smurari229@okaxis` with your actual donation handles in `src/components/Monetization/SponsorModal.tsx`.
-5. **Contextual Developer Ads**:
+1. **Affiliate URLs**:
+   - Configure only approved referral URLs through environment/configuration. Do not publish placeholders as verified links.
+2. **Stripe / Lemon Squeezy (Pro Membership)**:
+   - Configure provider secrets and product/checkout identifiers through Vercel environment variables. Never commit secret keys.
+3. **Sponsor links**:
+   - Configure sponsor URL/UPI values through environment variables. The repository does not hardcode personal payment handles.
+4. **Contextual Developer Ads**:
    - Configure an approved ad provider only after its account/placement is actually available. Do not claim ad revenue or provider approval before verification.
 
 ---
