@@ -205,9 +205,245 @@ const defaultInput = (tool: ToolItem) => {
   return 'The quick brown fox jumps over the lazy dog. 1234567890!';
 };
 
+
+
+const yamlScalar = (value: string): unknown => {
+  const v = value.trim();
+  if (!v) return null;
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  if (v === 'null' || v === '~') return null;
+  if (/^-?\d+(?:\.\d+)?$/.test(v)) return Number(v);
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) return v.slice(1, -1);
+  if (v.startsWith('[') || v.startsWith('{')) {
+    try { return JSON.parse(v); } catch { return v; }
+  }
+  return v;
+};
+
+const jsonToYaml = (value: string) => {
+  const data: unknown = JSON.parse(value);
+  const render = (item: unknown, depth: number): string => {
+    const pad = '  '.repeat(depth);
+    if (Array.isArray(item)) {
+      return item.length ? item.map(entry => {
+        if (entry && typeof entry === 'object') {
+          return pad + '-\n' + render(entry, depth + 1);
+        }
+        return pad + '- ' + yamlText(entry);
+      }).join('\n') : pad + '[]';
+    }
+    if (item && typeof item === 'object') {
+      const entries = Object.entries(item as Record<string, unknown>);
+      if (!entries.length) return pad + '{}';
+      return entries.map(([key, entry]) => {
+        if (entry && typeof entry === 'object') return pad + key + ':\n' + render(entry, depth + 1);
+        return pad + key + ': ' + yamlText(entry);
+      }).join('\n');
+    }
+    return pad + yamlText(item);
+  };
+  const yamlText = (item: unknown) => {
+    if (item === null) return 'null';
+    if (typeof item === 'string') return /^[A-Za-z0-9._/-]+$/.test(item) ? item : JSON.stringify(item);
+    return String(item);
+  };
+  return render(data, 0);
+};
+
+const yamlToJson = (value: string) => {
+  const lines = value.split(/\r?\n/).filter(line => line.trim() && !line.trim().startsWith('#'));
+  if (!lines.length) throw new Error('Enter a basic YAML document.');
+  const root: Record<string, unknown> = {};
+  const stack: Array<{ indent: number; value: Record<string, unknown> }> = [{ indent: -1, value: root }];
+  for (const line of lines) {
+    const match = line.match(/^(\s*)([-\w.]+):(?:\s*(.*))?$/);
+    if (!match) throw new Error('Basic YAML parser supports key: value mappings only.');
+    const indent = match[1].length;
+    const key = match[2];
+    const raw = match[3] ?? '';
+    while (stack.length > 1 && indent <= stack[stack.length - 1].indent) stack.pop();
+    const target = stack[stack.length - 1].value;
+    if (raw) target[key] = yamlScalar(raw);
+    else {
+      const child: Record<string, unknown> = {};
+      target[key] = child;
+      stack.push({ indent, value: child });
+    }
+  }
+  return JSON.stringify(root, null, 2);
+};
+
+const jsonPathExtract = (value: string) => {
+  const lines = value.split(/\r?\n/);
+  const path = lines.shift()?.trim() ?? '';
+  const data: unknown = JSON.parse(lines.join('\n'));
+  const tokens = path.replace(/^\$\.?/, '').split(/[.[\]]+/).filter(Boolean);
+  let current: unknown = data;
+  for (const token of tokens) {
+    if (current === null || current === undefined || (typeof current !== 'object' && !Array.isArray(current))) {
+      throw new Error('JSON path does not exist.');
+    }
+    current = (current as Record<string, unknown>)[token];
+  }
+  return typeof current === 'string' ? current : JSON.stringify(current, null, 2);
+};
+
+const sqlInsertFromJson = (value: string) => {
+  const data: unknown = JSON.parse(value);
+  if (!Array.isArray(data) || !data.length || data.some(item => !item || typeof item !== 'object' || Array.isArray(item))) {
+    throw new Error('Input must be a non-empty JSON array of objects.');
+  }
+  const rows = data as Array<Record<string, unknown>>;
+  const columns = Array.from(new Set(rows.flatMap(row => Object.keys(row))));
+  const sqlValue = (item: unknown) => {
+    if (item === null || item === undefined) return 'NULL';
+    if (typeof item === 'boolean') return item ? 'TRUE' : 'FALSE';
+    if (typeof item === 'number') return Number.isFinite(item) ? String(item) : 'NULL';
+    return "'" + String(item).replace(/'/g, "''") + "'";
+  };
+  return 'INSERT INTO table_name (' + columns.join(', ') + ') VALUES\n' +
+    rows.map(row => '  (' + columns.map(column => sqlValue(row[column])).join(', ') + ')').join(',\n') + ';';
+};
+
+const passwordStrength = (value: string) => {
+  const score = [value.length >= 12, /[a-z]/.test(value), /[A-Z]/.test(value), /\d/.test(value), /[^A-Za-z0-9]/.test(value)].filter(Boolean).length;
+  const label = score <= 1 ? 'Very weak' : score === 2 ? 'Weak' : score === 3 ? 'Fair' : score === 4 ? 'Strong' : 'Very strong';
+  return ['Length: ' + value.length, 'Score: ' + score + '/5', 'Rating: ' + label,
+    'Entropy estimate: ~' + Math.round(value.length * Math.log2(Math.max(1, new Set(value).size))) + ' bits'].join('\n');
+};
+
+const chmodCalculator = (value: string) => {
+  const raw = value.trim().replace(/^chmod\s+/, '');
+  const numeric = /^([0-7]{3,4})$/.test(raw) ? raw.slice(-3) : '';
+  const symbolic = numeric ? numeric : raw;
+  if (!/^[0-7]{3}$/.test(symbolic)) throw new Error('Enter a three-digit chmod value such as 755.');
+  const labels = ['---','--x','-w-','-wx','r--','r-x','rw-','rwx'];
+  const parts = symbolic.split('').map((digit, index) => {
+    const mode = labels[Number(digit)];
+    return ['Owner','Group','Others'][index] + ': ' + mode + ' (' + digit + ')';
+  });
+  return parts.join('\n') + '\nCommand: chmod ' + symbolic + ' path';
+};
+
+const contrastRatio = (foreground: string, background: string) => {
+  const hex = (input: string) => {
+    const clean = input.trim().replace(/^#/, '');
+    const expanded = clean.length === 3 ? clean.split('').map(ch => ch + ch).join('') : clean;
+    if (!/^[0-9a-f]{6}$/i.test(expanded)) throw new Error('Use two six-digit hex colors, e.g. #111111 #ffffff.');
+    return [0,2,4].map(i => parseInt(expanded.slice(i, i+2),16)/255);
+  };
+  const lum = (rgb: number[]) => rgb.map(v => v <= 0.03928 ? v/12.92 : ((v+0.055)/1.055)**2.4)
+    .reduce((a,v,i)=>a+v*[0.2126,0.7152,0.0722][i],0);
+  const ratio = (Math.max(lum(hex(foreground)),lum(hex(background))) + 0.05) /
+    (Math.min(lum(hex(foreground)),lum(hex(background))) + 0.05);
+  return 'Contrast ratio: ' + ratio.toFixed(2) + ':1\nWCAG AA normal text: ' + (ratio >= 4.5 ? 'PASS' : 'FAIL') +
+    '\nWCAG AA large text: ' + (ratio >= 3 ? 'PASS' : 'FAIL');
+};
+
+const minifyCss = (value: string) => value
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/\s+/g, ' ')
+  .replace(/\s*([{}:;,>])\s*/g, '$1')
+  .replace(/;}/g, '}').trim();
+
+const clampCalculator = (value: string) => {
+  const nums = value.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (nums.length < 3) throw new Error('Enter min, preferred, and max font sizes in px, e.g. 16 3 32.');
+  const [min, preferred, max] = nums;
+  const slope = preferred / 100;
+  const intercept = min - slope * 16;
+  return 'CSS: clamp(' + min + 'px, ' + slope.toFixed(4) + 'vw + ' + intercept.toFixed(2) + 'px, ' + max + 'px)';
+};
+
+const curlToFetch = (value: string) => {
+  const match = value.match(/curl\s+(?:(?:-X|--request)\s+([A-Z]+)\s+)?["']?([^"'\s]+)["']?/i);
+  if (!match) throw new Error('Enter a basic cURL command with a URL.');
+  const method = match[1] ?? 'GET';
+  const url = match[2];
+  const headers = Array.from(value.matchAll(/(?:-H|--header)\s+["']([^"']+)["']/gi))
+    .map(item => item[1].split(/:\s*/,2)).filter(item => item.length === 2);
+  const bodyMatch = value.match(/(?:-d|--data|--data-raw)\s+["']([^"']*)["']/i);
+  const lines = ["fetch('" + url + "', {", "  method: '" + method + "',"];
+  if (headers.length) lines.push("  headers: " + JSON.stringify(Object.fromEntries(headers)) + ',');
+  if (bodyMatch) lines.push("  body: " + JSON.stringify(bodyMatch[1]) + ',');
+  lines.push('});');
+  return lines.join('\n');
+};
+
+const cidrInfo = (value: string) => {
+  const match = value.trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/);
+  if (!match) throw new Error('Enter an IPv4 CIDR such as 192.168.1.0/24.');
+  const ip = match[1].split('.').map(Number);
+  const prefix = Number(match[2]);
+  if (ip.some(n => n > 255) || prefix > 32) throw new Error('Invalid IPv4 CIDR.');
+  const mask = prefix === 0 ? 0 : (0xffffffff << (32-prefix)) >>> 0;
+  const ipNum = (((ip[0]<<24)>>>0) + (ip[1]<<16) + (ip[2]<<8) + ip[3]) >>> 0;
+  const network = (ipNum & mask) >>> 0;
+  const broadcast = (network | (~mask >>> 0)) >>> 0;
+  const toIp = (n:number) => [n>>>24,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+  const total = 2 ** (32-prefix);
+  return ['Network: '+toIp(network),'Broadcast: '+toIp(broadcast),'Mask: '+toIp(mask),'Addresses: '+total,
+    'Usable hosts: '+(prefix >= 31 ? total : Math.max(0,total-2))].join('\n');
+};
+
+const convertUnits = (value: string, kind: 'bytes'|'length'|'temp') => {
+  const nums = value.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (!nums.length) throw new Error('Enter a numeric value.');
+  const n = nums[0];
+  if (kind === 'bytes') return ['Bytes: '+n,'KB: '+(n/1024).toFixed(4),'MB: '+(n/1024**2).toFixed(4),'GB: '+(n/1024**3).toFixed(6)].join('\n');
+  if (kind === 'length') return ['Meters: '+n,'Centimeters: '+(n*100).toFixed(4),'Feet: '+(n*3.280839895).toFixed(4),'Inches: '+(n*39.37007874).toFixed(4)].join('\n');
+  return ['Celsius: '+n,'Fahrenheit: '+(n*9/5+32).toFixed(2),'Kelvin: '+(n+273.15).toFixed(2)].join('\n');
+};
+
+const percentageVariants = (value: string) => {
+  const n = value.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  if (n.length < 2) throw new Error('Enter two numbers, e.g. 20 150.');
+  const [a,b]=n;
+  return ['X% of Y: '+(a*b/100).toFixed(2),'X is '+(b === 0 ? 'N/A' : (a/b*100).toFixed(2)+'% of Y'),
+    'Percentage change X→Y: '+(a === 0 ? 'N/A' : ((b-a)/Math.abs(a)*100).toFixed(2)+'%'),
+    'Y minus X: '+(b-a).toFixed(2)].join('\n');
+};
+
+const bitwiseOps = (value: string) => {
+  const n = value.match(/-?\d+/g)?.map(Number) ?? [];
+  if (n.length < 2) throw new Error('Enter two integers, e.g. 12 5.');
+  const [a,b]=n.map(Math.trunc);
+  return ['AND (&): '+(a&b),'OR (|): '+(a|b),'XOR (^): '+(a^b),'NOT (~a): '+(~a),
+    'Left shift (a<<b): '+(a<<b),'Right shift (a>>b): '+(a>>b)].join('\n');
+};
+
 type Handler = (tool: ToolItem, input: string) => string | null;
 
 const handlers: Handler[] = [
+  (tool, input) => has(tool, 'line number', 'line numbering') ? input.split(/\r?\n/).map((line, i) => String(i + 1).padStart(String(input.split(/\r?\n/).length).length, ' ') + ': ' + line).join('\n') : null,
+  (tool, input) => has(tool, 'find and replace', 'find & replace', 'text replace') ? (() => {
+    const [findValue, replaceValue, ...rest] = input.split(/\r?\n/);
+    if (!findValue) throw new Error('First line must contain the text to find.');
+    return rest.join('\n').split(findValue).join(replaceValue ?? '');
+  })() : null,
+  (tool, input) => has(tool, 'extract email') ? (input.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? []).join('\n') : null,
+  (tool, input) => has(tool, 'extract url', 'url extractor') ? (input.match(/https?:\/\/[^\s<>"']+/gi) ?? []).join('\n') : null,
+  (tool, input) => has(tool, 'json yaml', 'json to yaml', 'yaml json') ? (has(tool, 'yaml to json') ? yamlToJson(input) : jsonToYaml(input)) : null,
+  (tool, input) => has(tool, 'json path') ? jsonPathExtract(input) : null,
+  (tool, input) => has(tool, 'sql insert') ? sqlInsertFromJson(input) : null,
+  (tool, input) => has(tool, 'password strength', 'password meter') ? passwordStrength(input) : null,
+  (tool, input) => has(tool, 'chmod') ? chmodCalculator(input) : null,
+  (tool, input) => has(tool, 'csp header', 'content security policy') ? "Content-Security-Policy: default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" : null,
+  (tool, input) => has(tool, 'cors header', 'cors') ? 'Access-Control-Allow-Origin: ' + (input.trim() || '*') + '\nAccess-Control-Allow-Methods: GET,POST,OPTIONS\nAccess-Control-Allow-Headers: Content-Type, Authorization' : null,
+  (tool, input) => has(tool, 'css minif') ? minifyCss(input) : null,
+  (tool, input) => has(tool, 'clamp', 'fluid type') ? clampCalculator(input) : null,
+  (tool, input) => has(tool, 'contrast', 'wcag') ? (() => {
+    const colors = input.match(/#[0-9a-f]{3,8}/gi) ?? [];
+    return contrastRatio(colors[0] ?? '#000000', colors[1] ?? '#ffffff');
+  })() : null,
+  (tool, input) => has(tool, 'curl', 'fetch converter') ? curlToFetch(input) : null,
+  (tool, input) => has(tool, 'subnet', 'cidr') ? cidrInfo(input) : null,
+  (tool, input) => has(tool, 'byte converter', 'bytes converter') ? convertUnits(input, 'bytes') : null,
+  (tool, input) => has(tool, 'length converter') ? convertUnits(input, 'length') : null,
+  (tool, input) => has(tool, 'temperature converter', 'temp converter') ? convertUnits(input, 'temp') : null,
+  (tool, input) => has(tool, 'percentage') ? percentageVariants(input) : null,
+  (tool, input) => has(tool, 'bitwise') ? bitwiseOps(input) : null,
   (tool, input) => {
     if (!(tool.id === 'text-statistics' || has(tool, 'text statistics', 'word counter'))) return null;
     const list = words(input);
