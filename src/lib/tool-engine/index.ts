@@ -774,7 +774,7 @@ const roiBatch8: Handler = (tool, input) => {
   }
 };
 
-const handlers: Handler[] = [
+const handlers: Handler[] = [roiBatch8,
   (tool, input) => {
     if (!has(tool, 'case converter', 'camel case', 'snake case', 'pascal case', 'kebab case')) return null;
     const wordsList = caseWords(input).map(word => word.toLowerCase());
