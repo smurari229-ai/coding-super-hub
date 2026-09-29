@@ -32,6 +32,11 @@ describe('tool engine pure transforms', () => {
   it('finds and replaces text', () => {
     expect(executeTool(tool('find-replace', 'Find and Replace', ['find & replace']), 'cat\nDOG\ncat').output).toBe('DOG\nDOG');
   });
+  it('covers case transforms, CSV columns, and explicit number bases', () => {
+    expect(executeTool(tool('case', 'Camel Case Converter', ['camel case']), 'hello world').output).toBe('helloWorld');
+    expect(executeTool(tool('csv-column', 'CSV Column Extractor', ['csv column']), 'name\na,b\nA,1\nB,2').output).toBe('A\nB');
+    expect(executeTool(tool('number-base', 'Number Base Converter', ['number base']), '16 ff').output).toContain('Decimal: 255');
+  });
   it('extracts emails and URLs', () => {
     expect(executeTool(tool('email-extractor', 'Email Extractor', ['extract email']), 'a@test.com x@y.dev').output).toBe('a@test.com\nx@y.dev');
     expect(executeTool(tool('url-extractor', 'URL Extractor', ['extract url']), 'go https://example.com now').output).toBe('https://example.com');
