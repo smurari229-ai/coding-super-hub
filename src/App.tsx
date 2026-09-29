@@ -51,8 +51,14 @@ import {
   Tag
 } from 'lucide-react';
 
+const getToolFromUrl = (): ToolItem => {
+  if (typeof window === 'undefined') return TOOLS_CATALOG[0];
+  const id = new URL(window.location.href).searchParams.get('tool');
+  return TOOLS_CATALOG.find(tool => tool.id === id) ?? TOOLS_CATALOG[0];
+};
+
 export default function App() {
-  const [selectedTool, setSelectedTool] = useState<ToolItem>(TOOLS_CATALOG[0]); // JSON Formatter
+  const [selectedTool, setSelectedTool] = useState<ToolItem>(getToolFromUrl());
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all' | 'favorites'>('all');
   const [isPro, setIsPro] = useState(() => getProStatus().active);
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -95,6 +101,9 @@ export default function App() {
   // Switch active tool & track history
   const handleSelectTool = (tool: ToolItem) => {
     setSelectedTool(tool);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tool', tool.id);
+    window.history.replaceState({}, document.title, url.toString());
     setRecentTools(prev => {
       const filtered = prev.filter(t => t.id !== tool.id);
       const next = [tool, ...filtered].slice(0, 10);
