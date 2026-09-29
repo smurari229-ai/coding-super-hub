@@ -562,3 +562,13 @@ Main baseline: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 - These entries are recorded as **FAIL** rather than PASS because the defect is deterministically established by source inspection.
 - Remaining tools retain their prior runtime/semantic status until actual execution evidence exists.
 - The complete 535-tool semantic execution gate remains **NOT_RUN**.
+
+## Latest high-ROI execution-pass evidence
+
+- Catalog remains exactly **535** entries.
+- Dedicated catalog mappings remain **48**.
+- Engine source now contains **194 unique explicit handler IDs** measured from `case` clauses.
+- **77 unique explicit handler IDs** were added in the second high-ROI batch.
+- Five existing explicit case clauses are intentional `return null` placeholders and are not counted as real implementations.
+- `tests/catalog-execution.test.ts` now provides a deterministic 535-entry smoke execution oracle.
+- The oracle is intentionally evidence collection, not a semantic correctness certificate. Full mapped-tool semantic PASS/FAIL counts remain **NOT_RUN** until the oracle is executed and reviewed.
