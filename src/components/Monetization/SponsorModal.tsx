@@ -49,6 +49,7 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
           </p>
 
           <div className="space-y-2.5">
+            {BUY_ME_A_COFFEE_URL ? (
             <a
               href={BUY_ME_A_COFFEE_URL}
               target="_blank"
@@ -63,9 +64,9 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-amber-400 transition-colors" />
-            </a>
+            </a>\n            ) : null}
 
-            <a
+            {GITHUB_SPONSORS_URL ? (\n            <a
               href={GITHUB_SPONSORS_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -79,13 +80,13 @@ export const SponsorModal: React.FC<SponsorModalProps> = ({ isOpen, onClose }) =
                 </div>
               </div>
               <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-            </a>
+            </a>\n            ) : null}
 
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+            {UPI_ID ? (\n            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
               <div>
                 <span className="font-semibold text-xs text-white block">Direct UPI (India)</span>
                 <span className="text-[11px] text-slate-400 font-mono">{UPI_ID}</span>
-              </div>
+              </div>\n            ) : null}
               <button
                 onClick={handleCopyUpi}
                 className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1.5 font-medium transition-colors"
