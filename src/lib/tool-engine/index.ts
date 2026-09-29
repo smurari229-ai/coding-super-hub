@@ -425,10 +425,13 @@ const handlers: Handler[] = [
     return wordsList.join('-');
   },
   (tool, input) => has(tool, 'csv column', 'column extractor') ? (() => {
-    const rows = parseCsv(input);
+    const lines = input.split(/\r?\n/);
+    const columnName = lines.shift()?.trim();
+    if (!columnName) throw new Error('First line must contain the CSV column name.');
+    const rows = parseCsv(lines.join('\n'));
     if (rows.length < 2) throw new Error('CSV needs a header row and data.');
-    const column = rows[0].findIndex(header => header.trim().toLowerCase() === (input.split(/\r?\n/).pop() ?? '').trim().toLowerCase());
-    if (column < 0) throw new Error('For column extraction, append the exact column name as the final line.');
+    const column = rows[0].findIndex(header => header.trim().toLowerCase() === columnName.toLowerCase());
+    if (column < 0) throw new Error('CSV column not found.');
     return rows.slice(1).map(row => row[column] ?? '').join('\n');
   })() : null,
   (tool, input) => has(tool, 'line number', 'line numbering') ? input.split(/\r?\n/).map((line, i) => String(i + 1).padStart(String(input.split(/\r?\n/).length).length, ' ') + ': ' + line).join('\n') : null,
