@@ -79,4 +79,23 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('percentage', 'Percentage Calculator', ['percentage']), '20 200').output).toContain('X% of Y: 40.00');
     expect(executeTool(tool('bitwise', 'Bitwise Visualizer', ['bitwise']), '12 5').output).toContain('AND (&): 4');
   });
+  it('covers high-ROI text utilities', () => {
+    expect(executeTool(tool('string-truncate', 'String Truncate'), '5\nHello World').output).toBe('Hell…');
+    expect(executeTool(tool('count-lines', 'Count Lines'), 'a\n\nb').output).toContain('Total lines: 3');
+    expect(executeTool(tool('unicode-character-inspector', 'Unicode Inspector'), 'A').output).toContain('U+0041');
+    expect(executeTool(tool('remove-html-tags', 'HTML Tags Stripper'), '<p>Hello</p>').output).toBe('Hello');
+  });
+
+  it('covers data and calculator utilities', () => {
+    expect(executeTool(tool('csv-to-markdown', 'CSV to Markdown'), 'name,age\nA,20').output).toContain('| name | age |');
+    expect(executeTool(tool('roman-numerals-converter', 'Roman Numerals'), '2026').output).toBe('MMXXVI');
+    expect(executeTool(tool('simple-interest-calculator', 'Simple Interest'), '1000 10 2').output).toContain('Interest: 200');
+    expect(executeTool(tool('bmi-calculator', 'BMI'), '70 1.75').output).toContain('BMI:');
+  });
+
+  it('covers developer workflow utilities', () => {
+    expect(executeTool(tool('mac-address-formatter', 'MAC Formatter'), 'aabbccddeeff').output).toBe('AA:BB:CC:DD:EE:FF');
+    expect(executeTool(tool('px-to-rem-converter', 'PX to REM'), '32 16').output).toContain('rem: 2');
+    expect(executeTool(tool('architecture-decision-record', 'ADR'), 'Use registry engine').output).toContain('# ADR: Use registry engine');
+  });
 });
