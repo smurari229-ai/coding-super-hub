@@ -767,6 +767,47 @@ const roiBatch3: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch4: Handler = (tool, input) => {
+  const n=input.match(/-?\d+(?:\.\d+)?/g)?.map(Number)??[];
+  const lines=input.split(/\r?\n/);
+  switch(tool.id){
+    case 'levenshtein-distance-calc': {const a=lines[0]??'',b=lines[1]??'',dp=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=dp[0];dp[0]=i;for(let j=1;j<=b.length;j++){const old=dp[j];dp[j]=Math.min(dp[j]+1,dp[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return String(dp[b.length]);}
+    case 'hamming-distance-calc': {if(lines.length<2||lines[0].length!==lines[1].length)throw new Error('Enter two strings of equal length.');return String([...lines[0]].reduce((x,c,i)=>x+(c!==lines[1][i]?1:0),0));}
+    case 'jaccard-similarity-calc': {const a=new Set((lines[0]??'').toLowerCase().split(/\W+/).filter(Boolean)),b=new Set((lines[1]??'').toLowerCase().split(/\W+/).filter(Boolean));const inter=[...a].filter(x=>b.has(x)).length,uni=new Set([...a,...b]).size;return 'Jaccard: '+(uni?inter/uni:1);}
+    case 'euclidean-distance-2d': {if(n.length<4)throw new Error('Enter x1 y1 x2 y2.');return String(Math.hypot(n[2]-n[0],n[3]-n[1]));}
+    case 'manhattan-distance-calc': {if(n.length<4)throw new Error('Enter x1 y1 x2 y2.');return String(Math.abs(n[2]-n[0])+Math.abs(n[3]-n[1]));}
+    case 'logarithm-calculator': {if(n.length<2||n[0]<=0||n[1]<=0||n[1]===1)throw new Error('Enter positive number and valid base.');return String(Math.log(n[0])/Math.log(n[1]));}
+    case 'modulo-arithmetic-calc': {if(n.length<2||n[1]===0)throw new Error('Enter a number and non-zero modulus.');return String(((n[0]%n[1])+n[1])%n[1]);}
+    case 'fraction-simplifier-calc': {if(n.length<2||n[1]===0)throw new Error('Enter numerator and non-zero denominator.');let a=Math.trunc(n[0]),b=Math.trunc(n[1]);const g=(x:number,y:number)=>{x=Math.abs(x);y=Math.abs(y);while(y)[x,y]=[y,x%y];return x};const d=g(a,b);return (a/d)+'/'+(b/d)+' = '+a/b;}
+    case 'ratio-proportion-calculator': {if(n.length<3||n[1]===0)throw new Error('Enter A B C for A:B=C:X.');return 'X: '+n[2]*n[0]/n[1];}
+    case 'trigonometry-sin-cos-tan': {if(!Number.isFinite(n[0]))throw new Error('Enter an angle in degrees.');const r=n[0]*Math.PI/180;return 'sin: '+Math.sin(r)+'\ncos: '+Math.cos(r)+'\ntan: '+Math.tan(r);}
+    case 'hyperbolic-functions-calc': {const x=n[0];if(!Number.isFinite(x))throw new Error('Enter a number.');return 'sinh: '+Math.sinh(x)+'\ncosh: '+Math.cosh(x)+'\ntanh: '+Math.tanh(x);}
+    case 'aspect-ratio-scale-calc': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Scaled height: '+n[2]*n[0]/n[1];}
+    case 'speed-distance-time': {if(n.length<2)throw new Error('Enter two numeric values.');return 'Ratio: '+n[0]/n[1]+'\nProduct: '+n[0]*n[1];}
+    case 'http-status-explorer': return '200 OK\n201 Created\n204 No Content\n301/302 Redirect\n400 Bad Request\n401 Unauthorized\n403 Forbidden\n404 Not Found\n409 Conflict\n422 Unprocessable Content\n429 Too Many Requests\n500 Internal Server Error\n502 Bad Gateway\n503 Service Unavailable';
+    case 'port-numbers-database': return '20/21 FTP\n22 SSH\n25 SMTP\n53 DNS\n80 HTTP\n110 POP3\n143 IMAP\n443 HTTPS\n3306 MySQL\n5432 PostgreSQL\n6379 Redis\n27017 MongoDB';
+    case 'git-command-cheatsheet': return 'git status\ngit add .\ngit commit -m "message"\ngit switch -c feature/name\ngit pull --rebase\ngit log --oneline --decorate --graph\ngit diff\ngit stash';
+    case 'linux-command-cheatsheet': return 'pwd\nls -la\ncd path\nfind . -name "*.ts"\ngrep -R "text" .\ncat file\nhead -n 20 file\ntail -f file\nchmod 755 file\nps aux';
+    case 'ssh-config-builder': {const host=lines[0]||'my-server',hostname=lines[1]||'example.com',user=lines[2]||'ubuntu';return 'Host '+host+'\n  HostName '+hostname+'\n  User '+user+'\n  IdentityFile ~/.ssh/id_ed25519';}
+    case 'dockerfile': return 'FROM '+(input.trim()||'node:22-alpine')+'\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\nCMD ["npm","run","preview","--","--host","0.0.0.0"]';
+    case 'docker-compose-builder': return 'services:\n  app:\n    build: .\n    ports:\n      - "3000:3000"\n    restart: unless-stopped';
+    case 'github-actions-workflow': return 'name: CI\non: [push, pull_request]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n      - run: npm ci\n      - run: npm test\n      - run: npm run build';
+    case 'open-api-spec-starter': return 'openapi: 3.0.3\ninfo:\n  title: API\n  version: 1.0.0\npaths:\n  /health:\n    get:\n      responses:\n        "200":\n          description: OK';
+    case 'graphql-schema-starter': return 'type Query {\n  health: String!\n}\n\ntype Mutation {\n  noop: Boolean!\n}';
+    case 'protobuf-proto3-starter': return 'syntax = "proto3";\n\npackage app;\n\nmessage HealthResponse { string status = 1; }\nservice Health { rpc Check(HealthResponse) returns (HealthResponse); }';
+    case 'grpc-service-cheatsheet': return 'gRPC: HTTP/2 + protobuf + strongly typed contracts.\nREST: HTTP semantics + JSON + broad browser/tooling compatibility.\nChoose based on clients, streaming, tooling, and contract needs.';
+    case 'git-pre-commit': return '#!/bin/sh\nnpm run lint\nnpm test\n';
+    case 's3-bucket-policy-builder': return JSON.stringify({Version:'2012-10-17',Statement:[{Effect:'Allow',Action:['s3:GetObject'],Resource:'arn:aws:s3:::BUCKET/*'}]},null,2);
+    case 'clear-site-data-header': return 'Clear-Site-Data: "cache", "cookies", "storage"';
+    case 'spf-record-builder': return 'v=spf1 '+(input.trim()||'~all');
+    case 'dkim-selector-lookup': return 'selector1._domainkey.example.com\nType: TXT\nValue: v=DKIM1; k=rsa; p=PUBLIC_KEY';
+    case 'data-redactor': return input.replace(/(?:api[_-]?key|secret|token|password)\s*[:=]\s*[^\s,;]+/gi,'$1=[REDACTED]').replace(/\b\d{12,19}\b/g,m=>'[REDACTED-'+m.slice(-4)+']');
+    case 'hash-collision-explainer': {const bits=Math.max(1,Math.trunc(n[0]??128));return 'Approximate birthday-bound samples: 2^('+bits+'/2) = '+Math.pow(2,bits/2).toExponential(3);}
+    default:return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
