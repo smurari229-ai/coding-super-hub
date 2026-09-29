@@ -72,6 +72,10 @@
 
 ---
 
+## 🧪 Verification
+
+`npm run lint` checks TypeScript. `npm test` runs the pure engine suite with Vitest 5. `npm run build` performs the production Vite build. CI runs all three checks on pushes and pull requests.
+
 ## 🔧 Current tool coverage
 
 The catalog contains **535 registered entries**. The current repository has **48 catalog entries mapped to dedicated React tool components**. Those dedicated entries are the verified baseline for the release audit.
