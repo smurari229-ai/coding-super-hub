@@ -836,6 +836,32 @@ const roiBatch5: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch6: Handler = (tool, input) => {
+  const n=input.match(/-?\d+(?:\.\d+)?/g)?.map(Number)??[];
+  switch(tool.id){
+    case 'compound-interest-calc': {if(n.length<3)throw new Error('Enter principal, annual rate %, years.');const [p,r,t]=n;const a=p*Math.pow(1+r/100,t);return 'Final amount: '+a+'\nInterest earned: '+(a-p);}
+    case 'bmi-calculator': {if(n.length<2||n[1]<=0)throw new Error('Enter weight kg and height meters.');const bmi=n[0]/(n[1]**2);return 'BMI: '+bmi.toFixed(2)+'\nCategory: '+(bmi<18.5?'Underweight':bmi<25?'Normal':bmi<30?'Overweight':'Obesity');}
+    case 'tip-calculator': {if(n.length<2)throw new Error('Enter bill and tip percentage.');const tip=n[0]*n[1]/100;const people=n[2]||1;return 'Tip: '+tip.toFixed(2)+'\nTotal: '+(n[0]+tip).toFixed(2)+'\nPer person: '+((n[0]+tip)/people).toFixed(2);}
+    case 'quadratic-equation-solver': {if(n.length<3||n[0]===0)throw new Error('Enter a, b, c.');const [a,b,c]=n,d=b*b-4*a*c;if(d<0)return 'No real roots. Discriminant: '+d;return 'x1: '+((-b+Math.sqrt(d))/(2*a))+'\nx2: '+((-b-Math.sqrt(d))/(2*a));}
+    case 'matrix-multiplication-calc': {const rows=input.trim().split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(rows.length<4)throw new Error('Enter four rows: A row1, A row2, B row1, B row2.');const m=rows.map(r=>r.split(/[ ,]+/).map(Number));if(m.some(r=>r.length!==2||r.some(v=>!Number.isFinite(v))))throw new Error('Use 2x2 numeric rows.');return String(m[0][0]*m[2][0]+m[0][1]*m[2][1])+' '+String(m[0][0]*m[2][1]+m[0][1]*m[3][1])+'\n'+String(m[1][0]*m[2][0]+m[1][1]*m[2][1])+' '+String(m[1][0]*m[2][1]+m[1][1]*m[3][1]);}
+    case 'fuel-consumption-calc': {if(n.length<3)throw new Error('Enter distance km, fuel litres, and fuel price per litre.');return 'Efficiency: '+(n[0]/n[1]).toFixed(2)+' km/L\nTrip cost: '+(n[1]*n[2]).toFixed(2);}
+    case 'permutation-combination': {if(n.length<2)throw new Error('Enter n and r.');const a=Math.trunc(n[0]),b=Math.trunc(n[1]);if(a<0||b<0||b>a||a>170)throw new Error('Require 0<=r<=n<=170.');let f=(x:number)=>{let v=1;for(let i=2;i<=x;i++)v*=i;return v};return 'nPr: '+f(a)/f(a-b)+'\nnCr: '+f(a)/(f(b)*f(a-b));}
+    case 'probability-dice-coin': {const sides=Math.trunc(n[0]??6),rolls=Math.trunc(n[1]??1);if(sides<2||rolls<1)throw new Error('Enter positive dice sides and roll count.');return 'One-roll outcome probability: '+(1/sides)+'\nExpected sum: '+rolls*(sides+1)/2;}
+    case 'endianness-converter': {const value=Math.trunc(n[0]??0);if(!Number.isSafeInteger(value)||value<0)throw new Error('Enter a non-negative safe integer.');const hex=value.toString(16).padStart(8,'0').match(/../g)!;return 'Big endian: '+hex.join(' ')+'\nLittle endian: '+hex.reverse().join(' ');}
+    case 'standard-normal-z-score': {const x=n[0],mean=n[1]??0,sd=n[2]??1;if(!Number.isFinite(x)||sd<=0)throw new Error('Enter value, mean, and positive standard deviation.');return 'Z-score: '+((x-mean)/sd);}
+    case 'dpi-ppi-calculator': {if(n.length<2||n[1]<=0)throw new Error('Enter pixels and physical size.');return 'Density: '+n[0]/n[1]+' px/unit';}
+    case 'aspect-ratio-calculator': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Target height: '+n[2]*n[1]/n[0];}
+    case 'average-mean-median-mode': return null;
+    case 'big-o-notation-cheatsheet': return 'O(1): constant\nO(log n): binary search\nO(n): single pass\nO(n log n): efficient comparison sort\nO(n²): nested pairwise loops\nO(2^n): subset-style recursion';
+    case 'modulo-arithmetic-calc': return null;
+    case 'logarithm-calculator': return null;
+    case 'pythagorean-theorem-calc': return null;
+    case 'circle-area-perimeter': return null;
+    default:return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
