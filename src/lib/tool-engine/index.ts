@@ -634,6 +634,65 @@ const handlers: Handler[] = [
     ? 'server {\n  listen 80;\n  server_name ' + (input || 'example.com') + ';\n  root /usr/share/nginx/html;\n  index index.html;\n  location / { try_files $uri $uri/ /index.html; }\n}' : null
 ];
 
+
+const roiTextBatch1: Handler = (tool, input) => {
+  const lines = input.split(/\r?\n/);
+  switch (tool.id) {
+    case 'string-wrapper': {
+      const width = Math.max(10, Math.min(200, Number(lines[0]) || 80));
+      const source = lines.slice(1).join('\n') || input;
+      return source.split(/\r?\n/).flatMap(line => {
+        const out: string[] = [];
+        let rest = line;
+        while (rest.length > width) {
+          let cut = rest.lastIndexOf(' ', width);
+          if (cut < 1) cut = width;
+          out.push(rest.slice(0, cut).trim());
+          rest = rest.slice(cut).trimStart();
+        }
+        out.push(rest);
+        return out;
+      }).join('\n');
+    }
+    case 'string-truncate': {
+      const max = Math.max(1, Math.min(10000, Number(lines[0]) || 80));
+      const source = lines.slice(1).join('\n') || input;
+      return source.length <= max ? source : source.slice(0, Math.max(0, max - 1)).trimEnd() + '…';
+    }
+    case 'phonetic-alphabet': {
+      const map: Record<string,string> = {A:'Alpha',B:'Bravo',C:'Charlie',D:'Delta',E:'Echo',F:'Foxtrot',G:'Golf',H:'Hotel',I:'India',J:'Juliett',K:'Kilo',L:'Lima',M:'Mike',N:'November',O:'Oscar',P:'Papa',Q:'Quebec',R:'Romeo',S:'Sierra',T:'Tango',U:'Uniform',V:'Victor',W:'Whiskey',X:'X-ray',Y:'Yankee',Z:'Zulu'};
+      return input.toUpperCase().split('').map(char => map[char] ?? char).join(' ');
+    }
+    case 'unicode-character-inspector':
+      return Array.from(input).map(char => {
+        const code = char.codePointAt(0) ?? 0;
+        const bytes = Array.from(new TextEncoder().encode(char), byte => byte.toString(16).padStart(2,'0')).join(' ');
+        return char + ' U+' + code.toString(16).toUpperCase().padStart(4,'0') + ' UTF-8=' + bytes;
+      }).join('\n');
+    case 'count-lines': {
+      const all = input.split(/\r?\n/);
+      return 'Total lines: ' + all.length + '\nNon-empty lines: ' + all.filter(line => line.trim()).length +
+        '\nCharacters: ' + input.length + '\nUTF-8 bytes: ' + new TextEncoder().encode(input).length;
+    }
+    case 'string-splitter': {
+      const separator = lines[0] || ',';
+      return JSON.stringify((lines.slice(1).join('\n') || input).split(separator));
+    }
+    case 'string-joiner': {
+      const separator = lines[0] || ', ';
+      return lines.slice(1).join('\n').split(/\r?\n/).filter(Boolean).join(separator);
+    }
+    case 'remove-html-tags':
+      return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    case 'space-to-tab':
+      return input.replace(/^( +)/gm, match => '\t'.repeat(Math.floor(match.length / 4)) + ' '.repeat(match.length % 4));
+    case 'tab-to-space':
+      return input.replace(/\t/g, '    ');
+    default:
+      return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
