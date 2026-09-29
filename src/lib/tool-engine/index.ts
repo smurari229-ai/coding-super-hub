@@ -416,6 +416,21 @@ const bitwiseOps = (value: string) => {
 type Handler = (tool: ToolItem, input: string) => string | null;
 
 const handlers: Handler[] = [
+  (tool, input) => {
+    if (!has(tool, 'case converter', 'camel case', 'snake case', 'pascal case', 'kebab case')) return null;
+    const wordsList = caseWords(input).map(word => word.toLowerCase());
+    if (has(tool, 'camel')) return wordsList.map((word, i) => i === 0 ? word : word[0].toUpperCase() + word.slice(1)).join('');
+    if (has(tool, 'pascal')) return wordsList.map(word => word[0].toUpperCase() + word.slice(1)).join('');
+    if (has(tool, 'snake')) return wordsList.join('_');
+    return wordsList.join('-');
+  },
+  (tool, input) => has(tool, 'csv column', 'column extractor') ? (() => {
+    const rows = parseCsv(input);
+    if (rows.length < 2) throw new Error('CSV needs a header row and data.');
+    const column = rows[0].findIndex(header => header.trim().toLowerCase() === (input.split(/\r?\n/).pop() ?? '').trim().toLowerCase());
+    if (column < 0) throw new Error('For column extraction, append the exact column name as the final line.');
+    return rows.slice(1).map(row => row[column] ?? '').join('\n');
+  })() : null,
   (tool, input) => has(tool, 'line number', 'line numbering') ? input.split(/\r?\n/).map((line, i) => String(i + 1).padStart(String(input.split(/\r?\n/).length).length, ' ') + ': ' + line).join('\n') : null,
   (tool, input) => has(tool, 'find and replace', 'find & replace', 'text replace') ? (() => {
     const [findValue, replaceValue, ...rest] = input.split(/\r?\n/);
@@ -534,8 +549,9 @@ const handlers: Handler[] = [
   },
   (tool, input) => {
     if (!has(tool, 'number base', 'binary to decimal', 'hex to decimal', 'octal')) return null;
-    const base = tool.id.includes('binary') ? 2 : tool.id.includes('octal') ? 8 : tool.id.includes('hex') ? 16 : 10;
-    return numberBase(input, base);
+    const explicit = input.trim().match(/^(2|8|10|16)\s*[:=,\s]\s*(.+)$/);
+    const base = explicit ? Number(explicit[1]) : tool.id.includes('binary') ? 2 : tool.id.includes('octal') ? 8 : tool.id.includes('hex') ? 16 : 10;
+    return numberBase(explicit ? explicit[2] : input, base);
   },
   (tool, input) => {
     if (!has(tool, 'timestamp', 'unix time')) return null;
