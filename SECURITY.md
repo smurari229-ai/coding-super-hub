@@ -13,6 +13,9 @@
 - Production security headers are configured in `vercel.json` for CSP, MIME sniffing protection, referrer policy, permissions policy, and frame denial.
 - Existing HSTS was observed on the production response.
 
+## Paid-feature limitation
+- Pro entitlement is verified through the existing Lemon Squeezy / Stripe server verification paths, but the current client-side Pro flag is not an authentication boundary by itself. Any paid-only server capability must re-check provider-backed entitlement server-side before granting access.
+
 ## Important limitations
 - The current rate limiter is process-local and is not a durable multi-instance quota system.
 - Authentication, authorization, per-user quotas, usage accounting, and billing entitlements are not implemented yet.
