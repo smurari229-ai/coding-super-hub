@@ -693,6 +693,44 @@ const roiTextBatch1: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch2: Handler = (tool, input) => {
+  const n = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+  switch (tool.id) {
+    case 'strip-diacritics': return input.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+    case 'repeat-string': {
+      const lines=input.split(/\r?\n/); const count=Math.max(1,Math.min(1000,Number(lines[0])||2));
+      return Array(count).fill(lines.slice(1).join('\n')||input).join('\n');
+    }
+    case 'case-sentence': return input.toLowerCase().replace(/(^|[.!?]\s+)[a-z]/g,m=>m.toUpperCase());
+    case 'slug-to-text': return input.replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim().replace(/\b\w/g,c=>c.toUpperCase());
+    case 'data-size-converter': {
+      const v=n[0]; if(!Number.isFinite(v)) throw new Error('Enter a numeric byte value.');
+      return 'Bytes: '+v+'\nKiB: '+v/1024+'\nMiB: '+v/1024**2+'\nGiB: '+v/1024**3;
+    }
+    case 'roman-numerals-converter': {
+      const value=input.trim(); const num=Number(value);
+      if(Number.isInteger(num)&&num>=1&&num<=3999){const table:[[number,string]]|any=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let x=num,out='';for(const [v,s] of table){while(x>=v){out+=s;x-=v;}}return out;}
+      const map:Record<string,number>={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};let total=0,prev=0;for(const ch of value.toUpperCase().split('').reverse()){const v=map[ch];if(!v)throw new Error('Invalid Roman numeral.');total+=v<prev?-v:v;prev=Math.max(prev,v);}return String(total);
+    }
+    case 'scientific-notation-converter': {const value=Number(input.trim());if(!Number.isFinite(value))throw new Error('Enter a valid number.');return 'Scientific: '+value.toExponential()+'\nStandard: '+value;}
+    case 'duration-humanizer': {const ms=n[0];if(!Number.isFinite(ms)||ms<0)throw new Error('Enter non-negative milliseconds.');let s=Math.floor(ms/1000),d=Math.floor(s/86400);s%=86400;const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);s%=60;return d+'d '+h+'h '+m+'m '+s+'s';}
+    case 'human-time-to-ms': {const m=input.match(/(?:(\d+(?:\.\d+)?)d)?\s*(?:(\d+(?:\.\d+)?)h)?\s*(?:(\d+(?:\.\d+)?)m)?\s*(?:(\d+(?:\.\d+)?)s)?/i);if(!m||!m[0].trim())throw new Error('Use values like 2d 3h 4m 5s.');return String((Number(m[1]||0)*86400+Number(m[2]||0)*3600+Number(m[3]||0)*60+Number(m[4]||0))*1000);}
+    case 'calendar-week-number': {const d=new Date(input.trim());if(Number.isNaN(d.getTime()))throw new Error('Invalid date.');const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));const day=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()+4-day);const start=new Date(Date.UTC(x.getUTCFullYear(),0,1));return 'ISO week: '+Math.ceil((((x.getTime()-start.getTime())/86400000)+1)/7);}
+    case 'unit-converter-length': return convertUnits(input,'length');
+    case 'unit-converter-weight': {const v=n[0];if(!Number.isFinite(v))throw new Error('Enter kilograms.');return 'Kilograms: '+v+'\nGrams: '+v*1000+'\nPounds: '+v*2.2046226218+'\nOunces: '+v*35.27396195;}
+    case 'simple-interest-calculator': {if(n.length<3)throw new Error('Enter principal, annual rate %, and years.');const interest=n[0]*n[1]*n[2]/100;return 'Interest: '+interest+'\nTotal: '+(n[0]+interest);}
+    case 'average-mean-median-mode': {if(!n.length)throw new Error('Enter numbers.');const s=[...n].sort((a,b)=>a-b),mean=n.reduce((a,b)=>a+b,0)/n.length,mid=Math.floor(s.length/2);const freq=new Map<number,number>();n.forEach(v=>freq.set(v,(freq.get(v)||0)+1));const max=Math.max(...freq.values());return 'Mean: '+mean+'\nMedian: '+(s.length%2?s[mid]:(s[mid-1]+s[mid])/2)+'\nMode: '+[...freq].filter(x=>x[1]===max).map(x=>x[0]).join(', ')+'\nRange: '+(s[s.length-1]-s[0]);}
+    case 'standard-deviation-calc': {if(!n.length)throw new Error('Enter numbers.');const mean=n.reduce((a,b)=>a+b,0)/n.length;const variance=n.reduce((a,b)=>a+(b-mean)**2,0)/n.length;return 'Variance: '+variance+'\nStandard deviation: '+Math.sqrt(variance);}
+    case 'pythagorean-theorem-calc': {if(n.length<2)throw new Error('Enter two side lengths.');return 'Hypotenuse: '+Math.hypot(n[0],n[1]);}
+    case 'circle-area-perimeter': {const r=n[0];if(!(r>=0))throw new Error('Enter radius.');return 'Area: '+Math.PI*r*r+'\nCircumference: '+2*Math.PI*r+'\nDiameter: '+2*r;}
+    case 'sphere-volume-surface': {const r=n[0];if(!(r>=0))throw new Error('Enter radius.');return 'Volume: '+4*Math.PI*r**3/3+'\nSurface area: '+4*Math.PI*r*r;}
+    case 'cylinder-volume-surface': {if(n.length<2)throw new Error('Enter radius and height.');const [r,h]=n;return 'Volume: '+Math.PI*r*r*h+'\nSurface area: '+2*Math.PI*r*(r+h);}
+    case 'radian-degree-converter': {const v=n[0];if(!Number.isFinite(v))throw new Error('Enter an angle.');return 'Degrees: '+v*180/Math.PI+'\nRadians: '+v*Math.PI/180;}
+    default:return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
