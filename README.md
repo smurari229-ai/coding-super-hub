@@ -87,7 +87,7 @@
 
 The catalog contains **535 registered entries**. The current repository has **48 catalog entries mapped to dedicated React tool components**. Those dedicated entries are the verified baseline for the release audit.
 
-The generic engine now contains the prior audited handler surface plus **117 new explicit tool-ID handlers** added in the latest high-ROI pass. These are implementation-level routes, not blanket semantic PASS results. A current source-level routing heuristic estimates about **207 catalog entries** still lack a matched execution route; those entries remain explicitly Coming soon until semantic execution evidence exists.
+The generic engine now contains the prior audited handler surface plus **77 additional unique explicit tool-ID handlers** from the second high-ROI batch, for **194 unique explicit handler IDs** measured in the engine source. These are implementation-level routes, not blanket semantic PASS results. A full-catalog smoke execution oracle now covers all **535 catalog entries**; its results must be reviewed before claiming a semantic working-tool count. The earlier ~207 unmatched-route heuristic is no longer treated as a current release count.
 
 Unsupported catalog entries never echo input as if processing succeeded. They return an explicit **“Coming soon — this catalog entry does not have a verified execution algorithm yet.”** message.
 
