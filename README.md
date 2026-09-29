@@ -87,7 +87,7 @@
 
 The catalog contains **535 registered entries**. The current repository has **48 catalog entries mapped to dedicated React tool components**. Those dedicated entries are the verified baseline for the release audit.
 
-The generic engine currently metadata-matches **257 catalog entries** outside the 48 dedicated UI mappings, with real handlers covering text transforms, JSON/CSV/YAML, number bases, security snippets, CSS, networking, units, percentages, and bitwise helpers. These 257 are **engine-mapped, not fully semantically verified**; the remaining 230 catalog entries stay explicitly Coming soon until semantic execution evidence exists.
+The generic engine now contains the prior audited handler surface plus **117 new explicit tool-ID handlers** added in the latest high-ROI pass. These are implementation-level routes, not blanket semantic PASS results. A current source-level routing heuristic estimates about **207 catalog entries** still lack a matched execution route; those entries remain explicitly Coming soon until semantic execution evidence exists.
 
 Unsupported catalog entries never echo input as if processing succeeded. They return an explicit **“Coming soon — this catalog entry does not have a verified execution algorithm yet.”** message.
 
