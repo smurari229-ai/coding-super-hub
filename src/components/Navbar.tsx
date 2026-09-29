@@ -4,6 +4,7 @@ import {
   Terminal, 
   Sparkles, 
   Zap, 
+  ShieldCheck, 
   Heart, 
   HelpCircle, 
   Moon, 
@@ -22,6 +23,7 @@ interface NavbarProps {
   onOpenSponsor: () => void;
   onOpenShortcuts: () => void;
   onToggleSidebar?: () => void;
+  isPro?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -32,7 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPro,
   onOpenSponsor,
   onOpenShortcuts,
-  onToggleSidebar
+  onToggleSidebar,
+  isPro = false
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
@@ -54,8 +57,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-sm text-white tracking-tight">Coding Super Hub</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
-                  PRO
+                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md font-semibold border ${isPro ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'}`}>
+                  {isPro ? 'PRO' : 'FREE'}
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 hidden sm:block">500+ Developer Utilities &amp; Sandboxes</p>
@@ -125,13 +128,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Heart className="w-4 h-4" />
           </button>
 
-          {/* Go Pro Button */}
+          {/* Pro / Go Pro Button */}
           <button
             onClick={onOpenPro}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20"
+            className={isPro
+              ? "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition-all shadow-md shadow-emerald-500/10"
+              : "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20"}
           >
-            <Zap className="w-3.5 h-3.5 fill-white" />
-            <span>Go Pro</span>
+            {isPro ? <ShieldCheck className="w-3.5 h-3.5" /> : <Zap className="w-3.5 h-3.5 fill-white" />}
+            <span>{isPro ? 'Pro Active' : 'Go Pro'}</span>
           </button>
 
           {/* Shortcuts Help */}
