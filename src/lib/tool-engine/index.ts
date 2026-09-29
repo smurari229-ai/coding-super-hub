@@ -701,7 +701,7 @@ const highRoiExpansion: Handler = (tool, input) => {
   switch (tool.id) {
     case 'string-wrapper': {
       const width=Math.max(10, Math.min(200, Number(lines[0])||80));
-      return lines.slice(1).join('\n').replace(/\S(?:.{0,'+width+'})?(?=\s|$)/g,'');
+      const source=lines.slice(1).join('\n')||input; const out:string[]=[]; for(const paragraph of source.split(/\r?\n/)){ let rest=paragraph; while(rest.length>width){ let cut=rest.lastIndexOf(' ',width); if(cut<1) cut=width; out.push(rest.slice(0,cut).trimEnd()); rest=rest.slice(cut).trimStart(); } out.push(rest); } return out.join('\n');
     }
     case 'string-truncate': {
       const max=Math.max(1,Math.min(10000,Number(lines[0])||80)); const source=lines.slice(1).join('\n')||input;
@@ -776,7 +776,7 @@ const highRoiExpansion: Handler = (tool, input) => {
     case 'kill-process-port-helper': { const port=Math.trunc(nums[0]??3000); return 'Linux/macOS: lsof -i :'+port+' then kill <PID>\\nWindows: netstat -ano | findstr :'+port+' then taskkill /PID <PID> /F'; }
     case 'http-status-explorer': return 'Common HTTP statuses:\\n200 OK\\n201 Created\\n204 No Content\\n301/302 Redirect\\n400 Bad Request\\n401 Unauthorized\\n403 Forbidden\\n404 Not Found\\n409 Conflict\\n422 Unprocessable Content\\n429 Too Many Requests\\n500 Internal Server Error\\n502 Bad Gateway\\n503 Service Unavailable';
     case 'favicon-html-tags': return '<link rel="icon" href="/favicon.ico" sizes="any">\\n<link rel="icon" type="image/svg+xml" href="/icon.svg">\\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">';
-    case 'schema-org-breadcrumb': return JSON.stringify({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":lines.filter(Boolean).map((name,i)=>({"@type":"ListItem","position":i+1,"name"}))},null,2);
+    case 'schema-org-breadcrumb': return JSON.stringify({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":lines.filter(Boolean).map((name,i)=>({"@type":"ListItem","position":i+1,"name":name}))},null,2);
     case 'px-to-rem-converter': { const px=nums[0]; const base=nums[1]??16; return 'rem: '+px/base+'\nem: '+px/base; }
     case 'rem-to-px-converter': { const rem=nums[0],base=nums[1]??16; return 'px: '+rem*base; }
     case 'pt-to-px-converter': return 'px: '+(nums[0]??0)*96/72;
