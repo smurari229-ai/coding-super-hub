@@ -1,97 +1,133 @@
-# Coding Super Hub — High-ROI Release Pass Status
+# Coding Super Hub — Release Audit Status
 
-## Scope
+## Current source of truth
 
-Branch: `phase1-a-to-z-release-audit-2026-09-28`
+- Repository: `smurari229-ai/coding-super-hub`
+- Branch: `phase1-a-to-z-release-audit-2026-09-28`
+- Catalog: **535 entries exactly**
+- Main: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
+- Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
+- Current audit HEAD: `5eea566098d32bd67ec2c3fc695593c74ddc8ddf`
+- PR: **#4 OPEN**
+- Branch divergence vs main: **117 ahead / 44 behind**
 
-Final implementation/test commit: `01f59a7a8decc6e026aa989e92fd76207821c70b`
+## Phase 0 — Integration & build stabilization
 
-Latest documentation commit: `56ee3ab4a7cc24ea35f30141bbcd524758d80664`
+### Evidence
 
-Catalog baseline: **535 registered entries**.
+The exact divergence was rechecked before changes. Main has 44 commits after the merge base and the audit branch has 117 commits after the same merge base.
 
-## What became real in this run
+Main-only changes overlap materially with the audit branch in:
+- `.env.example`
+- `api/lemon-webhook.ts`
+- `api/verify-lemon-order.ts`
+- `api/verify-stripe-session.ts`
+- `src/App.tsx`
+- Monetization components
+- `src/components/Navbar.tsx`
+- `src/components/Sidebar.tsx`
+- `src/components/tools/AiCopilotTool.tsx`
+- `src/data/affiliates.ts`
+- `src/lib/pro.ts`
+- `src/types/tools.ts`
 
-The existing registry + `executeTool()` engine was extended with **117 new explicit tool-ID handlers** across:
+No blind overwrite or force update was performed.
 
-| Category | New explicit handlers |
-|---|---:|
-| Text & String | 23 |
-| Data & Formats | 12 |
-| Math & Algorithms | 35 |
-| DevOps & Network | 20 |
-| Web & Frontend | 15 |
-| Crypto & Security | 5 |
-| Productivity & Misc | 5 |
-| Uncategorized handler IDs requiring catalog re-check | 2 |
+A safe local rebase/merge could not be completed in this execution environment because the repository working tree and Bun toolchain are not locally available. The branch therefore remains **diverged** rather than falsely marked mergeable.
 
-These handlers are pure client-side TypeScript and use validation/error paths already enforced by the engine. No new dependency was added.
+### Build evidence
 
-Representative newly implemented surfaces include:
-- text wrapping/truncation, phonetic conversion, Unicode inspection, line statistics, delimiter split/join, HTML tag stripping, indentation conversion
-- Roman numerals, scientific notation, durations, ISO dates, CSV/TSV conversion, duplicate-row removal
-- BMI, interest, compound interest, tip, quadratic, matrix, distance, logarithm, probability, trigonometry and other calculators
-- IPv6 expansion, MAC formatting, SemVer, bandwidth/SLA, SSL expiry, process-port commands, Git/CI/OpenAPI/GraphQL/protobuf starters
-- CSS gradients, px/rem/pt conversion, SVG data URI, JS minification, specificity, picture/srcset and UI CSS helpers
-- ADR, code-review, launch-checklist, license and PR templates
+- Bun is not installed in the execution environment.
+- Vercel build for the latest test commit is **READY**:
+  - Deployment: `dpl_FfADJwLXYVhqAVkEkN8YaVAW7BdW`
+  - Preview: `coding-super-jcmbkq83j-earnal-hub.vercel.app`
+  - Commit: `5eea566098d32bd67ec2c3fc695593c74ddc8ddf`
+- Preview homepage returned **HTTP 200**.
+- Preview security headers remain present: CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options.
 
-## Verification
+**Phase 0 status: BLOCKED — integration and direct local command evidence remain open.**
 
-Vercel successfully produced READY preview deployments for every major implementation batch, including the final test commit:
+## Phase 1 — Second high-ROI batch
 
-`dpl_BBbUFrwA1rMP7mnGTvZNYzEWVv8X`
+### Completed
 
-Commit:
-`01f59a7a8decc6e026aa989e92fd76207821c70b`
+Added **77 new unique explicit engine handler IDs** in batch 8, all using pure TypeScript logic and existing engine helpers.
 
-The final preview build is **READY**.
+Coverage includes:
+- Text: dedupe, sorting, reverse, trimming, padding, prefixes/suffixes, blank-line removal, newline conversion, title/camel/snake transforms, find/replace, text statistics, slug humanization, diacritics, pluralization, JSON key sorting.
+- Math: percentage, discount, GCD/LCM, prime checks, factorial, Fibonacci, temperature, bitwise operations, EMI, mixed fractions.
+- Security: cookie flags, Basic Auth header, mock bearer token generation, random hex salt, DMARC, security.txt, rate-limit headers, CSP nonce generation.
+- Web: HTML boilerplate/table/form, robots.txt, sitemap, web manifest, CSS triangle/ribbon/scrollbar, User-Agent parsing, viewport calculations.
+- DevOps: git bisect, dockerignore, Cloudflare guidance, system commands, REST naming, ss/netstat, SFTP/FTPS guidance, git hooks, env example generation, Redis/Memcached/Kafka/RabbitMQ references, WHOIS/RDAP guidance, traceroute guidance, CIDR expansion, docker-run to compose.
+- Productivity: README badges, CONTRIBUTING, Code of Conduct, SECURITY policy, privacy/ToS templates, invoice HTML, hourly rate, SaaS MRR/ARR, CAC/LTV, burn-rate/runway, API pricing HTML, sprint velocity, Git aliases, Bash helpers, font stacks.
 
-A targeted Vitest suite was expanded with representative tests for the new text, data, calculator, and developer-workflow groups.
+### Exact source measurements
 
-## What is NOT claimed
+- Catalog entries: **535**
+- Unique catalog IDs: **535**
+- Explicit `case` clauses in engine: **201**
+- Unique explicit handler IDs: **194**
+- Explicit `case ... return null` placeholders: **5**
+- Unique handler IDs added in this run: **77**
+- Dedicated catalog mappings: **48**
+- Dedicated component types: **20**
 
-- The 117 handler cases are **not** being declared as 117 semantic PASS results.
-- Full 535-tool semantic execution is still incomplete.
-- Full local `bun run build`, lint and Vitest command execution has not been independently captured in this run; Vercel READY deployment is the available build evidence.
-- The exact post-expansion semantic "working tool" count still requires the catalog oracle to execute every mapped ID.
-- Advanced cryptographic tools that require real cryptographic implementations were intentionally not faked.
+The 194 explicit handler IDs are a source-level measurement only. They are **not** 194 semantic PASS results. Some existing engine routing is tag/metadata based and is not represented by a `case` ID.
 
-## Coming-soon state
+## Full catalog oracle
 
-The catalog remains exactly **535** entries.
+Added `tests/catalog-execution.test.ts`.
 
-A source-level routing heuristic currently estimates about **207 catalog entries still without a matched execution route**. This is a planning signal only, not a semantic PASS/FAIL result.
+It executes all **535 catalog entries** with deterministic smoke inputs and records:
+- routed outputs
+- Coming-soon responses
+- runtime/validation errors
 
-Those entries remain effectively **Coming soon until execution evidence exists**.
+This is deliberately a **smoke execution oracle**, not a semantic correctness certificate. It has been committed but a direct local Vitest run is still not independently captured in this environment.
+
+## Phase 2 — Release hardening
+
+- Gemini-only `/api/ai` architecture preserved.
+- Payment endpoints remain env-driven; no secrets added.
+- Security headers remain verified on the latest preview.
+- ErrorBoundary and existing engine architecture were not replaced.
+- Catalog count remains exactly **535**.
+- No advanced cryptographic primitive was faked.
+
+## Production status
+
+Production domain still points to the Main deployment rather than this audit branch.
+
+Therefore:
+- Production AI alignment: **NOT VERIFIED**
+- Production Lemon/Stripe alignment: **NOT VERIFIED**
+- Production smoke: **NOT RUN**
+- Mobile 375/390/412: **NOT RUN**
+- Full browser smoke: **NOT RUN**
+- Durable server-side Pro entitlement: **BLOCKED / incomplete**
 
 ## Remaining blockers
 
-1. Production domain still points to the Main deployment, not this audit branch.
-2. Production payment endpoints need the audited release aligned and then re-tested.
-3. Full 535-tool semantic execution remains incomplete.
-4. Server-side Pro entitlement is still not a complete durable billing source of truth.
-5. Browser/mobile smoke evidence is still required.
-6. Exact CI/test command evidence for the final commit is still required.
-
-## Next 2–3 day plan
-
-### Day 1
-- Re-baseline the full 535-tool execution oracle.
-- Run the expanded Vitest suite directly.
-- Close remaining deterministic engine failures.
-
-### Day 2
-- Complete production deployment alignment.
-- Re-test AI, Lemon, Stripe, security headers, XSS, Code Playground and deep links.
-- Run 375/390/412 mobile smoke.
-
-### Day 3
-- Semantic regression across all mapped tools.
-- Reconcile README/TOOL-AUDIT/TEST-MATRIX with measured counts.
-- Produce the final release-gate evidence matrix.
+1. Safe integration of the 44 newer Main commits into the audit branch.
+2. Direct local `bun run build`, lint, and full Vitest evidence.
+3. Execute and review the new 535-tool smoke oracle.
+4. Full semantic verification of mapped/dedicated tools.
+5. Production alignment followed by AI + Lemon + Stripe verification.
+6. Browser and 375/390/412 mobile smoke.
+7. Durable server-side Pro entitlement/lifecycle evidence.
 
 ## Release posture
 
-**RELEASE GATE BLOCKED**
+**RELEASE GATE: BLOCKED**
 
-The working surface has materially expanded, but production alignment and complete evidence closure are still required before release.
+This run materially increased the real handler surface by **77 unique IDs** and added a full-catalog smoke oracle, while keeping the catalog at exactly 535. No unsupported tool is being represented as a semantic PASS.
+
+## Next 48 hours
+
+1. Perform the deliberate main/audit integration with conflict-by-conflict preservation.
+2. Run local `bun run lint && bun test && bun run build` (or exact project-equivalent) and capture outputs.
+3. Run the 535-tool oracle and inspect every non-routed/error cluster.
+4. Close deterministic failures before adding more handlers.
+5. Align production only after the integrated preview is verified.
+6. Re-test AI, Lemon, Stripe, headers, deep links, CodePlayground, XSS boundaries, and mobile widths.
+7. Reconcile `README.md`, `TOOL-AUDIT.md`, `TEST-MATRIX.md`, and this file from measured evidence only.
