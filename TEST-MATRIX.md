@@ -14,7 +14,7 @@ Status vocabulary: PASS / FAIL / NOT_RUN / BLOCKED.
 | TypeScript | NOT_RUN | Local compiler execution unavailable in this audit environment. |
 | Lint | NOT_RUN | `npm run lint`/compiler execution not run in this audit environment. |
 | Build | NOT_RUN | Full local build not executed; Vercel deployment evidence is tracked separately. |
-| Unit tests | NOT_RUN | No repository test script was found in the inspected package manifest. |
+| Unit tests | NOT_RUN | Vitest suite is now present; execution evidence is still required. |
 | Integration tests | NOT_RUN | No integration suite was found in the inspected repository tree. |
 | Browser runtime | NOT_RUN | Interactive browser test not completed. |
 | Mobile 320–414px | NOT_RUN | No complete viewport interaction matrix executed. |
