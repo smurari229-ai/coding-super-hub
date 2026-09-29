@@ -862,6 +862,18 @@ const roiBatch6: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch7: Handler = (tool, input) => {
+  switch(tool.id){
+    case 'architecture-decision-record': return '# ADR: '+(input.trim()||'Decision')+'\n\n## Context\n\n## Decision\n\n## Consequences\n\n## Alternatives considered';
+    case 'code-review-checklist': return '- Correctness\n- Error handling\n- Security\n- Input validation\n- Performance\n- Tests\n- Accessibility\n- Documentation';
+    case 'website-launch-checklist': return '- Build passes\n- Tests pass\n- Security headers verified\n- Secrets excluded\n- Mobile smoke tested\n- Accessibility smoke tested\n- Rollback path verified';
+    case 'license-selector-guide': return 'MIT: permissive. Apache-2.0: permissive with patent grant. GPL-3.0: strong copyleft. BSD-2-Clause/BSD-3-Clause: permissive. MPL-2.0: file-level copyleft.';
+    case 'pull-request-template-md': return '## Summary\n- \n\n## Changes\n- \n\n## Testing\n- [ ] Unit tests\n- [ ] Build\n\n## Checklist\n- [ ] No secrets\n- [ ] Documentation updated';
+    default:return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
