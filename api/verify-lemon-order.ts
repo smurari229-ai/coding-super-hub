@@ -12,7 +12,10 @@ export default async function handler(request: Request): Promise<Response> {
       return json({ verified: false, error: 'Method not allowed' }, 405);
     }
 
-  const url = new URL(request.url);
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const host = request.headers.get('host')?.trim();
+  const fallbackBase = process.env.APP_URL?.trim() || (forwardedProto && host ? forwardedProto + '://' + host : 'http://localhost');
+  const url = new URL(request.url, fallbackBase);
   const orderId = url.searchParams.get('order_id')?.trim();
 
   const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
