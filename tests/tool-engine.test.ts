@@ -98,4 +98,38 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('px-to-rem-converter', 'PX to REM'), '32 16').output).toContain('rem: 2');
     expect(executeTool(tool('architecture-decision-record', 'ADR'), 'Use registry engine').output).toContain('# ADR: Use registry engine');
   });
+
+  it('covers second high-ROI text batch', () => {
+    expect(executeTool(tool('duplicate-line-remover', 'Duplicate Lines'), 'a\na\nb').output).toBe('a\nb');
+    expect(executeTool(tool('text-line-sorter', 'Line Sorter'), 'b\na\n10\n2').output).toBe('2\n10\na\nb');
+    expect(executeTool(tool('text-reverser', 'Text Reverser'), 'abc').output).toBe('cba');
+    expect(executeTool(tool('snake-to-camel', 'Snake to Camel'), 'user_first_name').output).toBe('userFirstName');
+    expect(executeTool(tool('strip-diacritics', 'Strip Diacritics'), 'Crème brûlée').output).toBe('Creme brulee');
+    expect(executeTool(tool('json-key-sorter', 'JSON Key Sorter'), '{"z":1,"a":2}').output).toContain('"a": 2');
+  });
+
+  it('covers deterministic calculators', () => {
+    expect(executeTool(tool('percentage-calculator', 'Percentage'), '20 200').output).toContain('X% of Y: 40');
+    expect(executeTool(tool('gcd-lcm-calculator', 'GCD LCM'), '12 18').output).toContain('GCD: 6');
+    expect(executeTool(tool('prime-number-checker', 'Prime'), '17').output).toContain('prime');
+    expect(executeTool(tool('factorial-calculator', 'Factorial'), '5').output).toContain('5! = 120');
+    expect(executeTool(tool('fibonacci-sequence', 'Fibonacci'), '6').output).toBe('0, 1, 1, 2, 3, 5');
+    expect(executeTool(tool('emi-loan-calculator', 'EMI'), '100000 12 12').output).toContain('Monthly EMI:');
+  });
+
+  it('covers security and web helpers', () => {
+    expect(executeTool(tool('basic-auth-header', 'Basic Auth'), 'user\npass').output).toContain('Authorization: Basic');
+    expect(executeTool(tool('cookie-flags-generator', 'Cookie Flags'), 'session').output).toContain('HttpOnly');
+    expect(executeTool(tool('html-boilerplate-generator', 'HTML Boilerplate'), 'Demo').output).toContain('<!doctype html>');
+    expect(executeTool(tool('xml-sitemap-generator', 'Sitemap'), 'https://example.com').output).toContain('<urlset');
+    expect(executeTool(tool('user-agent-parser', 'User Agent'), 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120').output).toContain('Windows');
+  });
+
+  it('covers DevOps and productivity templates', () => {
+    expect(executeTool(tool('docker-ignore-generator', 'Docker Ignore'), 'x').output).toContain('.env');
+    expect(executeTool(tool('git-bisect-guide', 'Git Bisect'), 'x').output).toContain('git bisect start');
+    expect(executeTool(tool('readme-badge-generator', 'README Badge'), 'build').output).toContain('img.shields.io');
+    expect(executeTool(tool('saas-mrr-arr-calculator', 'MRR ARR'), '10 9').output).toContain('MRR: 90.00');
+    expect(executeTool(tool('sprint-velocity-calculator', 'Sprint Velocity'), '40 4').output).toContain('10.00');
+  });
 });
