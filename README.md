@@ -1,6 +1,6 @@
 # Coding Super Hub 🚀 (Pro Developer Suite 2026)
 
-> **The modern, privacy-first, all-in-one developer toolbox with 500+ utilities, live sandboxes, AI copilot, and built-in monetization.**
+> **A privacy-aware developer toolbox with 535 registered catalog entries, verified dedicated tools, an honest generic engine, live sandboxes, AI Copilot, and built-in monetization.**
 
 [![React 19](https://img.shields.io/badge/React-19.0-blue.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org)
@@ -11,7 +11,7 @@
 
 ## ⚡ What Makes Coding Super Hub Different?
 
-1. **535 Registered Developer Tools**: Categorized across 8 departments (Text & Strings, Crypto & Security, Web & Frontend, Data & Formats, DevOps & Network, Math & Algorithms, Code Snippets & Sandbox, Productivity).
+1. **535 Registered Catalog Entries**: Categorized across 8 departments (Text & Strings, Crypto & Security, Web & Frontend, Data & Formats, DevOps & Network, Math & Algorithms, Code Snippets & Sandbox, Productivity).
 2. **Privacy-aware local tooling**: Many deterministic utilities (such as hashing, JWT decoding, JSON formatting, and regex work) run locally in the browser. AI Copilot is different: code/prompts submitted to it are sent to the configured server-side Gemini provider for inference.
 3. **AI Copilot**: Server-protected Google Gemini 2.5 Flash integration for code explanations, bug fixing, test generation, optimization, and TypeScript conversion. Other model providers are not currently implemented.
 4. **Live Code Sandbox**: Real-time multi-tab HTML/CSS/JS execution engine with sandboxed `<iframe>` isolation, device viewport toggles (desktop/mobile), and real-time console log interceptor.
@@ -72,6 +72,16 @@
 
 ---
 
+## 🔧 Current tool coverage
+
+The catalog contains **535 registered entries**. The current repository has **48 catalog entries mapped to dedicated React tool components**. Those dedicated entries are the verified baseline for the release audit.
+
+The generic engine now provides real deterministic algorithms for common text transforms, encoding, JSON/CSV, number bases, timestamps, UUID/random generation, generators, and selected DevOps helpers. Generic coverage is **not counted as fully verified** until the complete catalog has passed semantic execution tests.
+
+Unsupported catalog entries never echo input as if processing succeeded. They return an explicit **“Coming soon — this catalog entry does not have a verified execution algorithm yet.”** message.
+
+Therefore, this README does **not** claim that all 535 tools are production-grade.
+
 ## 🛠️ How to Add a New Tool in 30 Seconds
 
 All tools are completely **data-driven**. To add a new utility, simply add an entry to `src/data/tools-catalog.ts`:
@@ -121,7 +131,7 @@ npm run build
 
 ---
 
-## 📜 Complete Breakdown of 535 Registered Tools by Department
+## 📜 Catalog Breakdown — 535 Registered Entries
 
 * **Text & String (85 Tools)**: JSON/YAML/XML/TOML formatters, Base64/URL/Hex/Binary/HTML converters, Case converters, Regex debugger, Diff checker, UUID/NanoID generator, Slugifier, Word frequency, Text statistics, Cron builder, and more.
 * **Crypto & Security (64 Tools)**: SHA-256, SHA-512, MD5, HMAC, Password entropy meter, CSP generator, CORS header builder, X.509 PEM decoder, TOTP 2FA calculator, Chmod calculator, and SSRF guard.
@@ -134,4 +144,4 @@ npm run build
 
 ---
 
-© 2026 Coding Super Hub. Built for developers worldwide.
+© 2026 Coding Super Hub.
