@@ -4,7 +4,9 @@
 
 Branch: `phase1-a-to-z-release-audit-2026-09-28`
 
-Final commit for this pass: `01f59a7a8decc6e026aa989e92fd76207821c70b`
+Final implementation/test commit: `01f59a7a8decc6e026aa989e92fd76207821c70b`
+
+Latest documentation commit: `56ee3ab4a7cc24ea35f30141bbcd524758d80664`
 
 Catalog baseline: **535 registered entries**.
 
