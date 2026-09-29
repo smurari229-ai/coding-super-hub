@@ -731,6 +731,42 @@ const roiBatch2: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch3: Handler = (tool, input) => {
+  const nums=input.match(/-?\d+(?:\.\d+)?/g)?.map(Number)??[];
+  const lines=input.split(/\r?\n/);
+  switch(tool.id){
+    case 'ipv6-expander-compressor': {
+      const v=input.trim(), p=v.split('::'); if(p.length>2) throw new Error('Invalid IPv6.');
+      const left=p[0]?p[0].split(':'):[], right=p[1]?p[1].split(':'):[], fill=8-left.length-right.length;
+      if(fill<0) throw new Error('Invalid IPv6.');
+      return [...left,...Array(fill).fill('0'),...right].map(x=>x.padStart(4,'0')).join(':');
+    }
+    case 'mac-address-formatter': { const c=input.replace(/[^0-9a-f]/gi,''); if(c.length!==12) throw new Error('Enter a 12-hex-digit MAC address.'); return c.match(/../g)!.join(':').toUpperCase(); }
+    case 'git-commit-msg-helper': return 'feat: '+input.trim()+'\n\nUse fix/docs/refactor/test/chore when that better matches the change.';
+    case 'semver-calculator': { const m=input.trim().match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$/); if(!m) throw new Error('Enter a valid SemVer such as 1.2.3.'); return 'major='+m[1]+'\nminor='+m[2]+'\npatch='+m[3]+'\nprerelease='+(m[4]||'none')+'\nbuild='+(m[5]||'none'); }
+    case 'bandwidth-calculator': { if(nums.length<2) throw new Error('Enter size in bytes and bandwidth in Mbps.'); const seconds=nums[0]*8/(nums[1]*1e6); return 'Seconds: '+seconds+'\nMinutes: '+seconds/60; }
+    case 'uptime-sla-calculator': { const p=nums[0]??99.9; if(p<0||p>100) throw new Error('SLA must be between 0 and 100.'); return 'Allowed downtime/year: '+((100-p)/100*525600).toFixed(2)+' minutes'; }
+    case 'ssl-expiration-calc': { const d=new Date(input.trim()); if(Number.isNaN(d.getTime())) throw new Error('Enter an expiry date.'); return 'Days remaining: '+Math.ceil((d.getTime()-Date.now())/86400000); }
+    case 'kill-process-port-helper': { const port=Math.trunc(nums[0]??3000); return 'Linux/macOS: lsof -i :'+port+' then kill <PID>\nWindows: netstat -ano | findstr :'+port+' then taskkill /PID <PID> /F'; }
+    case 'favicon-html-tags': return '<link rel="icon" href="/favicon.ico" sizes="any">\n<link rel="icon" type="image/svg+xml" href="/icon.svg">\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">';
+    case 'px-to-rem-converter': { const px=nums[0]; const base=nums[1]??16; if(!Number.isFinite(px)) throw new Error('Enter pixels.'); return 'rem: '+px/base+'\nem: '+px/base; }
+    case 'rem-to-px-converter': { const rem=nums[0],base=nums[1]??16; if(!Number.isFinite(rem)) throw new Error('Enter rem.'); return 'px: '+rem*base; }
+    case 'pt-to-px-converter': { if(!Number.isFinite(nums[0])) throw new Error('Enter points.'); return 'px: '+nums[0]*96/72; }
+    case 'css-gradient-builder': { const a=lines[0]||'#000000',b=lines[1]||'#ffffff',angle=lines[2]||'90deg'; return 'background: linear-gradient('+angle+', '+a+', '+b+');'; }
+    case 'svg-to-data-uri': return 'data:image/svg+xml,'+encodeURIComponent(input.trim());
+    case 'js-minifier-basic': return input.replace(/\/\/.*$/gm,'').replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s+/g,' ').replace(/\s*([{}();,:])\s*/g,'$1').trim();
+    case 'css-specificity-calculator': { const s=input.trim(); const ids=(s.match(/#[A-Za-z0-9_-]+/g)||[]).length; const cls=(s.match(/\.[A-Za-z0-9_-]+|\[[^\]]+\]|:[A-Za-z-]+/g)||[]).length; const els=(s.match(/(^|[\s>+~])([A-Za-z][\w-]*)/g)||[]).length; return 'Specificity: '+ids+'-'+cls+'-'+els; }
+    case 'html-picture-srcset-maker': { const src=lines[0]||'image.jpg',srcset=lines[1]||src; return '<picture>\n  <img src="'+src+'" srcset="'+srcset+'" alt="">\n</picture>'; }
+    case 'tailwind-to-css': return '/* Review generated utility mapping manually */\n'+input.split(/\s+/).map(x=>'.'+x.replace(/[^a-zA-Z0-9_-]/g,'')+' { /* '+x+' */ }').join('\n');
+    case 'css-aspect-ratio-boxes': { const ratio=lines[0]||'16 / 9'; return '.aspect-box { aspect-ratio: '+ratio+'; overflow: hidden; }'; }
+    case 'css-scroll-snap-builder': return '.scroll-container { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:1rem; }\n.scroll-item { scroll-snap-align:start; flex:0 0 80%; }';
+    case 'css-toggle-switch': return '<label class="switch"><input type="checkbox"><span class="slider"></span></label>\n.switch{display:inline-block}.slider{display:block;width:3rem;height:1.5rem;border-radius:999px;background:#888}.switch input{display:none}';
+    case 'css-progress-bar': return '<div class="progress" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"><span></span></div>\n.progress{height:.5rem;background:#ddd}.progress span{display:block;width:50%;height:100%;background:#2563eb}';
+    default:return null;
+  }
+};
+
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
     if (input.length > 20_000) return { output: '', error: 'Input exceeds the 20,000 character safety limit.' };
