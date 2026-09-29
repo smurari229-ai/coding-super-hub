@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { X, Heart, Coffee, Github, Copy, Check, ExternalLink } from 'lucide-react';
 
-const BUY_ME_A_COFFEE_URL =
-  (import.meta.env.VITE_BUYMEACOFFEE_URL as string | undefined)?.trim() ||
-  'https://buymeacoffee.com/smurari';
-
-const GITHUB_SPONSORS_URL =
-  (import.meta.env.VITE_GITHUB_SPONSORS_URL as string | undefined)?.trim() ||
-  'https://github.com/sponsors/smurari229-ai';
-
-const UPI_ID =
-  (import.meta.env.VITE_UPI_ID as string | undefined)?.trim() ||
-  'smurari229@okaxis';
+const BUY_ME_A_COFFEE_URL = (import.meta.env.VITE_BUYMEACOFFEE_URL as string | undefined)?.trim();
+const GITHUB_SPONSORS_URL = (import.meta.env.VITE_GITHUB_SPONSORS_URL as string | undefined)?.trim();
+const UPI_ID = (import.meta.env.VITE_UPI_ID as string | undefined)?.trim();
 
 interface SponsorModalProps {
   isOpen: boolean;
