@@ -106,8 +106,8 @@ export async function POST(request: Request): Promise<Response> {
           plan: existing.plan,
           status: 'refunded',
           expires_at: new Date().toISOString(),
-          lemon_order_id: existing.lemon_order_id ?? orderId || null,
-          lemon_subscription_id: existing.lemon_subscription_id ?? subscriptionId || null,
+          lemon_order_id: existing.lemon_order_id ?? (orderId || null),
+          lemon_subscription_id: existing.lemon_subscription_id ?? (subscriptionId || null),
           updated_at: new Date().toISOString(),
         });
       }
