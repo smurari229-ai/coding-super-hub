@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { claimWebhookEvent, markWebhookEvent, upsertEntitlement } from './_supabase';
+import { claimWebhookEvent, getEntitlementByField, markWebhookEvent, upsertEntitlement } from './_supabase';
 
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -91,22 +91,37 @@ export async function POST(request: Request): Promise<Response> {
   if (!claimed) return json({ received: true, duplicate: true });
 
   try {
+    const paymentEvent = eventName.startsWith('subscription_payment_');
+    const orderId = data.type === 'orders' ? String(data.id) : String(attributes.order_id ?? '');
+    const subscriptionId = data.type === 'subscriptions' ? String(data.id) : String(attributes.subscription_id ?? '');
+
+    if (paymentEvent) {
+      const existing = subscriptionId ? await getEntitlementByField('lemon_subscription_id', subscriptionId) : null;
+      if (!existing) throw new Error('Subscription entitlement not found.');
+
+      if (eventName === 'subscription_payment_refunded') {
+        await upsertEntitlement({
+          user_id: existing.user_id,
+          provider: 'lemon-squeezy',
+          plan: existing.plan,
+          status: 'refunded',
+          expires_at: new Date().toISOString(),
+          lemon_order_id: existing.lemon_order_id ?? orderId || null,
+          lemon_subscription_id: existing.lemon_subscription_id ?? subscriptionId || null,
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      await markWebhookEvent('lemon-squeezy', eventId, 'processed');
+      return json({ received: true, processed: true, event: eventName, resource_id: data.id });
+    }
+
     const customUserId = String(payload.meta?.custom_data?.user_id || '');
     if (!isUuid(customUserId)) throw new Error('Missing or invalid checkout user association.');
 
-    const variantId = String(
-      attributes.variant_id ??
-      attributes.first_order_item?.variant_id ??
-      attributes.first_subscription_item?.variant_id ??
-      attributes.first_subscription_item?.price_id ??
-      ''
-    );
+    const variantId = String(attributes.variant_id ?? attributes.first_order_item?.variant_id ?? '');
     const plan = variantPlan(variantId);
-
     if (!plan) throw new Error('Non-Pro Lemon Squeezy variant.');
-
-    const orderId = String(attributes.order_id ?? data.type === 'orders' ? data.id : '');
-    const subscriptionId = data.type === 'subscriptions' ? String(data.id) : String(attributes.subscription_id ?? '');
 
     let status: 'active' | 'cancelled' | 'expired' | 'refunded' = 'active';
     let expiresAt: string | null = null;
