@@ -7,7 +7,7 @@ vi.mock('../api/_supabase', () => ({
     id: 'ent-1',
     user_id: '11111111-1111-1111-1111-111111111111',
     provider: value === '123' ? 'lemon-squeezy' : 'stripe',
-    plan: 'lifetime',
+    plan: value.startsWith('cs_') ? 'monthly' : 'lifetime',
     status: 'active',
     expires_at: null,
     stripe_session_id: value.startsWith('cs_') ? value : null,
