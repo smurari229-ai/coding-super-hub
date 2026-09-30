@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { getProStatus, refreshStoredProStatus } from '../../lib/pro';
 import { getAccessToken } from '../../lib/supabase-auth';
 
 type BillingCycle = 'monthly' | 'lifetime';
