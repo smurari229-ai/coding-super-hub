@@ -1,4 +1,4 @@
-import { requireUser } from './_supabase';
+import { getEntitlementByField, isEntitlementActive, requireUser } from './_supabase';
 
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -82,10 +82,6 @@ export default async function handler(request: Request): Promise<Response> {
     };
 
     const attrs = payload.data?.attributes;
-    const ownerId = String((payload as any).meta?.custom_data?.user_id || (payload as any).data?.meta?.custom_data?.user_id || '');
-    if (ownerId !== user.id) {
-      return json({ verified: false, error: 'Order ownership mismatch.' }, 403);
-    }
     const variantId = String(attrs?.first_order_item?.variant_id ?? '');
     const expectedPlan =
       variantId === monthlyVariant
@@ -149,7 +145,12 @@ export default async function handler(request: Request): Promise<Response> {
       }
     }
 
-    return json({ verified: true, plan: expectedPlan });
+    const entitlement = await getEntitlementByField('lemon_order_id', orderId);
+    if (!entitlement || entitlement.user_id !== user.id || !isEntitlementActive(entitlement)) {
+      return json({ verified: false, error: 'Payment is verified, but durable Pro entitlement is still pending.' }, 409);
+    }
+
+    return json({ verified: true, plan: entitlement.plan });
   } catch {
     return json({ verified: false, error: 'Payment provider unavailable.' }, 502);
   }
