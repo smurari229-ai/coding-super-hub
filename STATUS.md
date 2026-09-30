@@ -7,15 +7,15 @@
 - Catalog: **535 entries exactly**
 - Main: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current audit HEAD: `5eea566098d32bd67ec2c3fc695593c74ddc8ddf`
+- Current audit HEAD: `4e2ad26eb3283549dda41c8e630b80a1f7d7b8a1`
 - PR: **#4 OPEN**
-- Branch divergence vs main: **117 ahead / 44 behind**
+- Branch divergence vs main: **137 ahead / 44 behind**
 
 ## Phase 0 — Integration & build stabilization
 
 ### Evidence
 
-The exact divergence was rechecked before changes. Main has 44 commits after the merge base and the audit branch has 117 commits after the same merge base.
+The exact divergence was rechecked against GitHub: Main has 44 commits after the merge base and the audit branch has 137 commits after the same merge base.
 
 Main-only changes overlap materially with the audit branch in:
 - `.env.example`
@@ -39,9 +39,9 @@ A safe local rebase/merge could not be completed in this execution environment b
 
 - Bun is not installed in the execution environment.
 - Vercel build for the latest test commit is **READY**:
-  - Deployment: `dpl_FfADJwLXYVhqAVkEkN8YaVAW7BdW`
-  - Preview: `coding-super-jcmbkq83j-earnal-hub.vercel.app`
-  - Commit: `5eea566098d32bd67ec2c3fc695593c74ddc8ddf`
+  - Deployment: `dpl_5jXXoDdRboV3bZuBSrmqiqRkRSxj`
+  - Preview: `coding-super-3cbvyt0u8-earnal-hub.vercel.app`
+  - Commit: `4e2ad26eb3283549dda41c8e630b80a1f7d7b8a1`
 - Preview homepage returned **HTTP 200**.
 - Preview security headers remain present: CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options.
 
@@ -120,7 +120,9 @@ Therefore:
 
 **RELEASE GATE: BLOCKED**
 
-This run materially increased the real handler surface by **77 unique IDs** and added a full-catalog smoke oracle, while keeping the catalog at exactly 535. No unsupported tool is being represented as a semantic PASS.
+This run materially increased the real handler surface by **77 unique IDs** and added a full-catalog smoke oracle, while keeping the catalog at exactly 535.
+
+Latest verification note: PR #4 remains OPEN and non-mergeable; no merge/rebase/force-push was performed. The latest audit Preview is READY for the exact audit HEAD. Production remains on Main and is intentionally not changed. No unsupported tool is being represented as a semantic PASS. No unsupported tool is being represented as a semantic PASS.
 
 ## Next 48 hours
 
