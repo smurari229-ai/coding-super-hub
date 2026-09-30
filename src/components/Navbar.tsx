@@ -23,7 +23,9 @@ interface NavbarProps {
   onOpenSponsor: () => void;
   onOpenShortcuts: () => void;
   onToggleSidebar?: () => void;
+  onOpenAuth: () => void;
   isPro?: boolean;
+  isAuthenticated?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -35,7 +37,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSponsor,
   onOpenShortcuts,
   onToggleSidebar,
-  isPro = false
+  onOpenAuth,
+  isPro = false,
+  isAuthenticated = false
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
@@ -126,6 +130,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Support Creator"
           >
             <Heart className="w-4 h-4" />
+          </button>
+
+          {/* Account */}
+          <button
+            onClick={onOpenAuth}
+            className={isAuthenticated
+              ? "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold"
+              : "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-semibold"}
+            title={isAuthenticated ? "Account" : "Sign in"}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+            <span>{isAuthenticated ? "Account" : "Sign in"}</span>
           </button>
 
           {/* Pro / Go Pro Button */}
