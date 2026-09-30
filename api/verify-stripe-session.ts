@@ -7,15 +7,35 @@ const json = (body: Record<string, unknown>, status = 200) =>
     },
   });
 
+function resolveRequestUrl(request: Request): URL {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const host = request.headers.get('host')?.trim();
+  const forwardedBase =
+    (forwardedProto === 'http' || forwardedProto === 'https') && host
+      ? forwardedProto + '://' + host
+      : 'http://localhost';
+  const configuredBase = process.env.APP_URL?.trim();
+
+  if (configuredBase) {
+    try {
+      const parsed = new URL(configuredBase);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return new URL(request.url, parsed);
+      }
+    } catch {
+      // Ignore malformed APP_URL and use the request-host fallback below.
+    }
+  }
+
+  return new URL(request.url, forwardedBase);
+}
+
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'GET') {
     return json({ verified: false, error: 'Method not allowed' }, 405);
   }
 
-  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
-  const host = request.headers.get('host')?.trim();
-  const fallbackBase = process.env.APP_URL?.trim() || (forwardedProto && host ? forwardedProto + '://' + host : 'http://localhost');
-  const url = new URL(request.url, fallbackBase);
+  const url = resolveRequestUrl(request);
   const sessionId = url.searchParams.get('session_id')?.trim();
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const monthlyPrice = process.env.STRIPE_MONTHLY_PRICE_ID?.trim();
