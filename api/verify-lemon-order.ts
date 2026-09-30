@@ -1,3 +1,5 @@
+import { requireUser } from './_supabase';
+
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -52,6 +54,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   try {
+    const user = await requireUser(request);
     const response = await fetch(
       `https://api.lemonsqueezy.com/v1/orders/${encodeURIComponent(orderId)}`,
       {
@@ -68,6 +71,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     const payload = (await response.json()) as {
       data?: {
+        meta?: { custom_data?: { user_id?: string } };
         attributes?: {
           store_id?: number;
           status?: string;
@@ -78,6 +82,10 @@ export default async function handler(request: Request): Promise<Response> {
     };
 
     const attrs = payload.data?.attributes;
+    const ownerId = String((payload as any).meta?.custom_data?.user_id || (payload as any).data?.meta?.custom_data?.user_id || '');
+    if (ownerId !== user.id) {
+      return json({ verified: false, error: 'Order ownership mismatch.' }, 403);
+    }
     const variantId = String(attrs?.first_order_item?.variant_id ?? '');
     const expectedPlan =
       variantId === monthlyVariant
