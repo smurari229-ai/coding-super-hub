@@ -9,6 +9,8 @@ import { AffiliateHubModal } from './components/Monetization/AffiliateHubModal';
 import { ProUpgradeModal } from './components/Monetization/ProUpgradeModal';
 import { SponsorModal } from './components/Monetization/SponsorModal';
 import { TransparencyModal } from './components/Monetization/TransparencyModal';
+import { AuthModal } from './components/AuthModal';
+import { AUTH_EVENT, getCurrentUser, type AuthUser } from './lib/supabase-auth';
 import { getProStatus, refreshStoredProStatus, verifyCheckoutReturn, PRO_EVENT } from './lib/pro';
 
 // Dedicated Tool Components
@@ -61,6 +63,7 @@ export default function App() {
   const [selectedTool, setSelectedTool] = useState<ToolItem>(getToolFromUrl());
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | 'all' | 'favorites'>('all');
   const [isPro, setIsPro] = useState(() => getProStatus().active);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('csh_favorites');
@@ -86,6 +89,7 @@ export default function App() {
   const [isProOpen, setIsProOpen] = useState(false);
   const [isSponsorOpen, setIsSponsorOpen] = useState(false);
   const [isTransparencyOpen, setIsTransparencyOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
@@ -115,16 +119,31 @@ export default function App() {
   };
 
   useEffect(() => {
-    void verifyCheckoutReturn().then((verified) => {
-      if (verified?.active) setIsPro(true);
-    });
-    void refreshStoredProStatus().then((verified) => {
+    void getCurrentUser().then(setUser);
+    void verifyCheckoutReturn().then(() => refreshStoredProStatus()).then((verified) => {
       setIsPro(Boolean(verified?.active));
     });
     const handleProChange = () => setIsPro(getProStatus().active);
+    const handleAuthChange = () => {
+      void getCurrentUser().then((currentUser) => {
+        setUser(currentUser);
+        if (!currentUser) setIsPro(false);
+        else void refreshStoredProStatus().then((verified) => setIsPro(Boolean(verified?.active)));
+      });
+    };
     window.addEventListener(PRO_EVENT, handleProChange);
-    return () => window.removeEventListener(PRO_EVENT, handleProChange);
+    window.addEventListener(AUTH_EVENT, handleAuthChange);
+    return () => {
+      window.removeEventListener(PRO_EVENT, handleProChange);
+      window.removeEventListener(AUTH_EVENT, handleAuthChange);
+    };
   }, []);
+
+  const handleAuthChanged = (nextUser: AuthUser | null) => {
+    setUser(nextUser);
+    if (!nextUser) setIsPro(false);
+    else void refreshStoredProStatus().then((verified) => setIsPro(Boolean(verified?.active)));
+  };
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -265,6 +284,8 @@ export default function App() {
         }}
         onOpenAffiliates={() => setIsAffiliateOpen(true)}
         onOpenPro={() => setIsProOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        isAuthenticated={Boolean(user)}
         onOpenSponsor={() => setIsSponsorOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
@@ -472,6 +493,13 @@ export default function App() {
       <TransparencyModal
         isOpen={isTransparencyOpen}
         onClose={() => setIsTransparencyOpen(false)}
+      />
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        user={user}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthChanged={handleAuthChanged}
       />
     </div>
   );
