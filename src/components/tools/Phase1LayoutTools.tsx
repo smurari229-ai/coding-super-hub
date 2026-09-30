@@ -77,10 +77,15 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
     setColumns(3); setRows(2); setMinmax(true); setGridAlign('stretch');
   };
 
-  const select = (label: string, value: string, onChange: (v: string) => void, options: string[]) => (
+  const select = <T extends string>(
+    label: string,
+    value: T,
+    onChange: (v: T) => void,
+    options: readonly T[]
+  ) => (
     <label className="space-y-1 text-xs text-slate-400">
       <span>{label}</span>
-      <select value={value} onChange={e => onChange(e.target.value)} className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-200">
+      <select value={value} onChange={e => onChange(e.target.value as T)} className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-slate-200">
         {options.map(option => <option key={option}>{option}</option>)}
       </select>
     </label>
@@ -95,16 +100,16 @@ export const Phase1LayoutTools: React.FC<Props> = ({ tool }) => {
               <label className="space-y-1 text-xs text-slate-400"><span>Columns: {columns}</span><input type="range" min="1" max="8" value={columns} onChange={e => setColumns(Number(e.target.value))} className="w-full" /></label>
               <label className="space-y-1 text-xs text-slate-400"><span>Rows: {rows}</span><input type="range" min="1" max="6" value={rows} onChange={e => setRows(Number(e.target.value))} className="w-full" /></label>
               <label className="flex items-center gap-2 text-xs text-slate-300"><input type="checkbox" checked={minmax} onChange={e => setMinmax(e.target.checked)} /> Use minmax(0, 1fr)</label>
-              {select('Item alignment', gridAlign, setGridAlign, ['stretch', 'start', 'center', 'end'])}
-              {select('align-content', alignContent, setAlignContent, ['stretch','start','center','end','space-between','space-around'])}
-              {select('justify-content', justifyContent, setJustifyContent, ['start','center','end','space-between','space-around','space-evenly'])}
+              {select('Item alignment', gridAlign, setGridAlign, ['stretch', 'start', 'center', 'end'] as const)}
+              {select('align-content', alignContent, setAlignContent, ['stretch','start','center','end','space-between','space-around'] as const)}
+              {select('justify-content', justifyContent, setJustifyContent, ['start','center','end','space-between','space-around','space-evenly'] as const)}
             </> : <>
-              {select('flex-direction', direction, setDirection, ['row','row-reverse','column','column-reverse'])}
-              {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'])}
-              {select('align-items', align, setAlign, ['stretch','flex-start','center','flex-end','baseline'])}
-              {select('align-content', alignContent, setAlignContent, ['stretch','flex-start','center','flex-end','space-between','space-around'])}
-              {select('flex-wrap', wrap, setWrap, ['nowrap','wrap','wrap-reverse'])}
-              {select('flex-basis', basis, setBasis, ['auto','0','25%','50%','100px'])}
+              {select('flex-direction', direction, setDirection, ['row','row-reverse','column','column-reverse'] as const)}
+              {select('justify-content', justify, setJustify, ['flex-start','center','flex-end','space-between','space-around','space-evenly'] as const)}
+              {select('align-items', align, setAlign, ['stretch','flex-start','center','flex-end','baseline'] as const)}
+              {select('align-content', alignContent, setAlignContent, ['stretch','flex-start','center','flex-end','space-between','space-around'] as const)}
+              {select('flex-wrap', wrap, setWrap, ['nowrap','wrap','wrap-reverse'] as const)}
+              {select('flex-basis', basis, setBasis, ['auto','0','25%','50%','100px'] as const)}
               <label className="space-y-1 text-xs text-slate-400"><span>flex-grow: {grow}</span><input type="range" min="0" max="4" value={grow} onChange={e => setGrow(Number(e.target.value))} className="w-full" /></label>
               <label className="space-y-1 text-xs text-slate-400"><span>flex-shrink: {shrink}</span><input type="range" min="0" max="4" value={shrink} onChange={e => setShrink(Number(e.target.value))} className="w-full" /></label>
             </>}
