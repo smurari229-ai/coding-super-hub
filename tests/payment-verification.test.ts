@@ -1,5 +1,24 @@
 import crypto from 'node:crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../api/_supabase', () => ({
+  requireUser: vi.fn(async () => ({ id: '11111111-1111-1111-1111-111111111111', email: 'test@example.com' })),
+  getEntitlementByField: vi.fn(async (_field: string, value: string) => ({
+    id: 'ent-1',
+    user_id: '11111111-1111-1111-1111-111111111111',
+    provider: value === '123' ? 'lemon-squeezy' : 'stripe',
+    plan: 'lifetime',
+    status: 'active',
+    expires_at: null,
+    stripe_session_id: value.startsWith('cs_') ? value : null,
+    lemon_order_id: value === '123' ? value : null,
+  })),
+  isEntitlementActive: vi.fn(() => true),
+  claimWebhookEvent: vi.fn(async () => true),
+  markWebhookEvent: vi.fn(async () => undefined),
+  upsertEntitlement: vi.fn(async () => undefined),
+}));
+
 import lemonHandler from '../api/verify-lemon-order';
 import stripeHandler from '../api/verify-stripe-session';
 import { POST as lemonWebhook } from '../api/lemon-webhook';
