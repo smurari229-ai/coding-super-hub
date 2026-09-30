@@ -1,4 +1,4 @@
-import { requireUser } from './_supabase';
+import { getEntitlementByField, isEntitlementActive, requireUser } from './_supabase';
 
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -93,7 +93,12 @@ export default async function handler(request: Request): Promise<Response> {
       return json({ verified: false, error: 'Stripe payment is not an eligible paid Pro checkout.' }, 403);
     }
 
-    return json({ verified: true, plan });
+    const entitlement = await getEntitlementByField('stripe_session_id', sessionId);
+    if (!entitlement || entitlement.user_id !== user.id || !isEntitlementActive(entitlement)) {
+      return json({ verified: false, error: 'Payment is verified, but durable Pro entitlement is still pending.' }, 409);
+    }
+
+    return json({ verified: true, plan: entitlement.plan });
   } catch {
     return json({ verified: false, error: 'Stripe provider unavailable.' }, 502);
   }
