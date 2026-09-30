@@ -91,13 +91,44 @@ export async function claimWebhookEvent(provider: 'stripe' | 'lemon-squeezy', ev
     body: JSON.stringify({ provider, event_id: eventId, status: 'processing' }),
   });
   if (!response.ok) throw new Error('Failed to claim webhook event.');
+
   const rows = (await response.json()) as Array<{ id: string }>;
-  return rows.length > 0;
+  if (rows.length > 0) return true;
+
+  const lookup = new URLSearchParams({
+    select: 'id,status,received_at',
+    provider: `eq.${provider}`,
+    event_id: `eq.${eventId}`,
+    limit: '1',
+  });
+  const existingResponse = await supabaseRest(`billing_webhook_events?${lookup.toString()}`);
+  if (!existingResponse.ok) throw new Error('Failed to inspect webhook event state.');
+
+  const existing = (await existingResponse.json()) as Array<{ id: string; status: string; received_at: string }>;
+  const row = existing[0];
+  if (!row || row.status === 'processed') return false;
+
+  const age = Date.now() - Date.parse(row.received_at);
+  if (row.status === 'processing' && Number.isFinite(age) && age < 10 * 60 * 1000) return false;
+
+  const reclaimParams = new URLSearchParams({ provider: `eq.${provider}`, event_id: `eq.${eventId}` });
+  const reclaim = await supabaseRest(`billing_webhook_events?${reclaimParams.toString()}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      status: 'processing',
+      received_at: new Date().toISOString(),
+      processed_at: null,
+      error_code: null,
+    }),
+  });
+  if (!reclaim.ok) throw new Error('Failed to reclaim webhook event.');
+  return true;
 }
 
 export async function markWebhookEvent(provider: 'stripe' | 'lemon-squeezy', eventId: string, status: 'processed' | 'failed', errorCode?: string): Promise<void> {
   const params = new URLSearchParams({ provider: `eq.${provider}`, event_id: `eq.${eventId}` });
-  await supabaseRest(`billing_webhook_events?${params.toString()}`, {
+  const response = await supabaseRest(`billing_webhook_events?${params.toString()}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=minimal' },
     body: JSON.stringify({ status, error_code: errorCode ?? null, processed_at: new Date().toISOString() }),
