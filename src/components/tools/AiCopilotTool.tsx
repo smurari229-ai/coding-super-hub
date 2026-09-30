@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getProStatus, getAiLimit } from '../../lib/pro';
+import { getAccessToken } from '../../lib/supabase-auth';
 import { Sparkles, Bot, Copy, Check, AlertCircle } from 'lucide-react';
 
 type Task = 'fix' | 'explain' | 'optimize' | 'tests' | 'convert';
@@ -31,35 +31,19 @@ export const AiCopilotTool: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canRun = () => {
-    if (getProStatus().active) return true;
-    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
-    const used = Number(localStorage.getItem(key) || '0');
-    const limit = getAiLimit(false);
-    if (used >= limit) {
-      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot usage.`);
-      return false;
-    }
-    return true;
-  };
-
-  const consumeFreeRun = () => {
-    if (getProStatus().active) return;
-    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
-    const used = Number(localStorage.getItem(key) || '0');
-    localStorage.setItem(key, String(used + 1));
-  };
-
   const handleGenerate = async () => {
-    if (!canRun()) return;
     setLoading(true);
     setError(null);
     setResponse('');
 
     try {
+      const token = await getAccessToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
       const res = await fetch('/api/ai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           task,
           instruction: TASK_PROMPTS[task],
@@ -74,7 +58,6 @@ export const AiCopilotTool: React.FC = () => {
       }
 
       setResponse(typeof data?.text === 'string' ? data.text : 'No response returned from the AI provider.');
-      consumeFreeRun();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate AI response');
     } finally {
@@ -122,7 +105,7 @@ export const AiCopilotTool: React.FC = () => {
           </span>
         </div>
         <p className="text-[11px] leading-relaxed text-slate-500">
-          Your API key is never entered into or exposed by the browser. Requests are sent to the protected server API, which applies input and rate limits before calling Gemini.
+          Your API key is never entered into or exposed by the browser. The server verifies Pro entitlement and applies input, daily, and abuse-rate limits before calling Gemini.
         </p>
       </div>
 
