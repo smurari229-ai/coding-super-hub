@@ -7,7 +7,7 @@ vi.mock('../api/_supabase', () => ({
     id: 'ent-1',
     user_id: '11111111-1111-1111-1111-111111111111',
     provider: value === '123' ? 'lemon-squeezy' : 'stripe',
-    plan: value.startsWith('cs_') ? 'monthly' : 'lifetime',
+    plan: value === 'cs_lifetime123' ? 'lifetime' : (value.startsWith('cs_') ? 'monthly' : 'lifetime'),
     status: 'active',
     expires_at: null,
     stripe_session_id: value.startsWith('cs_') ? value : null,
@@ -71,7 +71,7 @@ describe('payment verification URL handling', () => {
 
     const request = {
       method: 'GET',
-      url: '/api/verify-stripe-session?session_id=cs_test123',
+      url: '/api/verify-stripe-session?session_id=cs_lifetime123',
       headers: new Headers({ host: 'example.com', 'x-forwarded-proto': 'https' }),
     } as unknown as Request;
 
@@ -134,7 +134,7 @@ describe('Lemon Squeezy webhook signature handling', () => {
   it('rejects an invalid signature before processing the payload', async () => {
     configuredWebhookEnv();
     const body = JSON.stringify({
-      meta: { event_name: 'order_created' },
+      meta: { event_name: 'order_created', custom_data: { user_id: '11111111-1111-1111-1111-111111111111' } },
       data: {
         type: 'orders',
         id: '123',
@@ -165,7 +165,7 @@ describe('Lemon Squeezy webhook signature handling', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       received: true,
-      processed: false,
+      processed: true,
       event: 'order_created',
     });
   });
