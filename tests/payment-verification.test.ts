@@ -153,7 +153,7 @@ describe('Lemon Squeezy webhook signature handling', () => {
   it('accepts a valid signed webhook and does not grant browser-local entitlement', async () => {
     configuredWebhookEnv();
     const body = JSON.stringify({
-      meta: { event_name: 'order_created' },
+      meta: { event_name: 'order_created', custom_data: { user_id: '11111111-1111-1111-1111-111111111111' } },
       data: {
         type: 'orders',
         id: '123',
