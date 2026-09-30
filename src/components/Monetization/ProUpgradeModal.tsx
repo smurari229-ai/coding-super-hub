@@ -1,20 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { getProStatus, setProStatus, verifyLemonOrder, verifyStripeSession } from '../../lib/pro';
+import { getProStatus, refreshStoredProStatus } from '../../lib/pro';
+import { getAccessToken } from '../../lib/supabase-auth';
 
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
-
-const CHECKOUT_URLS: Record<PaymentProvider, Record<BillingCycle, string>> = {
-  'lemon-squeezy': {
-    monthly: (import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_URL as string | undefined)?.trim() || '',
-    lifetime: (import.meta.env.VITE_LEMON_SQUEEZY_LIFETIME_URL as string | undefined)?.trim() || ''
-  },
-  stripe: {
-    monthly: (import.meta.env.VITE_STRIPE_MONTHLY_URL as string | undefined)?.trim() || '',
-    lifetime: (import.meta.env.VITE_STRIPE_LIFETIME_URL as string | undefined)?.trim() || ''
-  }
-};
 
 interface ProUpgradeModalProps {
   isOpen: boolean;
@@ -27,117 +17,42 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const checkoutUrl = useMemo(
-    () => CHECKOUT_URLS[provider][billingCycle],
-    [provider, billingCycle]
-  );
 
-  useEffect(() => {
-    if (!document.getElementById('lemon-squeezy-js')) {
-      const script = document.createElement('script');
-      script.id = 'lemon-squeezy-js';
-      script.src = 'https://app.lemonsqueezy.com/js/lemon.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-
-    const lemon = (window as unknown as {
-      LemonSqueezy?: {
-        Setup?: (options: {
-          eventHandler: (event: {
-            event?: string;
-            data?: { id?: string };
-          }) => void;
-        }) => void;
-      };
-    }).LemonSqueezy;
-
-    const setup = () => {
-      const current = (window as unknown as {
-        LemonSqueezy?: {
-          Setup?: (options: {
-            eventHandler: (event: {
-              event?: string;
-              data?: { id?: string };
-            }) => void;
-          }) => void;
-        };
-      }).LemonSqueezy;
-
-      current?.Setup?.({
-        eventHandler: (event) => {
-          if (event.event !== 'Checkout.Success' || !event.data?.id) return;
-
-          setIsLoading(true);
-          setStatusMsg('Payment received. Verifying your Pro order…');
-
-          void verifyLemonOrder(event.data.id).then((verified) => {
-            setIsLoading(false);
-            setStatusMsg(
-              verified?.active
-                ? 'Payment verified. Pro is now active.'
-                : 'Payment completed, but Pro verification is still pending. Please refresh shortly.'
-            );
-          });
-        },
-      });
-    };
-
-    if (lemon?.Setup) {
-      setup();
-    } else {
-      window.setTimeout(setup, 300);
-    }
-  }, []);
-
-  useEffect(() => {
-    const existing = getProStatus();
-    if (existing.active) {
-      setStatusMsg('Pro is active on this browser.');
-    } else if (window.location.search.includes('csh_pro=cancel')) {
-      setStatusMsg('Checkout was cancelled. No Pro entitlement was changed.');
-      const url = new URL(window.location.href);
-      url.searchParams.delete('csh_pro');
-      url.searchParams.delete('plan');
-      url.searchParams.delete('provider');
-      url.searchParams.delete('order_id');
-      url.searchParams.delete('session_id');
-      window.history.replaceState({}, document.title, url.toString());
-    }
-  }, []);
 
   if (!isOpen) return null;
 
-  const handleCheckout = () => {
-    if (!checkoutUrl) {
-      setStatusMsg(
-        provider === 'lemon-squeezy'
-          ? 'Lemon Squeezy checkout is not configured yet.'
-          : 'Stripe checkout is not configured yet.'
-      );
-      return;
-    }
-
+  const handleCheckout = async () => {
+    setStatusMsg(null);
     setIsLoading(true);
-    setStatusMsg('Opening secure checkout…');
-
-    window.setTimeout(() => {
-      if (provider === 'lemon-squeezy') {
-        const lemon = (window as unknown as {
-          LemonSqueezy?: {
-            Url?: { Open?: (url: string) => void };
-          };
-        }).LemonSqueezy;
-
-        if (lemon?.Url?.Open) {
-          lemon.Url.Open(checkoutUrl);
-          setIsLoading(false);
-          return;
-        }
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        setStatusMsg('Please sign in before starting a Pro checkout. Your account is required to bind the payment to the correct user.');
+        return;
       }
 
-      window.location.assign(checkoutUrl);
-    }, 350);
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ provider, plan: billingCycle }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as { checkout_url?: string; error?: string };
+      if (!response.ok || !data.checkout_url) {
+        setStatusMsg(data.error || 'Secure checkout could not be created.');
+        return;
+      }
+
+      setStatusMsg('Opening secure checkout…');
+      window.location.assign(data.checkout_url);
+    } catch {
+      setStatusMsg('Secure checkout could not be created. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -260,7 +175,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
             <div className="flex gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-200 text-[10px] leading-relaxed">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>
-                Payment links are configured by you in Vercel environment variables. Never put Stripe secret keys or Lemon Squeezy API keys in this client app.
+                Checkout sessions are created server-side for your signed-in account. Provider secrets never enter this client app.
               </span>
             </div>
 
