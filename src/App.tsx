@@ -286,6 +286,7 @@ export default function App() {
         onOpenPro={() => setIsProOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
         isAuthenticated={Boolean(user)}
+        isPro={isPro}
         onOpenSponsor={() => setIsSponsorOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
