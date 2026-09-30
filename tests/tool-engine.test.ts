@@ -30,11 +30,11 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('line-numbering', 'Line Numbering', ['line number']), 'a\nb').output).toContain('1: a');
   });
   it('finds and replaces text', () => {
-    expect(executeTool(tool('find-replace', 'Find and Replace', ['find & replace']), 'cat\nDOG\ncat').output).toBe('DOG\nDOG');
+    expect(executeTool(tool('find-replace', 'Find and Replace', ['find & replace']), 'cat\nDOG\ncat\ncat').output).toBe('DOG\nDOG');
   });
   it('covers case transforms, CSV columns, and explicit number bases', () => {
     expect(executeTool(tool('case', 'Camel Case Converter', ['camel case']), 'hello world').output).toBe('helloWorld');
-    expect(executeTool(tool('csv-column', 'CSV Column Extractor', ['csv column']), 'name\na,b\nA,1\nB,2').output).toBe('A\nB');
+    expect(executeTool(tool('csv-column', 'CSV Column Extractor', ['csv column']), 'a\na,b\nA,1\nB,2').output).toBe('A\nB');
     expect(executeTool(tool('number-base', 'Number Base Converter', ['number base']), '16 ff').output).toContain('Decimal: 255');
   });
   it('extracts emails and URLs', () => {
@@ -66,7 +66,7 @@ describe('tool engine pure transforms', () => {
   it('minifies CSS and calculates clamp/contrast', () => {
     expect(executeTool(tool('css-minifier', 'CSS Minifier', ['css minif']), 'a { color: red; }').output).toBe('a{color:red}');
     expect(executeTool(tool('clamp-calculator', 'Fluid Type Clamp', ['clamp']), '16 2 32').output).toContain('clamp(');
-    expect(executeTool(tool('contrast', 'WCAG Contrast', ['contrast']), '#000 #fff').output).toContain('4.5');
+    expect(executeTool(tool('contrast', 'WCAG Contrast', ['contrast']), '#000 #fff').output).toContain('21.00:1');
   });
   it('converts cURL and CIDR', () => {
     expect(executeTool(tool('curl-fetch', 'cURL to Fetch', ['curl']), 'curl -X POST https://example.com').output).toContain("method: 'POST'");
