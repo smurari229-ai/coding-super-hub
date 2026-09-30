@@ -135,13 +135,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Account */}
           <button
             onClick={onOpenAuth}
-            className={isAuthenticated
-              ? "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold"
-              : "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-semibold"}
+            className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs font-semibold"
             title={isAuthenticated ? "Account" : "Sign in"}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{isAuthenticated ? "Account" : "Sign in"}</span>
+            <span className="hidden sm:inline">{isAuthenticated ? "Account" : "Sign in"}</span>
           </button>
 
           {/* Pro / Go Pro Button */}
