@@ -101,7 +101,7 @@ export async function signUp(email: string, password: string): Promise<{ session
     body: JSON.stringify({
       email: email.trim(),
       password,
-      options: { emailRedirectTo: window.location.origin },
+      redirect_to: window.location.origin,
     }),
   });
 
