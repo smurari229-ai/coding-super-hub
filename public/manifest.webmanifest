@@ -1,0 +1,7 @@
+{
+  "name": "Coding Super Hub",
+  "short_name": "Coding Hub",
+  "start_url": "/",
+  "display": "standalone",
+  "description": "535 developer tools, coding utilities, and AI-assisted workflows."
+}
