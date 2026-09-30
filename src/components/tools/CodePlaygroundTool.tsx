@@ -232,7 +232,7 @@ console.log('Sandbox loaded successfully!');`;
             <iframe
               ref={iframeRef}
               title="Code Preview Sandbox"
-              sandbox="allow-scripts allow-modals"
+              sandbox="allow-scripts"
               className={`border-0 rounded-xl transition-all ${
                 deviceView === 'mobile' ? 'w-[320px] h-[360px] shadow-2xl border border-slate-800' : 'w-full h-full min-h-[340px]'
               }`}
