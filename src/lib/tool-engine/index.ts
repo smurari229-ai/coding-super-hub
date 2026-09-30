@@ -774,7 +774,7 @@ const roiBatch8: Handler = (tool, input) => {
   }
 };
 
-const handlers: Handler[] = [roiBatch8,
+const baseHandlers: Handler[] = [roiBatch8,
   (tool, input) => {
     if (!has(tool, 'case converter', 'camel case', 'snake case', 'pascal case', 'kebab case')) return null;
     const wordsList = caseWords(input).map(word => word.toLowerCase());
@@ -801,7 +801,7 @@ const handlers: Handler[] = [roiBatch8,
   })() : null,
   (tool, input) => has(tool, 'extract email') ? (input.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? []).join('\n') : null,
   (tool, input) => has(tool, 'extract url', 'url extractor') ? (input.match(/https?:\/\/[^\s<>"']+/gi) ?? []).join('\n') : null,
-  (tool, input) => has(tool, 'json yaml', 'json to yaml', 'yaml json') ? (has(tool, 'yaml to json') ? yamlToJson(input) : jsonToYaml(input)) : null,
+  (tool, input) => has(tool, 'json yaml', 'json to yaml', 'yaml json', 'yaml to json') ? (has(tool, 'yaml to json') ? yamlToJson(input) : jsonToYaml(input)) : null,
   (tool, input) => has(tool, 'json path') ? jsonPathExtract(input) : null,
   (tool, input) => has(tool, 'sql insert') ? sqlInsertFromJson(input) : null,
   (tool, input) => has(tool, 'password strength', 'password meter') ? passwordStrength(input) : null,
@@ -1232,6 +1232,18 @@ const roiBatch7: Handler = (tool, input) => {
     default:return null;
   }
 };
+
+const handlers: Handler[] = [
+  roiBatch8,
+  roiTextBatch1,
+  roiBatch2,
+  roiBatch3,
+  roiBatch4,
+  roiBatch5,
+  roiBatch6,
+  roiBatch7,
+  ...baseHandlers.slice(1),
+];
 
 export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
   try {
