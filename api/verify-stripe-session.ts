@@ -1,3 +1,5 @@
+import { requireUser } from './_supabase';
+
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -50,6 +52,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   try {
+    const user = await requireUser(request);
     const response = await fetch(
       `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand%5B%5D=line_items.data.price`,
       {
@@ -64,14 +67,21 @@ export default async function handler(request: Request): Promise<Response> {
     }
 
     const payload = (await response.json()) as {
+      id?: string;
       payment_status?: string;
       status?: string;
+      client_reference_id?: string | null;
+      metadata?: { user_id?: string; plan?: string };
       line_items?: {
         data?: Array<{ price?: { id?: string } }>;
       };
     };
 
     const priceId = payload.line_items?.data?.[0]?.price?.id;
+    const ownerId = payload.metadata?.user_id || payload.client_reference_id || '';
+    if (ownerId !== user.id) {
+      return json({ verified: false, error: 'Checkout session ownership mismatch.' }, 403);
+    }
     const plan =
       priceId === monthlyPrice
         ? 'monthly'
