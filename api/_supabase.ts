@@ -16,28 +16,17 @@ type Entitlement = {
 };
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
-const SUPABASE_SECRET_KEY = (
-  process.env.SUPABASE_SECRET_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  ''
-).trim();
+const SUPABASE_SECRET_KEY = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 function configError() {
   return !SUPABASE_URL || !SUPABASE_SECRET_KEY;
 }
 
-function supabaseHeaders(extra: Record<string, string> = {}) {
-  return {
-    apikey: SUPABASE_SECRET_KEY,
-    'content-type': 'application/json',
-    ...extra,
-  };
-}
-
 async function supabaseRest(path: string, init: RequestInit = {}) {
   if (configError()) throw new Error('Supabase server configuration is missing.');
   const headers = new Headers(init.headers);
-  for (const [key, value] of Object.entries(supabaseHeaders())) headers.set(key, value);
+  headers.set('apikey', SUPABASE_SECRET_KEY);
+  headers.set('content-type', 'application/json');
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...init, headers });
 }
 
@@ -45,16 +34,11 @@ export async function requireUser(request: Request): Promise<SupabaseUser> {
   const auth = request.headers.get('authorization') || '';
   const match = auth.match(/^Bearer\s+(.+)$/i);
   if (!match) throw new Error('Authentication required.');
-
   if (configError()) throw new Error('Supabase server configuration is missing.');
 
   const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-    headers: {
-      apikey: SUPABASE_SECRET_KEY,
-      Authorization: `Bearer ${match[1]}`,
-    },
+    headers: { apikey: SUPABASE_SECRET_KEY, Authorization: `Bearer ${match[1]}` },
   });
-
   if (!response.ok) throw new Error('Invalid or expired authentication session.');
 
   const user = (await response.json()) as SupabaseUser;
@@ -63,29 +47,29 @@ export async function requireUser(request: Request): Promise<SupabaseUser> {
 }
 
 export async function getEntitlement(userId: string, provider?: string): Promise<Entitlement | null> {
-  const params = new URLSearchParams({
-    select: '*',
-    user_id: `eq.${userId}`,
-    limit: '10',
-  });
+  const params = new URLSearchParams({ select: '*', user_id: `eq.${userId}`, limit: '10' });
   if (provider) params.set('provider', `eq.${provider}`);
-
   const response = await supabaseRest(`pro_entitlements?${params.toString()}`);
   if (!response.ok) throw new Error('Failed to read Pro entitlement.');
-
   const rows = (await response.json()) as Entitlement[];
   return rows[0] ?? null;
 }
 
 export async function getEntitlements(userId: string): Promise<Entitlement[]> {
-  const params = new URLSearchParams({
-    select: '*',
-    user_id: `eq.${userId}`,
-    limit: '10',
-  });
+  const params = new URLSearchParams({ select: '*', user_id: `eq.${userId}`, limit: '10' });
   const response = await supabaseRest(`pro_entitlements?${params.toString()}`);
   if (!response.ok) throw new Error('Failed to read Pro entitlements.');
   return (await response.json()) as Entitlement[];
+}
+
+export async function getEntitlementByField(field: string, value: string): Promise<Entitlement | null> {
+  const allowed = new Set(['stripe_session_id', 'stripe_subscription_id', 'stripe_payment_intent_id', 'lemon_order_id', 'lemon_subscription_id']);
+  if (!allowed.has(field)) throw new Error('Unsupported entitlement lookup.');
+  const params = new URLSearchParams({ select: '*', [field]: `eq.${value}`, limit: '1' });
+  const response = await supabaseRest(`pro_entitlements?${params.toString()}`);
+  if (!response.ok) throw new Error('Failed to read provider entitlement.');
+  const rows = (await response.json()) as Entitlement[];
+  return rows[0] ?? null;
 }
 
 export async function upsertEntitlement(row: Record<string, unknown>): Promise<void> {
@@ -111,31 +95,20 @@ export async function claimWebhookEvent(provider: 'stripe' | 'lemon-squeezy', ev
   return rows.length > 0;
 }
 
-export async function markWebhookEvent(eventId: string, status: 'processed' | 'failed', errorCode?: string): Promise<void> {
-  const params = new URLSearchParams({ event_id: `eq.${eventId}` });
+export async function markWebhookEvent(provider: 'stripe' | 'lemon-squeezy', eventId: string, status: 'processed' | 'failed', errorCode?: string): Promise<void> {
+  const params = new URLSearchParams({ provider: `eq.${provider}`, event_id: `eq.${eventId}` });
   await supabaseRest(`billing_webhook_events?${params.toString()}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({
-      status,
-      error_code: errorCode ?? null,
-      processed_at: new Date().toISOString(),
-    }),
+    body: JSON.stringify({ status, error_code: errorCode ?? null, processed_at: new Date().toISOString() }),
   });
 }
 
 export function isEntitlementActive(row: Entitlement | null): boolean {
   if (!row) return false;
   if (row.plan === 'lifetime' && row.status === 'active' && !row.expires_at) return true;
-
-  if (row.status === 'active') {
-    return !row.expires_at || Date.parse(row.expires_at) > Date.now();
-  }
-
-  if (row.status === 'cancelled') {
-    return Boolean(row.expires_at && Date.parse(row.expires_at) > Date.now());
-  }
-
+  if (row.status === 'active') return !row.expires_at || Date.parse(row.expires_at) > Date.now();
+  if (row.status === 'cancelled') return Boolean(row.expires_at && Date.parse(row.expires_at) > Date.now());
   return false;
 }
 
