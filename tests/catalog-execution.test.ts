@@ -22,6 +22,13 @@ const inputFor = (tool: (typeof TOOLS_CATALOG)[number]) => {
 describe('535-tool catalog execution smoke oracle', () => {
   it('measures route coverage without converting smoke into semantic PASS claims', () => {
     expect(TOOLS_CATALOG).toHaveLength(535);
+    const ids = TOOLS_CATALOG.map(tool => tool.id);
+    const names = TOOLS_CATALOG.map(tool => tool.name);
+    expect(new Set(ids).size).toBe(535);
+    expect(new Set(names).size).toBe(535);
+    expect(ids.every(Boolean)).toBe(true);
+    expect(names.every(Boolean)).toBe(true);
+
     const rows = TOOLS_CATALOG.map(tool => {
       const result = executeTool(tool, inputFor(tool));
       return { id: tool.id, routed: Boolean(result.output), error: result.error ?? '' };
