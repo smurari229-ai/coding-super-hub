@@ -1,6 +1,8 @@
+import crypto from 'node:crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import lemonHandler from '../api/verify-lemon-order';
 import stripeHandler from '../api/verify-stripe-session';
+import { POST as lemonWebhook } from '../api/lemon-webhook';
 
 const originalEnv = { ...process.env };
 
@@ -86,5 +88,66 @@ describe('payment verification URL handling', () => {
     const response = await lemonHandler(request);
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ verified: true, plan: 'lifetime' });
+  });
+});
+
+describe('Lemon Squeezy webhook signature handling', () => {
+  const secret = 'webhook-test-secret';
+
+  function configuredWebhookEnv() {
+    process.env.LEMON_SQUEEZY_WEBHOOK_SECRET = secret;
+    process.env.LEMON_SQUEEZY_STORE_ID = '1';
+    process.env.LEMON_SQUEEZY_MONTHLY_VARIANT_ID = '10';
+    process.env.LEMON_SQUEEZY_LIFETIME_VARIANT_ID = '20';
+  }
+
+  function signedRequest(body: string, signature = crypto.createHmac('sha256', secret).update(body, 'utf8').digest('hex')) {
+    return new Request('https://example.com/api/lemon-webhook', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-signature': signature,
+      },
+      body,
+    });
+  }
+
+  it('rejects an invalid signature before processing the payload', async () => {
+    configuredWebhookEnv();
+    const body = JSON.stringify({
+      meta: { event_name: 'order_created' },
+      data: {
+        type: 'orders',
+        id: '123',
+        attributes: { store_id: 1, variant_id: 20 },
+      },
+    });
+
+    const response = await lemonWebhook(signedRequest(body, 'invalid'));
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      received: false,
+      error: 'Invalid webhook signature.',
+    });
+  });
+
+  it('accepts a valid signed webhook and does not grant browser-local entitlement', async () => {
+    configuredWebhookEnv();
+    const body = JSON.stringify({
+      meta: { event_name: 'order_created' },
+      data: {
+        type: 'orders',
+        id: '123',
+        attributes: { store_id: 1, variant_id: 20 },
+      },
+    });
+
+    const response = await lemonWebhook(signedRequest(body));
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      received: true,
+      processed: false,
+      event: 'order_created',
+    });
   });
 });
