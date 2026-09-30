@@ -133,6 +133,7 @@ export async function markWebhookEvent(provider: 'stripe' | 'lemon-squeezy', eve
     headers: { Prefer: 'return=minimal' },
     body: JSON.stringify({ status, error_code: errorCode ?? null, processed_at: new Date().toISOString() }),
   });
+  if (!response.ok) throw new Error('Failed to update webhook event state.');
 }
 
 export function isEntitlementActive(row: Entitlement | null): boolean {
