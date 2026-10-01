@@ -108,6 +108,12 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('json-key-sorter', 'JSON Key Sorter'), '{"z":1,"a":2}').output).toContain('"a": 2');
   });
 
+  it('calculates speed, distance, and time from clear inputs', () => {
+    expect(executeTool(tool('speed-distance-time', 'Speed Distance Time'), '100 2').output).toContain('Speed: 50');
+    expect(executeTool(tool('speed-distance-time', 'Speed Distance Time'), 'distance=100\ntime=2').output).toContain('Speed: 50');
+    expect(executeTool(tool('speed-distance-time', 'Speed Distance Time'), 'speed=50\ntime=2').output).toContain('Distance: 100');
+  });
+
   it('covers deterministic calculators', () => {
     expect(executeTool(tool('percentage-calculator', 'Percentage'), '20 200').output).toContain('X% of Y: 40');
     expect(executeTool(tool('gcd-lcm-calculator', 'GCD LCM'), '12 18').output).toContain('GCD: 6');
