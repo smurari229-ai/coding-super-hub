@@ -196,6 +196,7 @@ const randomToken = (length: number) => {
 
 const defaultInput = (tool: ToolItem) => {
   if (tool.defaultInput) return tool.defaultInput;
+  if (tool.id === 'speed-distance-time') return '100 2';
   if (has(tool, 'json')) return '{\n  "name": "Coding Super Hub",\n  "active": true\n}';
   if (has(tool, 'url')) return 'https://example.com/search?q=hello world';
   if (has(tool, 'base64', 'hex', 'binary')) return 'Hello, Coding Super Hub!';
@@ -1143,7 +1144,33 @@ const roiBatch4: Handler = (tool, input) => {
     case 'trigonometry-sin-cos-tan': {if(!Number.isFinite(n[0]))throw new Error('Enter an angle in degrees.');const r=n[0]*Math.PI/180;return 'sin: '+Math.sin(r)+'\ncos: '+Math.cos(r)+'\ntan: '+Math.tan(r);}
     case 'hyperbolic-functions-calc': {const x=n[0];if(!Number.isFinite(x))throw new Error('Enter a number.');return 'sinh: '+Math.sinh(x)+'\ncosh: '+Math.cosh(x)+'\ntanh: '+Math.tanh(x);}
     case 'aspect-ratio-scale-calc': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Scaled height: '+n[2]*n[0]/n[1];}
-    case 'speed-distance-time': {if(n.length<2)throw new Error('Enter two numeric values.');return 'Ratio: '+n[0]/n[1]+'\nProduct: '+n[0]*n[1];}
+    case 'speed-distance-time': {
+      const labeled: Record<string, number> = {};
+      for (const [key, value] of input.matchAll(/\b(distance|speed|time)\s*[:=]\s*(-?\d+(?:\.\d+)?)/gi)) {
+        labeled[key[1].toLowerCase()] = Number(value);
+      }
+      if (Object.keys(labeled).length >= 2) {
+        const distance = labeled.distance;
+        const speed = labeled.speed;
+        const time = labeled.time;
+        if (distance !== undefined && speed !== undefined) {
+          if (speed === 0) throw new Error('Speed must be non-zero to calculate time.');
+          return 'Distance: '+distance+'\nSpeed: '+speed+'\nTime: '+distance/speed;
+        }
+        if (distance !== undefined && time !== undefined) {
+          if (time === 0) throw new Error('Time must be non-zero to calculate speed.');
+          return 'Distance: '+distance+'\nTime: '+time+'\nSpeed: '+distance/time;
+        }
+        if (speed !== undefined && time !== undefined) {
+          return 'Speed: '+speed+'\nTime: '+time+'\nDistance: '+speed*time;
+        }
+      }
+      if (n.length === 2) {
+        if (n[1] === 0) throw new Error('Time must be non-zero. Input is interpreted as distance then time.');
+        return 'Distance: '+n[0]+'\nTime: '+n[1]+'\nSpeed: '+n[0]/n[1];
+      }
+      throw new Error('Enter two values as distance then time, or label two values as distance=, speed=, or time=.');
+    }
     case 'http-status-explorer': return '200 OK\n201 Created\n204 No Content\n301/302 Redirect\n400 Bad Request\n401 Unauthorized\n403 Forbidden\n404 Not Found\n409 Conflict\n422 Unprocessable Content\n429 Too Many Requests\n500 Internal Server Error\n502 Bad Gateway\n503 Service Unavailable';
     case 'port-numbers-database': return '20/21 FTP\n22 SSH\n25 SMTP\n53 DNS\n80 HTTP\n110 POP3\n143 IMAP\n443 HTTPS\n3306 MySQL\n5432 PostgreSQL\n6379 Redis\n27017 MongoDB';
     case 'git-command-cheatsheet': return 'git status\ngit add .\ngit commit -m "message"\ngit switch -c feature/name\ngit pull --rebase\ngit log --oneline --decorate --graph\ngit diff\ngit stash';
