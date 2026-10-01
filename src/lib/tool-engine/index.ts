@@ -622,8 +622,8 @@ const roiBatch8: Handler = (tool, input) => {
       const rows = parseCsv(input);
       if (!rows.length) throw new Error('Enter CSV rows.');
       const esc = (v: string) => encodeHtml(v);
-      return '<table>\\n<thead><tr>' + rows[0].map(v => '<th>' + esc(v) + '</th>').join('') + '</tr></thead>\\n<tbody>\\n' +
-        rows.slice(1).map(row => '<tr>' + row.map(v => '<td>' + esc(v) + '</td>').join('') + '</tr>').join('\n') + '\n</tbody>\\n</table>';
+      return '<table>\n<thead><tr>' + rows[0].map(v => '<th>' + esc(v) + '</th>').join('') + '</tr></thead>\n<tbody>\n' +
+        rows.slice(1).map(row => '<tr>' + row.map(v => '<td>' + esc(v) + '</td>').join('') + '</tr>').join('\n') + '\n</tbody>\n</table>';
     }
     case 'html-form-builder':
       return '<form method="post" action="/submit">\n  <label for="email">Email</label>\n  <input id="email" name="email" type="email" required>\n  <button type="submit">Submit</button>\n</form>';
@@ -645,12 +645,12 @@ const roiBatch8: Handler = (tool, input) => {
     case 'css-triangle-generator': {
       const size = Math.max(1, Math.min(500, Math.trunc(nums[0] ?? 40)));
       const color = /^#?[0-9a-f]{3,8}$/i.test((input.split(/\s+/)[1] ?? '')) ? input.split(/\s+/)[1] : '#333';
-      return '.triangle {\\n  width: 0; height: 0;\\n  border-left: ' + size / 2 + 'px solid transparent;\\n  border-right: ' + size / 2 + 'px solid transparent;\\n  border-bottom: ' + size + 'px solid ' + color + ';\\n}';
+      return '.triangle {\n  width: 0; height: 0;\n  border-left: ' + size / 2 + 'px solid transparent;\n  border-right: ' + size / 2 + 'px solid transparent;\n  border-bottom: ' + size + 'px solid ' + color + ';\n}';
     }
     case 'css-ribbon-banner':
       return '.ribbon { position: relative; display: inline-block; padding: 0.4rem 1rem; background: #111827; color: #fff; transform: rotate(-3deg); }';
     case 'css-scrollbar-customizer':
-      return '::-webkit-scrollbar { width: 10px; }\\n::-webkit-scrollbar-thumb { background: #888; border-radius: 5px; }\\n* { scrollbar-width: thin; }';
+      return '::-webkit-scrollbar { width: 10px; }\n::-webkit-scrollbar-thumb { background: #888; border-radius: 5px; }\n* { scrollbar-width: thin; }';
     case 'user-agent-parser': {
       const ua = input.trim();
       if (!ua) throw new Error('Enter a User-Agent string.');
