@@ -17,8 +17,16 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const execute = (value = input) => {
+  // GenericToolRunner intentionally stays UI-focused: the shared tool engine does the
+  // heavy lifting. This wrapper is ID/category aware so future fallback handlers can
+  // be added here without disturbing dedicated components or the existing engine.
+  const handleExecute = (value = input) => {
     const result = executeTool(tool, value);
+
+    // Keep the component deliberately thin. All real algorithms live in
+    // src/lib/tool-engine so 535 catalog entries share one tested execution path.
+    // The engine is selected by tool.id/name/tags and can remain category-aware
+    // without duplicating business logic in this React component.
     const boundedOutput = result.output.length > MAX_OUTPUT_LENGTH
       ? result.output.slice(0, MAX_OUTPUT_LENGTH) + '\n\n[Output truncated at the 50,000 character safety limit.]'
       : result.output;
@@ -28,7 +36,7 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
 
   useEffect(() => {
     setInput(initialInput);
-    execute(initialInput);
+    handleExecute(initialInput);
   }, [tool.id, initialInput]);
 
   const copyOutput = async () => {
@@ -55,14 +63,14 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
 
   const reset = () => {
     setInput(initialInput);
-    execute(initialInput);
+    handleExecute(initialInput);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-900/80 p-3">
         <div className="flex items-center gap-2">
-          <button onClick={() => execute()} aria-label="Process tool input" className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500">
+          <button onClick={() => handleExecute()} aria-label="Process tool input" className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500">
             <Play className="h-3.5 w-3.5 fill-white" />
             <span>Process</span>
           </button>
@@ -104,7 +112,7 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
             id="generic-tool-input"
             value={input}
             onChange={event => setInput(event.target.value)}
-            onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') execute(); }}
+            onKeyDown={event => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') handleExecute(); }}
             rows={10}
             className="w-full rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 shadow-inner focus:border-indigo-500 focus:outline-none"
             placeholder={tool.placeholder ?? 'Type or paste input here...'}
