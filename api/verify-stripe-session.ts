@@ -10,6 +10,11 @@ function getClientIp(request: Request): string {
 function verificationRateLimited(request: Request): boolean {
   const ip = getClientIp(request);
   const now = Date.now();
+  if (verifyRateStore.size > 5000) {
+    for (const [key, entry] of verifyRateStore) {
+      if (entry.resetAt <= now) verifyRateStore.delete(key);
+    }
+  }
   const current = verifyRateStore.get(ip);
   if (!current || current.resetAt <= now) {
     verifyRateStore.set(ip, { count: 1, resetAt: now + VERIFY_WINDOW_MS });
