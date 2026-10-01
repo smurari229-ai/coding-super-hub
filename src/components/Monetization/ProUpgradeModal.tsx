@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { X, Check, Zap, CreditCard, ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
-import { getProStatus, setProStatus, verifyLemonOrder, verifyStripeSession } from '../../lib/pro';
+import { getProStatus, verifyLemonOrder, verifyStripeSession } from '../../lib/pro';
 
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
