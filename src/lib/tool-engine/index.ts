@@ -1143,7 +1143,7 @@ const roiBatch4: Handler = (tool, input) => {
     case 'trigonometry-sin-cos-tan': {if(!Number.isFinite(n[0]))throw new Error('Enter an angle in degrees.');const r=n[0]*Math.PI/180;return 'sin: '+Math.sin(r)+'\ncos: '+Math.cos(r)+'\ntan: '+Math.tan(r);}
     case 'hyperbolic-functions-calc': {const x=n[0];if(!Number.isFinite(x))throw new Error('Enter a number.');return 'sinh: '+Math.sinh(x)+'\ncosh: '+Math.cosh(x)+'\ntanh: '+Math.tanh(x);}
     case 'aspect-ratio-scale-calc': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Scaled height: '+n[2]*n[0]/n[1];}
-    case 'speed-distance-time': {if(n.length<2)throw new Error('Enter two numeric values.');return 'Ratio: '+n[0]/n[1]+'\nProduct: '+n[0]*n[1];}
+    case 'speed-distance-time': { const lower=input.toLowerCase(); const speed=lower.match(/speed\s*[=:]\s*(-?\d+(?:\.\d+)?)/)?.[1]; const distance=lower.match(/distance\s*[=:]\s*(-?\d+(?:\.\d+)?)/)?.[1]; const time=lower.match(/time\s*[=:]\s*(-?\d+(?:\.\d+)?)/)?.[1]; if(speed!==undefined&&distance!==undefined&&time===undefined&&Number(speed)!==0)return 'Time: '+Number(distance)/Number(speed)+' hours'; if(speed!==undefined&&time!==undefined&&distance===undefined)return 'Distance: '+Number(speed)*Number(time)+' km'; if(distance!==undefined&&time!==undefined&&time!=='0')return 'Speed: '+Number(distance)/Number(time)+' km/h'; if(n.length>=3)return 'Speed: '+n[0]+' km/h\nDistance: '+n[1]+' km\nTime: '+n[2]+' hours'; if(n.length>=2&&n[0]!==0)return 'Time: '+n[1]/n[0]+' hours'; throw new Error('Enter two values, or use speed=, distance=, and time= labels.'); }}
     case 'http-status-explorer': return '200 OK\n201 Created\n204 No Content\n301/302 Redirect\n400 Bad Request\n401 Unauthorized\n403 Forbidden\n404 Not Found\n409 Conflict\n422 Unprocessable Content\n429 Too Many Requests\n500 Internal Server Error\n502 Bad Gateway\n503 Service Unavailable';
     case 'port-numbers-database': return '20/21 FTP\n22 SSH\n25 SMTP\n53 DNS\n80 HTTP\n110 POP3\n143 IMAP\n443 HTTPS\n3306 MySQL\n5432 PostgreSQL\n6379 Redis\n27017 MongoDB';
     case 'git-command-cheatsheet': return 'git status\ngit add .\ngit commit -m "message"\ngit switch -c feature/name\ngit pull --rebase\ngit log --oneline --decorate --graph\ngit diff\ngit stash';
@@ -1211,12 +1211,12 @@ const roiBatch6: Handler = (tool, input) => {
     case 'standard-normal-z-score': {const x=n[0],mean=n[1]??0,sd=n[2]??1;if(!Number.isFinite(x)||sd<=0)throw new Error('Enter value, mean, and positive standard deviation.');return 'Z-score: '+((x-mean)/sd);}
     case 'dpi-ppi-calculator': {if(n.length<2||n[1]<=0)throw new Error('Enter pixels and physical size.');return 'Density: '+n[0]/n[1]+' px/unit';}
     case 'aspect-ratio-calculator': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Target height: '+n[2]*n[1]/n[0];}
-    case 'average-mean-median-mode': return null;
+    case 'average-mean-median-mode': { if(!n.length)throw new Error('Enter at least one number.'); const sorted=[...n].sort((a,b)=>a-b); const mean=n.reduce((s,v)=>s+v,0)/n.length; const mid=Math.floor(sorted.length/2); const median=sorted.length%2?sorted[mid]:(sorted[mid-1]+sorted[mid])/2; const counts=new Map<number,number>(); n.forEach(v=>counts.set(v,(counts.get(v)??0)+1)); const max=Math.max(...counts.values()); const modes=max>1?[...counts.entries()].filter(([,count])=>count===max).map(([v])=>v):[]; const variance=n.reduce((s,v)=>s+(v-mean)**2,0)/n.length; return 'Mean: '+mean+'\nMedian: '+median+'\nMode: '+(modes.length?modes.join(', '):'none')+'\nRange: '+(sorted.at(-1)!-sorted[0])+'\nPopulation variance: '+variance; }
     case 'big-o-notation-cheatsheet': return 'O(1): constant\nO(log n): binary search\nO(n): single pass\nO(n log n): efficient comparison sort\nO(n²): nested pairwise loops\nO(2^n): subset-style recursion';
-    case 'modulo-arithmetic-calc': return null;
-    case 'logarithm-calculator': return null;
-    case 'pythagorean-theorem-calc': return null;
-    case 'circle-area-perimeter': return null;
+    case 'modulo-arithmetic-calc': { if(n.length<2||n[1]===0)throw new Error('Enter a number and non-zero modulus.'); const m=Math.abs(n[1]); return 'A mod B: '+n[0]%n[1]+'\nNormalized modulo: '+(((n[0]%m)+m)%m); }
+    case 'logarithm-calculator': { if(!n.length||n[0]<=0)throw new Error('Enter a positive number.'); const out=['ln: '+Math.log(n[0]),'log10: '+Math.log10(n[0]),'log2: '+Math.log2(n[0])]; if(n.length>=2){if(n[1]<=0||n[1]===1)throw new Error('Custom base must be positive and not 1.'); out.push('custom log base '+n[1]+': '+Math.log(n[0])/Math.log(n[1]));} return out.join('\n'); }
+    case 'pythagorean-theorem-calc': { if(n.length<2||n[0]<0||n[1]<0)throw new Error('Enter two non-negative known side lengths.'); return 'Hypotenuse: '+Math.hypot(n[0],n[1]); }
+    case 'circle-area-perimeter': { if(!n.length||n[0]<0)throw new Error('Enter a non-negative radius.'); const r=n[0]; return 'Radius: '+r+'\nDiameter: '+r*2+'\nArea: '+Math.PI*r*r+'\nCircumference: '+2*Math.PI*r; }
     default:return null;
   }
 };
