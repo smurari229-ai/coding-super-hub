@@ -1,5 +1,32 @@
 import crypto from 'node:crypto';
 
+const WEBHOOK_WINDOW_MS = 60_000;
+const WEBHOOK_MAX_REQUESTS = 60;
+const webhookRateStore = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for') ?? '';
+  return forwarded.split(',')[0]?.trim() || 'unknown';
+}
+
+function webhookRateLimited(request: Request): boolean {
+  const ip = getClientIp(request);
+  const now = Date.now();
+  if (webhookRateStore.size > 5000) {
+    for (const [key, entry] of webhookRateStore) {
+      if (entry.resetAt <= now) webhookRateStore.delete(key);
+    }
+  }
+  const current = webhookRateStore.get(ip);
+  if (!current || current.resetAt <= now) {
+    webhookRateStore.set(ip, { count: 1, resetAt: now + WEBHOOK_WINDOW_MS });
+    return false;
+  }
+  if (current.count >= WEBHOOK_MAX_REQUESTS) return true;
+  current.count += 1;
+  return false;
+}
+
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -29,6 +56,10 @@ function isValidSignature(rawBody: string, signature: string, secret: string): b
 export async function POST(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ received: false, error: 'Method not allowed' }, 405);
+  }
+
+  if (webhookRateLimited(request)) {
+    return json({ received: false, error: 'Too many webhook requests. Please try again later.' }, 429);
   }
 
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET?.trim();
