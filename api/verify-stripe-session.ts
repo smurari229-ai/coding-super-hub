@@ -97,6 +97,10 @@ export default async function handler(request: Request): Promise<Response> {
     const payload = (await response.json()) as {
       payment_status?: string;
       status?: string;
+      mode?: string;
+      subscription?: {
+        status?: string;
+      } | string | null;
       line_items?: {
         data?: Array<{ price?: { id?: string } }>;
       };
@@ -112,6 +116,20 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (payload.payment_status !== 'paid' || payload.status !== 'complete' || !plan) {
       return json({ verified: false, error: 'Stripe payment is not an eligible paid Pro checkout.' }, 403);
+    }
+
+    // Monthly Pro must remain backed by a live Stripe subscription. A completed
+    // Checkout Session can remain "complete" even after its subscription is
+    // cancelled, so session payment status alone is not durable subscription proof.
+    if (plan === 'monthly') {
+      const subscription =
+        typeof payload.subscription === 'object' && payload.subscription !== null
+          ? payload.subscription
+          : null;
+      const subscriptionStatus = subscription?.status;
+      if (payload.mode !== 'subscription' || !['active', 'trialing'].includes(subscriptionStatus ?? '')) {
+        return json({ verified: false, error: 'Stripe Pro subscription is no longer active.' }, 403);
+      }
     }
 
     return json({ verified: true, plan });
