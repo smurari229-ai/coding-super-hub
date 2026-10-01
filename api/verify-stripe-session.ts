@@ -1,3 +1,25 @@
+const VERIFY_WINDOW_MS = 60_000;
+const VERIFY_MAX_REQUESTS = 20;
+const verifyRateStore = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for') ?? '';
+  return forwarded.split(',')[0]?.trim() || 'unknown';
+}
+
+function verificationRateLimited(request: Request): boolean {
+  const ip = getClientIp(request);
+  const now = Date.now();
+  const current = verifyRateStore.get(ip);
+  if (!current || current.resetAt <= now) {
+    verifyRateStore.set(ip, { count: 1, resetAt: now + VERIFY_WINDOW_MS });
+    return false;
+  }
+  if (current.count >= VERIFY_MAX_REQUESTS) return true;
+  current.count += 1;
+  return false;
+}
+
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -33,6 +55,10 @@ function resolveRequestUrl(request: Request): URL {
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'GET') {
     return json({ verified: false, error: 'Method not allowed' }, 405);
+  }
+
+  if (verificationRateLimited(request)) {
+    return json({ verified: false, error: 'Too many verification requests. Please try again later.' }, 429);
   }
 
   const url = resolveRequestUrl(request);
