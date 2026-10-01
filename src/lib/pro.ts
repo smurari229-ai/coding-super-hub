@@ -43,7 +43,7 @@ export function isProUser(): boolean {
   return getProStatus().active;
 }
 
-export function setProStatus(
+function setProStatus(
   active: boolean,
   details: Omit<ProStatus, 'active'> = {}
 ): void {
