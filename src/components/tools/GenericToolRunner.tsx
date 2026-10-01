@@ -20,7 +20,7 @@ const categoryFallback = async (tool: ToolItem, input: string): Promise<string |
   const text = input.trim();
 
   // Text & String: common transforms that are safe to run entirely in the browser.
-  if (contains(tool, 'case', 'camel', 'snake', 'kebab', 'pascal')) {
+  if (/(case|camel|snake|kebab|pascal|constant|title)-?converter|case-converter/.test(id)) {
     const words = text.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_\-./]+/g, ' ').trim().split(/\s+/).filter(Boolean);
     if (id.includes('camel')) return words.map((w,i) => i ? w.charAt(0).toUpperCase()+w.slice(1).toLowerCase() : w.toLowerCase()).join('');
     if (id.includes('pascal')) return words.map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join('');
@@ -91,22 +91,22 @@ const categoryFallback = async (tool: ToolItem, input: string): Promise<string |
     return ['X% of Y: '+(n[0]*n[1]/100), 'X as % of Y: '+(n[1] ? (n[0]/n[1]*100).toFixed(2)+'%' : 'N/A'), 'Change X→Y: '+(n[0] ? ((n[1]-n[0])/Math.abs(n[0])*100).toFixed(2)+'%' : 'N/A')].join('\n');
   }
 
-  if (contains(tool, 'byte', 'bytes') && (contains(tool, 'converter', 'convert'))) {
+  if (/(byte|bytes).*(converter|convert)|byte-converter/.test(id)) {
     const n = Number(text.match(/-?\d+(?:\.\d+)?/)?.[0]);
     if (!Number.isFinite(n)) throw new Error('Enter a numeric byte value.');
     return ['Bytes: '+n, 'KiB: '+(n/1024), 'MiB: '+(n/1024**2), 'GiB: '+(n/1024**3)].join('\n');
   }
 
-  if (contains(tool, 'password', 'strength')) {
+  if (id.includes('password-strength') || id.includes('password-checker')) {
     const score = [text.length >= 12, /[a-z]/.test(text), /[A-Z]/.test(text), /\d/.test(text), /[^A-Za-z0-9]/.test(text)].filter(Boolean).length;
     return ['Length: '+text.length, 'Score: '+score+'/5', 'Rating: '+(score>=4?'Strong':score===3?'Fair':score>=2?'Weak':'Very weak')].join('\n');
   }
 
-  if (contains(tool, 'uuid') && (id.includes('generator') || id.includes('uuid'))) {
+  if ((id.includes('uuid') || id.includes('guid')) && id.includes('generator')) {
     return crypto.randomUUID();
   }
 
-  if (contains(tool, 'sha-256', 'sha256', 'hash')) {
+  if (id.includes('sha-256') || id.includes('sha256')) {
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
     return Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2,'0')).join('');
   }
