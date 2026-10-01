@@ -82,7 +82,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   try {
     const response = await fetch(
-      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand%5B%5D=line_items.data.price`,
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand%5B%5D=line_items.data.price&expand%5B%5D=subscription`,
       {
         headers: {
           Authorization: `Bearer ${secretKey}`,
