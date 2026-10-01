@@ -162,9 +162,7 @@ export default async function handler(request: Request): Promise<Response> {
 
       const subscriptionValid =
         subscriptionVariant === monthlyVariant &&
-        ['on_trial', 'active', 'paused', 'past_due', 'unpaid', 'cancelled'].includes(
-          subscriptionStatus ?? ''
-        ) &&
+        ['on_trial', 'active', 'cancelled'].includes(subscriptionStatus ?? '') &&
         cancelledStillValid;
 
       if (!subscriptionValid) {
