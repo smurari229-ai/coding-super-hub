@@ -21,6 +21,8 @@ describe('payment verification URL handling', () => {
       new Response(JSON.stringify({
         payment_status: 'paid',
         status: 'complete',
+        mode: 'subscription',
+        subscription: { status: 'active' },
         line_items: { data: [{ price: { id: 'price_monthly' } }] },
       }), { status: 200 })
     ));
@@ -46,6 +48,7 @@ describe('payment verification URL handling', () => {
       new Response(JSON.stringify({
         payment_status: 'paid',
         status: 'complete',
+        mode: 'payment',
         line_items: { data: [{ price: { id: 'price_lifetime' } }] },
       }), { status: 200 })
     ));
