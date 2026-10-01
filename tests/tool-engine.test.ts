@@ -108,6 +108,15 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('json-key-sorter', 'JSON Key Sorter'), '{"z":1,"a":2}').output).toContain('"a": 2');
   });
 
+  it('covers previously incomplete math calculators', () => {
+    expect(executeTool(tool('average-mean-median-mode', 'Statistics'), '1 2 2 4').output).toContain('Mean: 2.25');
+    expect(executeTool(tool('modulo-arithmetic-calc', 'Modulo'), '-5 3').output).toContain('Normalized modulo: 1');
+    expect(executeTool(tool('logarithm-calculator', 'Logarithm'), '100 10').output).toContain('custom log base 10: 2');
+    expect(executeTool(tool('pythagorean-theorem-calc', 'Pythagorean'), '3 4').output).toContain('Hypotenuse: 5');
+    expect(executeTool(tool('circle-area-perimeter', 'Circle'), '2').output).toContain('Diameter: 4');
+    expect(executeTool(tool('speed-distance-time', 'Speed Distance Time'), 'speed=60 distance=120').output).toContain('Time: 2 hours');
+  });
+
   it('covers deterministic calculators', () => {
     expect(executeTool(tool('percentage-calculator', 'Percentage'), '20 200').output).toContain('X% of Y: 40');
     expect(executeTool(tool('gcd-lcm-calculator', 'GCD LCM'), '12 18').output).toContain('GCD: 6');
