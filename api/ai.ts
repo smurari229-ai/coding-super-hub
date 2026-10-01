@@ -16,6 +16,11 @@ function getClientIp(req: any): string {
 
 function rateLimited(ip: string): boolean {
   const now = Date.now();
+  if (rateStore.size > 5000) {
+    for (const [key, entry] of rateStore) {
+      if (entry.resetAt <= now) rateStore.delete(key);
+    }
+  }
   const current = rateStore.get(ip);
   if (!current || current.resetAt <= now) {
     rateStore.set(ip, { count: 1, resetAt: now + WINDOW_MS });
