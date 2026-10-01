@@ -4,6 +4,7 @@ const MAX_CODE_LENGTH = 20_000;
 const MAX_INSTRUCTION_LENGTH = 4_000;
 const MAX_BODY_LENGTH = 26_000;
 const MAX_REQUESTS_PER_WINDOW = 10;
+const MAX_RESPONSE_LENGTH = 12_000;
 const WINDOW_MS = 60_000;
 
 type RateEntry = { count: number; resetAt: number };
@@ -84,7 +85,10 @@ export default async function handler(req: any, res: any) {
     });
     const text = typeof result.text === 'string' ? result.text : '';
     if (!text) return send(res, 502, { error: 'AI provider returned no text response' });
-    return send(res, 200, { text });
+    const boundedText = text.length > MAX_RESPONSE_LENGTH
+      ? text.slice(0, MAX_RESPONSE_LENGTH) + '\n\n[Response truncated at the 12,000 character safety limit.]'
+      : text;
+    return send(res, 200, { text: boundedText });
   } catch {
     return send(res, 502, { error: 'AI provider request failed' });
   }
