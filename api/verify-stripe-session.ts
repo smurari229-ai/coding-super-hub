@@ -130,6 +130,8 @@ export default async function handler(request: Request): Promise<Response> {
       if (payload.mode !== 'subscription' || !['active', 'trialing'].includes(subscriptionStatus ?? '')) {
         return json({ verified: false, error: 'Stripe Pro subscription is no longer active.' }, 403);
       }
+    } else if (payload.mode !== 'payment') {
+      return json({ verified: false, error: 'Stripe lifetime Pro checkout must use one-time payment mode.' }, 403);
     }
 
     return json({ verified: true, plan });
