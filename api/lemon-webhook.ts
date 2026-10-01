@@ -41,6 +41,9 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const rawBody = await request.text();
+  if (rawBody.length > 256_000) {
+    return json({ received: false, error: 'Webhook payload is too large.' }, 413);
+  }
   const signature = request.headers.get('x-signature')?.trim() ?? '';
 
   if (!isValidSignature(rawBody, signature, secret)) {
