@@ -1,3 +1,5 @@
+import { getAccessToken } from './auth';
+
 export const PRO_STORAGE_KEY = 'csh_pro_status';
 
 // localStorage is only a persistence hint. Pro access is granted in-memory
@@ -119,10 +121,13 @@ export function clearCheckoutReturn(): void {
 export async function verifyLemonOrder(orderId: string): Promise<ProStatus | null> {
   if (!orderId) return null;
 
+  const token = await getAccessToken();
+  if (!token) return null;
+
   try {
     const response = await fetch(
       `/api/verify-lemon-order?order_id=${encodeURIComponent(orderId)}`,
-      { headers: { Accept: 'application/json' } }
+      { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } }
     );
 
     if (!response.ok) return null;
@@ -149,10 +154,13 @@ export async function verifyLemonOrder(orderId: string): Promise<ProStatus | nul
 export async function verifyStripeSession(sessionId: string): Promise<ProStatus | null> {
   if (!sessionId) return null;
 
+  const token = await getAccessToken();
+  if (!token) return null;
+
   try {
     const response = await fetch(
       `/api/verify-stripe-session?session_id=${encodeURIComponent(sessionId)}`,
-      { headers: { Accept: 'application/json' } }
+      { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } }
     );
 
     if (!response.ok) return null;
