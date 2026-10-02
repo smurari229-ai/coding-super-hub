@@ -1146,8 +1146,9 @@ const roiBatch4: Handler = (tool, input) => {
     case 'aspect-ratio-scale-calc': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Scaled height: '+n[2]*n[0]/n[1];}
     case 'speed-distance-time': {
       const labeled: Record<string, number> = {};
-      for (const [key, value] of input.matchAll(/\b(distance|speed|time)\s*[:=]\s*(-?\d+(?:\.\d+)?)/gi)) {
-        labeled[key[1].toLowerCase()] = Number(value);
+      for (const line of input.split(/\r?\n/)) {
+        const match = line.match(/^\s*(distance|speed|time)\s*[:=]\s*(-?\d+(?:\.\d+)?)\s*$/i);
+        if (match) labeled[match[1].toLowerCase()] = Number(match[2]);
       }
       if (Object.keys(labeled).length >= 2) {
         const distance = labeled.distance;
