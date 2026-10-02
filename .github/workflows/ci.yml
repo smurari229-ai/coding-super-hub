@@ -25,7 +25,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: ${{ env.BUN_VERSION }}
-      - run: bun install --no-save
+      - run: bun install
       - uses: actions/upload-artifact@v4.6.2
         with:
           name: generated-bun-lock
