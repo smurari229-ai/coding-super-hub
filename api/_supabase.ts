@@ -40,7 +40,6 @@ export async function supabaseRest(path: string, init: RequestInit = {}) {
   const { url, key } = requireBaseAndSecret();
   const headers = new Headers(init.headers);
   headers.set('apikey', key);
-  headers.set('Authorization', 'Bearer ' + key);
   if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   return fetch(url + '/rest/v1/' + path.replace(/^\//, ''), { ...init, headers });
 }
@@ -101,7 +100,7 @@ export async function findUserIdByEmail(email: string): Promise<string | null> {
   const { url, key } = requireBaseAndSecret();
   for (let page = 1; page <= 20; page += 1) {
     const response = await fetch(url + '/auth/v1/admin/users?page=' + page + '&per_page=1000', {
-      headers: { apikey: key, Authorization: 'Bearer ' + key },
+      headers: { apikey: key },
     });
     if (!response.ok) return null;
     const data = await response.json().catch(() => null);
