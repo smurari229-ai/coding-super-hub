@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v5.0.0
+        with:
+          node-version: 20.19.4
+          package-manager-cache: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2.2.0
+        with:
+          bun-version: 1.4.0
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Verify
+        run: |
+          bun run lint
+          bun run test
+          bun run build
+
+      - name: Package build artifact
+        run: tar -czf "coding-super-hub-${{ inputs.tag }}.tar.gz" dist
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ inputs.tag }}" "coding-super-hub-${{ inputs.tag }}.tar.gz" \
+            --target "${{ github.sha }}" \
+            --title "${{ inputs.tag }}" \
+            --generate-notes
