@@ -1,3 +1,4 @@
+import { getAuthenticatedUser, upsertEntitlement } from './_supabase';
 const VERIFY_WINDOW_MS = 60_000;
 const VERIFY_MAX_REQUESTS = 20;
 const verifyRateStore = new Map<string, { count: number; resetAt: number }>();
@@ -66,6 +67,9 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ verified: false, error: 'Too many verification requests. Please try again later.' }, 429);
   }
 
+  const user = await getAuthenticatedUser(request);
+  if (!user?.id || !user.email) return json({ verified: false, error: 'Authenticated email is required.' }, 401);
+
   const url = resolveRequestUrl(request);
   const orderId = url.searchParams.get('order_id')?.trim();
 
@@ -121,6 +125,7 @@ export default async function handler(request: Request): Promise<Response> {
       String(attrs?.store_id ?? '') === storeId &&
       attrs?.status === 'paid' &&
       attrs?.refunded !== true &&
+      typeof attrs?.user_email === 'string' && attrs.user_email.trim().toLowerCase() === user.email.trim().toLowerCase() &&
       expectedPlan !== null;
 
     if (!verified) {
@@ -169,6 +174,18 @@ export default async function handler(request: Request): Promise<Response> {
         return json({ verified: false, error: 'Monthly Pro subscription is no longer active.' }, 403);
       }
     }
+
+    const subscriptionId = expectedPlan === 'monthly' ? String((subscriptionPayload.data?.[0] as any)?.id ?? '') : null;
+    const subscriptionAttrs = subscriptionPayload.data?.[0]?.attributes as any;
+    await upsertEntitlement({
+      user_id: user.id,
+      provider: 'lemon-squeezy',
+      plan: expectedPlan,
+      status: 'active',
+      expires_at: expectedPlan === 'monthly' && subscriptionAttrs?.status === 'cancelled' ? subscriptionAttrs?.ends_at ?? null : null,
+      lemon_order_id: orderId,
+      lemon_subscription_id: subscriptionId || null,
+    });
 
     return json({ verified: true, plan: expectedPlan });
   } catch {
