@@ -7,93 +7,91 @@
 - Catalog: **535 entries exactly**
 - Main: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current audit HEAD: `d9c2f772506822a3bee888fe2c2c78b5d2055c9b`
-- PR: **#4 OPEN**
-- Branch divergence vs main: **139 ahead / 44 behind**
-- Latest audit HEAD Vercel status: **SUCCESS**
+- Audit HEAD: **current branch tip; verified during this audit**
+- PR: **#4 OPEN / unmerged**
+- Current compare: **192 ahead / 44 behind main**
+- Latest verified audit CI for `5fe608d371739014ecef916e8bcc6125bbbe87fe`: **PASS** — install, typecheck, 38 tests, build.
+- Latest verified audit Vercel deployment for that same SHA: **READY**.
 
 ## Verified safeguards
 
-- No merge, rebase, force-push, history rewrite, or direct Main change performed.
+- No merge, rebase, force-push, history rewrite, or direct Main change performed during this audit.
 - Catalog identity guard asserts exactly 535 entries, 535 unique IDs, and 535 unique names.
 - Full catalog smoke oracle executes all 535 entries but is explicitly **not** a semantic correctness certificate.
-- Lemon webhook uses a named `POST` handler with signature/store validation.
-- Stripe/Lemon verification paths use safe relative-URL resolution for Vercel requests.
-- Payment regression tests and webhook signature tests are present.
-- No payment credentials or API secrets are committed.
+- AI now requires a verified Supabase Auth identity at the server boundary.
+- Free AI quota is server-authoritative and uses atomic Postgres reservation/release RPCs.
+- Durable Pro entitlement is stored in `public.pro_entitlements`.
+- Stripe and Lemon webhook processing uses `public.billing_webhook_events` for durable idempotency/retry state.
 - Client-local Pro state is not treated as durable billing authority.
+- No payment credentials or API secrets are committed.
 
 ## Engine / catalog
 
 - Catalog entries: **535**
 - Unique catalog IDs: **535**
+- Duplicate IDs: **0**
 - Unique catalog names: **535**
-- Explicit engine case clauses: **201**
-- Unique explicit handler IDs: **194**
+- Duplicate names: **0**
+- Category counts: text-string=85, crypto-security=64, web-frontend=102, data-formats=55, devops-network=75, math-algorithms=55, code-snippets=45, misc-productivity=54
 - Dedicated catalog mappings: **48**
 - Dedicated component types: **20**
-- Recent ROI expansion: **77 new unique explicit handler IDs**
 
-These handler counts are implementation measurements only. They are **not semantic PASS counts**.
+These handler/component counts are implementation measurements only. They are **not semantic PASS counts**.
 
 ## Full catalog oracle
 
-`tests/catalog-execution.test.ts`:
-- Executes all 535 catalog entries with deterministic smoke inputs.
-- Records routed outputs, Coming-soon responses, and runtime/validation errors.
-- Locks catalog identity invariants.
-- Does **not** convert smoke routing into semantic PASS claims.
+`tests/catalog-execution.test.ts` executes all 535 catalog entries with deterministic smoke inputs.
 
-Full deterministic semantic verification of the 535 tools remains open.
+Latest CI oracle:
 
-## Main/audit integration
+- Total: **535**
+- Routed with smoke input: **216**
+- Coming-soon: **267**
+- Runtime/validation errors: **52**
 
-GitHub compare currently reports:
+These results are smoke classifications, not semantic correctness claims. The 319 non-routed outcomes still require semantic triage.
 
-- Audit ahead of Main: **139 commits**
-- Main ahead of Audit: **44 commits**
-- Status: **diverged**
-- Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
+## Supabase / billing
 
-The 44 Main-only commits overlap materially with monetization, payment verification, AI, App, navigation, affiliates, and related files. They must be reconciled conflict-by-conflict; blind merging is not approved.
+Existing durable billing tables are reused:
+
+- `public.pro_entitlements`
+- `public.billing_webhook_events`
+
+AI quota uses the separate `public.ai_usage_daily` table with atomic reserve/release RPCs.
+
+Current database state verified during this audit:
+
+- RLS enabled on all three tables.
+- Billing webhook event uniqueness exists on `(provider,event_id)`.
+- Pro entitlement uniqueness exists per `(user_id,provider)` plus provider identifier indexes.
+- Supabase security/performance advisor review remains part of the release gate.
+- Current Auth user count is not yet sufficient for real end-to-end payment/AI smoke evidence.
 
 ## Production
 
-Production remains on Main commit `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`.
+Production remains protected and is **not promoted** by this audit.
 
-Therefore the audit fixes are **not yet production fixes**.
+Audit preview/deployment evidence is separate from production evidence.
 
-Production verification remains open for:
-- AI route
-- Stripe verification
-- Lemon verification
-- Lemon webhook
-- complete security-header set
+Remaining production/release verification includes:
+
+- authenticated AI Free/Pro runtime smoke
+- 10th/11th quota boundary
+- failed-Gemini quota release
+- real Stripe/Lemon webhook delivery
+- cancellation/expiry/refund/replay
+- security-header verification on the intended release deployment
 - browser smoke
 - mobile 375/390/412
 - accessibility
-
-Historical/current production runtime evidence showed Invalid URL errors on payment verification and Lemon webhook timeout errors on the Main deployment.
-
-## Pro entitlement
-
-Server-side payment verification exists, but durable server-side Pro entitlement persistence/authorization is **not implemented/evidenced**.
-
-The browser-local Pro flag must not be treated as billing authority.
+- semantic verification of the remaining catalog outcomes
+- safe reconciliation of the 44 Main-only commits before any merge decision
 
 ## Release gate
 
 **RELEASE GATE: BLOCKED**
 
-Remaining high-priority work:
+No production promotion or PR merge is authorized by this audit.
 
-1. Reconcile the 44 Main-only commits without overwriting safer audit changes.
-2. Fresh CI/build/test evidence for the latest audit HEAD.
-3. Execute and classify the full 535-tool semantic oracle.
-4. Verify dedicated tools and deep links in a real browser.
-5. Verify AI, Stripe, Lemon, webhook, and security headers on the integrated Preview.
-6. Verify mobile widths 375/390/412 and basic accessibility.
-7. Resolve or explicitly document the Pro entitlement boundary.
-8. Only after fresh Preview evidence, obtain explicit release approval before changing Production.
-
-**Do not merge or promote Production while the gate is BLOCKED.**
+**Do not merge PR #4 or change Main while the gate is BLOCKED.**
