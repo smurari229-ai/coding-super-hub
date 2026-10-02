@@ -2,9 +2,10 @@
 
 ## Current state
 - The repository contains UI components for Pro upgrade, sponsors, affiliates, ads, and transparency.
-- Server-side Stripe Checkout Session and Lemon Squeezy order verification endpoints are implemented and validate configured paid Pro products.
-- The Lemon Squeezy webhook endpoint verifies signed webhook payloads and validates the configured store/variants, but it does not persist entitlements or provide idempotent durable event processing.
-- No database-backed subscription/entitlement store or authenticated user identity is currently implemented.
+- Server-side Stripe Checkout Session and Lemon Squeezy order verification endpoints validate configured paid Pro products and bind the verified purchase to the authenticated account email.
+- `public.pro_entitlements` is the durable Pro authorization source of truth.
+- Lemon Squeezy and Stripe webhooks verify signatures and use `public.billing_webhook_events` for durable idempotency/retry handling.
+- Supabase Auth email OTP provides the trusted user identity used by AI and payment verification.
 
 ## Planned model
 - Free: core developer tools.
@@ -21,4 +22,4 @@
 - Test renewal, cancellation, failure, upgrade and downgrade flows.
 - Do not trust browser-only payment state.
 
-Live billing is therefore NOT_READY at this audit stage.
+Live billing code is implemented on the audit branch, but real provider configuration and end-to-end payment/webhook smoke tests remain required before production promotion.
