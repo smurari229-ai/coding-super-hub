@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getAccessToken, getAuthSession, sendEmailOtp, signOut, verifyEmailOtp } from '../../lib/auth';
 import { Sparkles, Bot, Copy, Check, AlertCircle } from 'lucide-react';
 
