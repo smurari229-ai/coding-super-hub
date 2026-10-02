@@ -114,14 +114,24 @@ export async function findUserIdByEmail(email: string): Promise<string | null> {
 }
 
 export async function claimWebhookEvent(provider: 'stripe' | 'lemon-squeezy', eventId: string) {
-  const response = await supabaseRest('/billing_webhook_events?on_conflict=provider,event_id', {
+  const insertResponse = await supabaseRest('/billing_webhook_events?on_conflict=provider,event_id', {
     method: 'POST',
     headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
     body: JSON.stringify({ provider, event_id: eventId, status: 'processing' }),
   });
-  const data = await response.json().catch(() => null);
-  if (!response.ok) throw new Error('Could not claim webhook event.');
-  return Array.isArray(data) && data.length > 0;
+  const inserted = await insertResponse.json().catch(() => null);
+  if (!insertResponse.ok) throw new Error('Could not claim webhook event.');
+  if (Array.isArray(inserted) && inserted.length > 0) return true;
+
+  const params = new URLSearchParams({ provider: 'eq.' + provider, event_id: 'eq.' + eventId, status: 'eq.failed' });
+  const retryResponse = await supabaseRest('/billing_webhook_events?' + params.toString(), {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ status: 'processing', error_code: null }),
+  });
+  const retried = await retryResponse.json().catch(() => null);
+  if (!retryResponse.ok) throw new Error('Could not retry webhook event.');
+  return Array.isArray(retried) && retried.length > 0;
 }
 
 export async function markWebhookProcessed(provider: 'stripe' | 'lemon-squeezy', eventId: string) {
