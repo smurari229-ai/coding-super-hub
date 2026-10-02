@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getProStatus, getAiLimit } from '../../lib/pro';
+import { getAccessToken, getAuthSession, sendEmailOtp, signOut, verifyEmailOtp } from '../../lib/auth';
 import { Sparkles, Bot, Copy, Check, AlertCircle } from 'lucide-react';
 
 type Task = 'fix' | 'explain' | 'optimize' | 'tests' | 'convert';
@@ -30,28 +30,44 @@ export const AiCopilotTool: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState(getAuthSession()?.user.email ?? '');
+  const [otp, setOtp] = useState('');
+  const [authReady, setAuthReady] = useState(Boolean(getAuthSession()));
+  const [otpSent, setOtpSent] = useState(false);
 
-  const canRun = () => {
-    if (getProStatus().active) return true;
-    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
-    const used = Number(localStorage.getItem(key) || '0');
-    const limit = getAiLimit(false);
-    if (used >= limit) {
-      setError(`Free limit reached (${limit} AI runs today). Upgrade to Pro for unlimited Copilot usage.`);
-      return false;
+  useEffect(() => {
+    setAuthReady(Boolean(getAuthSession()));
+  }, []);
+
+  const handleSendOtp = async () => {
+    try {
+      setError(null);
+      await sendEmailOtp(email);
+      setOtpSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send the sign-in code.');
     }
-    return true;
   };
 
-  const consumeFreeRun = () => {
-    if (getProStatus().active) return;
-    const key = `csh_ai_usage_${new Date().toISOString().slice(0, 10)}`;
-    const used = Number(localStorage.getItem(key) || '0');
-    localStorage.setItem(key, String(used + 1));
+  const handleVerifyOtp = async () => {
+    try {
+      setError(null);
+      await verifyEmailOtp(email, otp);
+      setAuthReady(true);
+      setOtp('');
+      setOtpSent(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not verify the sign-in code.');
+    }
   };
 
   const handleGenerate = async () => {
-    if (!canRun()) return;
+    const token = await getAccessToken();
+    if (!token) {
+      setAuthReady(false);
+      setError('Sign in is required before using AI Copilot.');
+      return;
+    }
     setLoading(true);
     setError(null);
     setResponse('');
@@ -59,7 +75,7 @@ export const AiCopilotTool: React.FC = () => {
     try {
       const res = await fetch('/api/ai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify({
           task,
           instruction: TASK_PROMPTS[task],
@@ -74,7 +90,7 @@ export const AiCopilotTool: React.FC = () => {
       }
 
       setResponse(typeof data?.text === 'string' ? data.text : 'No response returned from the AI provider.');
-      consumeFreeRun();
+      setAuthReady(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate AI response');
     } finally {
@@ -94,6 +110,30 @@ export const AiCopilotTool: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {!authReady ? (
+        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3">
+          <div>
+            <div className="text-sm font-semibold text-white">Sign in for secure AI access</div>
+            <p className="text-[11px] text-slate-500 mt-1">AI requests require a verified Supabase Auth identity. The server, not localStorage, enforces Pro status and the 10 successful calls/day Free quota.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="you@example.com" aria-label="Email for AI sign in" className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+            {!otpSent ? (
+              <button onClick={handleSendOtp} className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold">Send code</button>
+            ) : (
+              <>
+                <input value={otp} onChange={e => setOtp(e.target.value)} inputMode="numeric" maxLength={8} placeholder="Email code" aria-label="Email verification code" className="w-full sm:w-36 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white" />
+                <button onClick={handleVerifyOtp} className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold">Verify</button>
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/70 border border-slate-800">
+          <span className="text-[11px] text-slate-400">Signed in securely{email ? ' as ' + email : ''}. AI quota is enforced on the server.</span>
+          <button onClick={() => { signOut(); setAuthReady(false); setOtpSent(false); }} className="text-[11px] text-slate-400 hover:text-white">Sign out</button>
+        </div>
+      )}
       <div className="p-4 bg-slate-900/80 rounded-2xl border border-slate-800 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
