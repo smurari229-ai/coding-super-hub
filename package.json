@@ -1,8 +1,8 @@
 {
   "name": "coding-super-hub",
   "version": "0.1.0",
-  "description": "Open-source developer toolbox with 535 coding utilities, AI-assisted workflows, security tools, converters, generators, and sandboxes.",
-  "private": false,
+  "description": "Privacy-first all-in-one developer toolbox",
+  "private": true,
   "type": "module",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/smurari229-ai/coding-super-hub/issues"
   },
-  "homepage": "https://coding-super-hub.vercel.app/",
+  "homepage": "https://github.com/smurari229-ai/coding-super-hub#readme",
   "author": "Coding Super Hub",
   "license": "MIT",
   "scripts": {
@@ -20,8 +20,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "npx --yes vitest@5.0.0 run",
-    "test:watch": "npx --yes vitest@5.0.0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check": "npm run lint && npm test && npm run build"
   },
   "dependencies": {
@@ -37,14 +37,17 @@
     "vite": "8.3.1"
   },
   "devDependencies": {
+    "@testing-library/react": "16.3.3",
     "@types/express": "4.17.25",
     "@types/node": "22.20.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "autoprefixer": "10.6.1",
     "esbuild": "0.25.12",
+    "jsdom": "30.1.1",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.15",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
   }
 }

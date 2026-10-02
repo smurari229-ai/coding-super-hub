@@ -1,31 +1,69 @@
 # Contributing to Coding Super Hub
 
-## Development setup
+## Prerequisites
 
-1. Install Node.js 20 LTS and Bun 1.4.0 or the compatible Bun release recorded by the lockfile.
-2. Clone the repository and switch to a working branch.
+- Node.js 20 LTS or newer.
+- Bun 1.4.0 or the compatible Bun release recorded by the lockfile.
+- Git and a GitHub account.
+
+## Setup
+
+1. Clone the repository.
+2. Create a focused working branch.
 3. Run `bun install --frozen-lockfile`.
-4. Run `bun run lint`, `bun run test`, and `bun run build`.
+4. Run `bun run dev` to start the local development server.
+5. Before opening a pull request, run `bun run lint`, `bun run test`, and `bun run build`.
 
 ## Branch naming
 
-Use focused names such as `fix/<short-description>`, `feat/<short-description>`, `docs/<short-description>`, `test/<short-description>`, and `chore/<short-description>`.
+Use one of these prefixes:
+
+- `feat/<short-description>`
+- `fix/<short-description>`
+- `docs/<short-description>`
+- `chore/<short-description>`
+
 Do not commit directly to `main`.
 
 ## Commit style
 
-Use concise conventional-style messages such as `feat:`, `fix:`, `docs:`, `test:`, `chore:`, and `security:`.
-Keep commits small and explain the reason for the change.
+Use Conventional Commits, for example:
+
+- `feat: add a new developer tool`
+- `fix: prevent invalid input from reaching the API`
+- `docs: clarify local setup`
+- `chore: update CI configuration`
+
+Keep commits focused and explain the reason for the change.
 
 ## Pull requests
 
-- Describe the problem, change, and verification evidence.
-- Preserve the 535-entry catalog unless a maintainer explicitly approves a catalog change.
-- Do not weaken authentication, authorization, quota, billing, sandbox, or security-header controls.
-- Do not commit secrets or real payment credentials.
-- Include test and build results.
-- Keep unrelated formatting or refactors out of focused fixes.
+Every pull request should:
 
-## Reporting security issues
+- Describe the problem, scope, and verification evidence.
+- Pass `bun run lint`, `bun run test`, and `bun run build`.
+- Preserve existing tool and UI behavior unless the PR explicitly changes it.
+- Preserve authentication, authorization, quota, billing, sandbox, and security-header controls.
+- Avoid committing secrets, payment credentials, API keys, or private environment values.
+- Keep unrelated formatting and refactors out of focused fixes.
+- Update documentation when public behavior or configuration changes.
+
+## Adding a new tool
+
+1. Review `src/data/tools-catalog.ts` for the existing catalog structure, IDs, categories, names, descriptions, and metadata.
+2. Preserve unique tool IDs and names.
+3. Prefer an existing engine handler when the tool semantics match an existing implementation.
+4. If dedicated UI is genuinely required, keep the change isolated and add appropriate tests.
+5. Verify the catalog count and relevant routing behavior before submitting the pull request.
+
+## Code style
+
+- Use strict TypeScript and preserve the repository's existing compiler configuration.
+- Do not use `any`; prefer explicit types, unions, generics, or `unknown` with validation.
+- Use Tailwind CSS for UI styling where UI changes are necessary.
+- Keep deterministic transformations pure and testable where practical.
+- Do not weaken security controls to simplify implementation.
+
+## Security
 
 Do not disclose sensitive vulnerabilities in public issues. Follow [SECURITY.md](SECURITY.md).
