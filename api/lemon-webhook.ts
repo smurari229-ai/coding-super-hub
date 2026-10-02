@@ -53,7 +53,7 @@ function isValidSignature(rawBody: string, signature: string, secret: string): b
   );
 }
 
-export async function POST(request: Request): Promise<Response> {
+export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ received: false, error: 'Method not allowed' }, 405);
   }
