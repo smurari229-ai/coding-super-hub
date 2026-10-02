@@ -6,8 +6,22 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.0-38bdf8.svg)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/smurari229-ai/coding-super-hub/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smurari229-ai/coding-super-hub/actions/workflows/ci.yml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
+
+## Security
+
+Security reporting and supported-version policy are documented in [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+Contribution setup, branch naming, commit style, and pull-request rules are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Monetization setup
+
+Public checkout, sponsor, affiliate, and placeholder configuration is documented in [MONETIZATION_SETUP.md](MONETIZATION_SETUP.md).
 
 ## ⚡ What Makes Coding Super Hub Different?
 
