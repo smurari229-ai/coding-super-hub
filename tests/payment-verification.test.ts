@@ -4,6 +4,18 @@ import lemonHandler from '../api/verify-lemon-order';
 import stripeHandler from '../api/verify-stripe-session';
 import lemonWebhook from '../api/lemon-webhook';
 
+vi.mock('../api/_supabase', () => ({
+  getAuthenticatedUser: vi.fn(async () => ({ id: 'user-1', email: 'buyer@example.com' })),
+  upsertEntitlement: vi.fn(async (row: unknown) => row),
+  claimWebhookEvent: vi.fn(async () => true),
+  markWebhookProcessed: vi.fn(async () => undefined),
+  markWebhookFailed: vi.fn(async () => undefined),
+  findUserIdByEmail: vi.fn(async () => 'user-1'),
+  updateEntitlementByProviderField: vi.fn(async () => undefined),
+  supabaseRest: vi.fn(),
+  supabaseRpc: vi.fn(),
+}));
+
 const originalEnv = { ...process.env };
 
 afterEach(() => {
@@ -22,7 +34,8 @@ describe('payment verification URL handling', () => {
         payment_status: 'paid',
         status: 'complete',
         mode: 'subscription',
-        subscription: { status: 'active' },
+        customer_details: { email: 'buyer@example.com' },
+        subscription: { id: 'sub_test', status: 'active', current_period_end: 2000000000 },
         line_items: { data: [{ price: { id: 'price_monthly' } }] },
       }), { status: 200 })
     ));
@@ -49,6 +62,7 @@ describe('payment verification URL handling', () => {
         payment_status: 'paid',
         status: 'complete',
         mode: 'payment',
+        customer_details: { email: 'buyer@example.com' },
         line_items: { data: [{ price: { id: 'price_lifetime' } }] },
       }), { status: 200 })
     ));
@@ -76,6 +90,7 @@ describe('payment verification URL handling', () => {
           store_id: 1,
           status: 'paid',
           refunded: false,
+          user_email: 'buyer@example.com',
           first_order_item: { variant_id: 20 },
         } },
       }), { status: 200 }));
@@ -122,7 +137,7 @@ describe('Lemon Squeezy webhook signature handling', () => {
       data: {
         type: 'orders',
         id: '123',
-        attributes: { store_id: 1, variant_id: 20 },
+        attributes: { store_id: 1, variant_id: 20, user_email: 'buyer@example.com' },
       },
     });
 
@@ -149,7 +164,7 @@ describe('Lemon Squeezy webhook signature handling', () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       received: true,
-      processed: false,
+      processed: true,
       event: 'order_created',
     });
   });
