@@ -107,6 +107,7 @@ export default async function handler(request: Request): Promise<Response> {
           store_id?: number;
           status?: string;
           refunded?: boolean;
+          user_email?: string;
           first_order_item?: { variant_id?: number };
         };
       };
@@ -132,6 +133,9 @@ export default async function handler(request: Request): Promise<Response> {
       return json({ verified: false, error: 'Order is not an eligible paid Pro order.' }, 403);
     }
 
+    let subscriptionId: string | null = null;
+    let subscriptionAttrs: any = null;
+
     if (expectedPlan === 'monthly') {
       const subscriptionResponse = await fetch(
         `https://api.lemonsqueezy.com/v1/subscriptions?filter[order_id]=${encodeURIComponent(orderId)}&page[size]=1`,
@@ -149,6 +153,7 @@ export default async function handler(request: Request): Promise<Response> {
 
       const subscriptionPayload = (await subscriptionResponse.json()) as {
         data?: Array<{
+          id?: string;
           attributes?: {
             status?: string;
             variant_id?: number;
@@ -158,6 +163,8 @@ export default async function handler(request: Request): Promise<Response> {
       };
 
       const subscription = subscriptionPayload.data?.[0]?.attributes;
+      subscriptionId = subscriptionPayload.data?.[0]?.id ? String(subscriptionPayload.data[0].id) : null;
+      subscriptionAttrs = subscription;
       const subscriptionStatus = subscription?.status;
       const subscriptionVariant = String(subscription?.variant_id ?? '');
       const cancelledEndsAt = subscription?.ends_at ? Date.parse(subscription.ends_at) : Number.NaN;
@@ -175,8 +182,6 @@ export default async function handler(request: Request): Promise<Response> {
       }
     }
 
-    const subscriptionId = expectedPlan === 'monthly' ? String((subscriptionPayload.data?.[0] as any)?.id ?? '') : null;
-    const subscriptionAttrs = subscriptionPayload.data?.[0]?.attributes as any;
     await upsertEntitlement({
       user_id: user.id,
       provider: 'lemon-squeezy',
