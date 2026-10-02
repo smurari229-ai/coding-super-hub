@@ -1,10 +1,12 @@
 import { GoogleGenAI } from '@google/genai';
+import { getAuthenticatedUser, getEntitlement, supabaseRpc } from './_supabase';
 
 const MAX_CODE_LENGTH = 20_000;
 const MAX_INSTRUCTION_LENGTH = 4_000;
 const MAX_BODY_LENGTH = 26_000;
 const MAX_REQUESTS_PER_WINDOW = 10;
 const MAX_RESPONSE_LENGTH = 12_000;
+const FREE_DAILY_LIMIT = 10;
 const WINDOW_MS = 60_000;
 
 type RateEntry = { count: number; resetAt: number };
@@ -55,6 +57,9 @@ export default async function handler(req: any, res: any) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return send(res, 503, { error: 'AI service is not configured on the server.' });
 
+  const user = await getAuthenticatedUser(req);
+  if (!user?.id) return send(res, 401, { error: 'Sign in is required before using AI Copilot.' });
+
   const body = req.body;
   if (!body || typeof body !== 'object' || Array.isArray(body)) return send(res, 400, { error: 'Invalid request body' });
 
@@ -65,6 +70,33 @@ export default async function handler(req: any, res: any) {
   if (!code.trim()) return send(res, 400, { error: 'Code input is required' });
   if (code.length > MAX_CODE_LENGTH) return send(res, 413, { error: 'Code input exceeds the 20,000 character limit' });
   if (instruction.length > MAX_INSTRUCTION_LENGTH || customPrompt.length > MAX_INSTRUCTION_LENGTH) return send(res, 413, { error: 'Instruction input is too large' });
+
+  let entitlement = null;
+  try {
+    entitlement = await getEntitlement(user.id);
+  } catch {
+    return send(res, 503, { error: 'Billing authorization is temporarily unavailable.' });
+  }
+
+  const isPro = Boolean(entitlement);
+  const usageDate = new Date().toISOString().slice(0, 10);
+  let quotaReserved = false;
+
+  if (!isPro) {
+    try {
+      quotaReserved = Boolean(await supabaseRpc('reserve_ai_quota', {
+        p_user_id: user.id,
+        p_usage_date: usageDate,
+        p_limit: FREE_DAILY_LIMIT,
+      }));
+    } catch {
+      return send(res, 503, { error: 'AI quota service is temporarily unavailable.' });
+    }
+
+    if (!quotaReserved) {
+      return send(res, 429, { error: 'Free AI limit reached (10 successful calls today). Upgrade to Pro for expanded Copilot access.' });
+    }
+  }
 
   const prompt = [
     instruction || 'Analyze the supplied code carefully.',
@@ -84,12 +116,17 @@ export default async function handler(req: any, res: any) {
       config: { maxOutputTokens: 1400, temperature: 0.2 }
     });
     const text = typeof result.text === 'string' ? result.text : '';
-    if (!text) return send(res, 502, { error: 'AI provider returned no text response' });
+    if (!text) throw new Error('empty-response');
     const boundedText = text.length > MAX_RESPONSE_LENGTH
       ? text.slice(0, MAX_RESPONSE_LENGTH) + '\n\n[Response truncated at the 12,000 character safety limit.]'
       : text;
-    return send(res, 200, { text: boundedText });
+    return send(res, 200, { text: boundedText, plan: isPro ? 'pro' : 'free' });
   } catch {
+    if (quotaReserved) {
+      try {
+        await supabaseRpc('release_ai_quota', { p_user_id: user.id, p_usage_date: usageDate });
+      } catch {}
+    }
     return send(res, 502, { error: 'AI provider request failed' });
   }
 }
