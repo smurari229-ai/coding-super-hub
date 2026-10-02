@@ -15,16 +15,13 @@
 ## Current request flow
 Tool input → client-side validation/processing → rendered result → copy/download/reset where implemented.
 
-AI request → `/api/ai` → method/body/input limits → in-memory rate limit → server-side Gemini call → bounded response → client.
+AI request → authenticated Supabase user → `/api/ai` → method/body/input limits + IP rate limit → durable entitlement lookup → atomic Free quota reservation when needed → Gemini → bounded response → client.
 
 ## Explicitly not implemented yet
 - Database-backed workspace.
 - Cross-device favorites/history.
 - Token/cost ledger beyond quota counters.
 - Team/advanced entitlement tiers.
-- Project generator.
-- GitHub repository write integration.
-- Durable analytics pipeline.
 - Project generator.
 - GitHub repository write integration.
 - Durable analytics pipeline.
