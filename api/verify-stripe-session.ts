@@ -1,3 +1,4 @@
+import { getAuthenticatedUser, upsertEntitlement } from './_supabase';
 const VERIFY_WINDOW_MS = 60_000;
 const VERIFY_MAX_REQUESTS = 20;
 const verifyRateStore = new Map<string, { count: number; resetAt: number }>();
@@ -66,6 +67,9 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ verified: false, error: 'Too many verification requests. Please try again later.' }, 429);
   }
 
+  const user = await getAuthenticatedUser(request);
+  if (!user?.id || !user.email) return json({ verified: false, error: 'Authenticated email is required.' }, 401);
+
   const url = resolveRequestUrl(request);
   const sessionId = url.searchParams.get('session_id')?.trim();
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -98,9 +102,15 @@ export default async function handler(request: Request): Promise<Response> {
       payment_status?: string;
       status?: string;
       mode?: string;
+      customer_email?: string | null;
+      customer_details?: { email?: string | null } | null;
       subscription?: {
+        id?: string;
         status?: string;
+        current_period_end?: number | null;
+        customer?: string | null;
       } | string | null;
+      payment_intent?: string | null;
       line_items?: {
         data?: Array<{ price?: { id?: string } }>;
       };
@@ -113,6 +123,11 @@ export default async function handler(request: Request): Promise<Response> {
         : priceId === lifetimePrice
           ? 'lifetime'
           : null;
+
+    const customerEmail = payload.customer_details?.email || payload.customer_email || null;
+    if (!customerEmail || customerEmail.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+      return json({ verified: false, error: 'Stripe customer email does not match the authenticated account.' }, 403);
+    }
 
     if (payload.payment_status !== 'paid' || payload.status !== 'complete' || !plan) {
       return json({ verified: false, error: 'Stripe payment is not an eligible paid Pro checkout.' }, 403);
@@ -133,6 +148,18 @@ export default async function handler(request: Request): Promise<Response> {
     } else if (payload.mode !== 'payment') {
       return json({ verified: false, error: 'Stripe lifetime Pro checkout must use one-time payment mode.' }, 403);
     }
+
+    const subscription = typeof payload.subscription === 'object' && payload.subscription !== null ? payload.subscription : null;
+    await upsertEntitlement({
+      user_id: user.id,
+      provider: 'stripe',
+      plan,
+      status: 'active',
+      expires_at: plan === 'monthly' && subscription?.status === 'active' ? (subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null) : null,
+      stripe_session_id: sessionId,
+      stripe_subscription_id: plan === 'monthly' ? subscription?.id ?? null : null,
+      stripe_payment_intent_id: typeof payload.payment_intent === 'string' ? payload.payment_intent : null,
+    });
 
     return json({ verified: true, plan });
   } catch {
