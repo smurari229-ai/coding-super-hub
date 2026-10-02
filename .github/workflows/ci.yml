@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   BUN_VERSION: 1.4.0
@@ -26,11 +26,17 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install
-      - uses: actions/upload-artifact@v4.6.2
-        with:
-          name: generated-bun-lock
-          path: bun.lock
-          if-no-files-found: error
+      - name: Commit generated lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- bun.lock; then
+            echo "Bun lockfile is already synchronized."
+            exit 0
+          fi
+          git add bun.lock
+          git commit -m "chore: sync Bun lockfile"
+          git push
 
   install:
     name: Install
