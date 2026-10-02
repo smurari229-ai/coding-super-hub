@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import lemonHandler from '../api/verify-lemon-order';
 import stripeHandler from '../api/verify-stripe-session';
-import { POST as lemonWebhook } from '../api/lemon-webhook';
+import lemonWebhook from '../api/lemon-webhook';
 
 const originalEnv = { ...process.env };
 
