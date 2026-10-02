@@ -21,7 +21,7 @@ Contribution setup, branch naming, commit style, and pull-request rules are docu
 
 ## Monetization setup
 
-Public checkout, sponsor, affiliate, and placeholder configuration is documented in [MONETIZATION_SETUP.md](MONETIZATION_SETUP.md).
+Public checkout, sponsor, affiliate, and placeholder configuration is documented in [MONETIZATION_SETUP.md](MONETIZATION_SETUP.md). Copy the public environment-variable names from [.env.example](.env.example); never commit real credentials or secrets.
 
 ## ⚡ What Makes Coding Super Hub Different?
 
