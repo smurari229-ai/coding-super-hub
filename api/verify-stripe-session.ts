@@ -142,7 +142,13 @@ export default async function handler(request: Request): Promise<Response> {
           ? payload.subscription
           : null;
       const subscriptionStatus = subscription?.status;
-      if (payload.mode !== 'subscription' || !['active', 'trialing'].includes(subscriptionStatus ?? '')) {
+      const periodEnd = Number(subscription?.current_period_end || 0);
+      const cancelledButUnexpired =
+        subscriptionStatus === 'canceled' && periodEnd > Math.floor(Date.now() / 1000);
+      if (
+        payload.mode !== 'subscription' ||
+        (!['active', 'trialing'].includes(subscriptionStatus ?? '') && !cancelledButUnexpired)
+      ) {
         return json({ verified: false, error: 'Stripe Pro subscription is no longer active.' }, 403);
       }
     } else if (payload.mode !== 'payment') {
@@ -154,8 +160,14 @@ export default async function handler(request: Request): Promise<Response> {
       user_id: user.id,
       provider: 'stripe',
       plan,
-      status: 'active',
-      expires_at: plan === 'monthly' && subscription?.status === 'active' ? (subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null) : null,
+      status:
+        plan === 'monthly' && subscription?.status === 'canceled'
+          ? 'cancelled'
+          : 'active',
+      expires_at:
+        plan === 'monthly' && subscription?.current_period_end
+          ? new Date(subscription.current_period_end * 1000).toISOString()
+          : null,
       stripe_session_id: sessionId,
       stripe_subscription_id: plan === 'monthly' ? subscription?.id ?? null : null,
       stripe_payment_intent_id: typeof payload.payment_intent === 'string' ? payload.payment_intent : null,
