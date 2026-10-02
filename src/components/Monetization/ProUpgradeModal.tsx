@@ -5,14 +5,16 @@ import { getProStatus, verifyLemonOrder, verifyStripeSession } from '../../lib/p
 type BillingCycle = 'monthly' | 'lifetime';
 type PaymentProvider = 'lemon-squeezy' | 'stripe';
 
+const STRIPE_CHECKOUT_PLACEHOLDER = '__REPLACE_ME_STRIPE_URL__';
+
 const CHECKOUT_URLS: Record<PaymentProvider, Record<BillingCycle, string>> = {
   'lemon-squeezy': {
     monthly: (import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_URL as string | undefined)?.trim() || '',
     lifetime: (import.meta.env.VITE_LEMON_SQUEEZY_LIFETIME_URL as string | undefined)?.trim() || ''
   },
   stripe: {
-    monthly: (import.meta.env.VITE_STRIPE_MONTHLY_URL as string | undefined)?.trim() || '',
-    lifetime: (import.meta.env.VITE_STRIPE_LIFETIME_URL as string | undefined)?.trim() || ''
+    monthly: (import.meta.env.VITE_STRIPE_MONTHLY_URL as string | undefined)?.trim() || STRIPE_CHECKOUT_PLACEHOLDER,
+    lifetime: (import.meta.env.VITE_STRIPE_LIFETIME_URL as string | undefined)?.trim() || STRIPE_CHECKOUT_PLACEHOLDER
   }
 };
 
@@ -31,6 +33,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
     () => CHECKOUT_URLS[provider][billingCycle],
     [provider, billingCycle]
   );
+  const isCheckoutConfigured = Boolean(checkoutUrl && !checkoutUrl.startsWith('__REPLACE_ME_'));
 
   useEffect(() => {
     if (!document.getElementById('lemon-squeezy-js')) {
@@ -109,7 +112,7 @@ export const ProUpgradeModal: React.FC<ProUpgradeModalProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   const handleCheckout = () => {
-    if (!checkoutUrl) {
+    if (!isCheckoutConfigured) {
       setStatusMsg(
         provider === 'lemon-squeezy'
           ? 'Lemon Squeezy checkout is not configured yet.'
