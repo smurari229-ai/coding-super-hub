@@ -7,11 +7,11 @@
 - Catalog: **535 entries exactly**
 - Main: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Audit HEAD: **current branch tip; verified during this audit**
+- Audit HEAD: **a2406cea2ebabb6a669bfc3138fea7369bd5a81b** (verified as the current branch tip during this audit)
 - PR: **#4 OPEN / unmerged**
-- Current compare: **192 ahead / 44 behind main**
-- Latest verified audit CI for `5fe608d371739014ecef916e8bcc6125bbbe87fe`: **PASS** — install, typecheck, 38 tests, build.
-- Latest verified audit Vercel deployment for that same SHA: **READY**.
+- Current compare: **193 ahead / 44 behind main**
+- Latest verified audit CI: **5fe608d371739014ecef916e8bcc6125bbbe87fe PASS** — install, typecheck, 38 tests, build. Current HEAD CI is **NOT_VERIFIED**.
+- Latest audit Vercel deployment: **a2406cea2ebabb6a669bfc3138fea7369bd5a81b READY**.
 
 ## Verified safeguards
 
@@ -66,7 +66,7 @@ Current database state verified during this audit:
 - Billing webhook event uniqueness exists on `(provider,event_id)`.
 - Pro entitlement uniqueness exists per `(user_id,provider)` plus provider identifier indexes.
 - Supabase security/performance advisor review remains part of the release gate.
-- Current Auth user count is not yet sufficient for real end-to-end payment/AI smoke evidence.
+- Current Auth user count is **0**, so real end-to-end payment/AI smoke evidence is not yet available.
 
 ## Production
 
