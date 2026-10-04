@@ -12,6 +12,12 @@ function secretKey() {
   return (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
 }
 
+const SUPABASE_TIMEOUT_MS = 10_000;
+
+function withTimeout(init: RequestInit = {}): RequestInit {
+  return { ...init, signal: init.signal ?? AbortSignal.timeout(SUPABASE_TIMEOUT_MS) };
+}
+
 function requireBaseAndSecret() {
   const url = baseUrl();
   const key = secretKey();
@@ -41,7 +47,7 @@ export async function supabaseRest(path: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers);
   headers.set('apikey', key);
   if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  return fetch(url + '/rest/v1/' + path.replace(/^\//, ''), { ...init, headers });
+  return fetch(url + '/rest/v1/' + path.replace(/^\//, ''), withTimeout({ ...init, headers }));
 }
 
 export async function supabaseRpc(name: string, body: Record<string, unknown>) {
@@ -99,9 +105,9 @@ export async function findUserIdByEmail(email: string): Promise<string | null> {
   if (!normalized) return null;
   const { url, key } = requireBaseAndSecret();
   for (let page = 1; page <= 20; page += 1) {
-    const response = await fetch(url + '/auth/v1/admin/users?page=' + page + '&per_page=1000', {
+    const response = await fetch(url + '/auth/v1/admin/users?page=' + page + '&per_page=1000', withTimeout({
       headers: { apikey: key },
-    });
+    }));
     if (!response.ok) return null;
     const data = await response.json().catch(() => null);
     const users = Array.isArray(data?.users) ? data.users : [];
@@ -122,11 +128,27 @@ export async function claimWebhookEvent(provider: 'stripe' | 'lemon-squeezy', ev
   if (!insertResponse.ok) throw new Error('Could not claim webhook event.');
   if (Array.isArray(inserted) && inserted.length > 0) return true;
 
+  const staleBefore = new Date(Date.now() - 5 * 60_000).toISOString();
+  const staleParams = new URLSearchParams({
+    provider: 'eq.' + provider,
+    event_id: 'eq.' + eventId,
+    status: 'eq.processing',
+    received_at: 'lt.' + staleBefore,
+  });
+  const staleResponse = await supabaseRest('/billing_webhook_events?' + staleParams.toString(), {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ status: 'failed', error_code: 'stale_processing_timeout' }),
+  });
+  const staleRows = await staleResponse.json().catch(() => null);
+  if (!staleResponse.ok) throw new Error('Could not recover stale webhook event.');
+  if (Array.isArray(staleRows) && staleRows.length > 0) return true;
+
   const params = new URLSearchParams({ provider: 'eq.' + provider, event_id: 'eq.' + eventId, status: 'eq.failed' });
   const retryResponse = await supabaseRest('/billing_webhook_events?' + params.toString(), {
     method: 'PATCH',
     headers: { Prefer: 'return=representation' },
-    body: JSON.stringify({ status: 'processing', error_code: null }),
+    body: JSON.stringify({ status: 'processing', error_code: null, received_at: new Date().toISOString() }),
   });
   const retried = await retryResponse.json().catch(() => null);
   if (!retryResponse.ok) throw new Error('Could not retry webhook event.');
