@@ -33,9 +33,9 @@ export async function getAuthenticatedUser(req: any): Promise<AuthUser | null> {
   const key = publicKey();
   if (!token || !url || !key) return null;
 
-  const response = await fetch(url + '/auth/v1/user', {
+  const response = await fetch(url + '/auth/v1/user', withTimeout({
     headers: { apikey: key, Authorization: 'Bearer ' + token },
-  });
+  }));
   if (!response.ok) return null;
   const user = await response.json().catch(() => null);
   if (!user?.id) return null;
