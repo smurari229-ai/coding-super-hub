@@ -10,6 +10,7 @@ import {
 
 const WEBHOOK_WINDOW_MS = 60_000;
 const WEBHOOK_MAX_REQUESTS = 60;
+const PROVIDER_TIMEOUT_MS = 10_000;
 const webhookRateStore = new Map<string, { count: number; resetAt: number }>();
 
 function getClientIp(request: Request): string {
