@@ -38,7 +38,7 @@ function send(res: any, status: number, body: Record<string, unknown>) {
   res.status(status).setHeader('Cache-Control', 'no-store').json(body);
 }
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return send(res, 405, { error: 'Method not allowed' });
