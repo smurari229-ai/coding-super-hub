@@ -34,48 +34,51 @@ function rateLimited(ip: string): boolean {
   return false;
 }
 
-function send(res: any, status: number, body: Record<string, unknown>) {
-  res.status(status).setHeader('Cache-Control', 'no-store').json(body);
+function send(status: number, body: Record<string, unknown>): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+  });
 }
 
 async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return send(res, 405, { error: 'Method not allowed' });
+    return send( 405, { error: 'Method not allowed' });
   }
 
   const contentLength = Number(req.headers?.['content-length'] || 0);
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_LENGTH) {
-    return send(res, 413, { error: 'AI request is too large' });
+    return send( 413, { error: 'AI request is too large' });
   }
 
   const ip = getClientIp(req);
   if (rateLimited(ip)) {
-    return send(res, 429, { error: 'Too many AI requests. Please wait before trying again.' });
+    return send( 429, { error: 'Too many AI requests. Please wait before trying again.' });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return send(res, 503, { error: 'AI service is not configured on the server.' });
+  if (!apiKey) return send( 503, { error: 'AI service is not configured on the server.' });
 
   const user = await getAuthenticatedUser(req);
-  if (!user?.id) return send(res, 401, { error: 'Sign in is required before using AI Copilot.' });
+  if (!user?.id) return send( 401, { error: 'Sign in is required before using AI Copilot.' });
 
   const body = req.body;
-  if (!body || typeof body !== 'object' || Array.isArray(body)) return send(res, 400, { error: 'Invalid request body' });
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return send( 400, { error: 'Invalid request body' });
 
   const code = typeof body.code === 'string' ? body.code : '';
   const instruction = typeof body.instruction === 'string' ? body.instruction : '';
   const customPrompt = typeof body.customPrompt === 'string' ? body.customPrompt : '';
 
-  if (!code.trim()) return send(res, 400, { error: 'Code input is required' });
-  if (code.length > MAX_CODE_LENGTH) return send(res, 413, { error: 'Code input exceeds the 20,000 character limit' });
-  if (instruction.length > MAX_INSTRUCTION_LENGTH || customPrompt.length > MAX_INSTRUCTION_LENGTH) return send(res, 413, { error: 'Instruction input is too large' });
+  if (!code.trim()) return send( 400, { error: 'Code input is required' });
+  if (code.length > MAX_CODE_LENGTH) return send( 413, { error: 'Code input exceeds the 20,000 character limit' });
+  if (instruction.length > MAX_INSTRUCTION_LENGTH || customPrompt.length > MAX_INSTRUCTION_LENGTH) return send( 413, { error: 'Instruction input is too large' });
 
   let entitlement = null;
   try {
     entitlement = await getEntitlement(user.id);
   } catch {
-    return send(res, 503, { error: 'Billing authorization is temporarily unavailable.' });
+    return send( 503, { error: 'Billing authorization is temporarily unavailable.' });
   }
 
   const isPro = Boolean(entitlement);
@@ -90,11 +93,11 @@ async function handler(req: any, res: any) {
         p_limit: FREE_DAILY_LIMIT,
       }));
     } catch {
-      return send(res, 503, { error: 'AI quota service is temporarily unavailable.' });
+      return send( 503, { error: 'AI quota service is temporarily unavailable.' });
     }
 
     if (!quotaReserved) {
-      return send(res, 429, { error: 'Free AI limit reached (10 successful calls today). Upgrade to Pro for expanded Copilot access.' });
+      return send( 429, { error: 'Free AI limit reached (10 successful calls today). Upgrade to Pro for expanded Copilot access.' });
     }
   }
 
@@ -120,14 +123,14 @@ async function handler(req: any, res: any) {
     const boundedText = text.length > MAX_RESPONSE_LENGTH
       ? text.slice(0, MAX_RESPONSE_LENGTH) + '\n\n[Response truncated at the 12,000 character safety limit.]'
       : text;
-    return send(res, 200, { text: boundedText, plan: isPro ? 'pro' : 'free' });
+    return send( 200, { text: boundedText, plan: isPro ? 'pro' : 'free' });
   } catch {
     if (quotaReserved) {
       try {
         await supabaseRpc('release_ai_quota', { p_user_id: user.id, p_usage_date: usageDate });
       } catch {}
     }
-    return send(res, 502, { error: 'AI provider request failed' });
+    return send( 502, { error: 'AI provider request failed' });
   }
 }
 
