@@ -6,7 +6,7 @@ import {
   markWebhookProcessed,
   upsertEntitlement,
   updateEntitlementByProviderField,
-} from './_supabase';
+} from './_supabase.js';
 
 const WEBHOOK_WINDOW_MS = 60_000;
 const WEBHOOK_MAX_REQUESTS = 60;
