@@ -9,11 +9,17 @@ import {
   updateEntitlementByProviderField,
 } from './_supabase';
 
+const PROVIDER_TIMEOUT_MS = 10_000;
+
 const json = (body: Record<string, unknown>, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
+
+function providerRequest(init: RequestInit = {}): RequestInit {
+  return { ...init, signal: init.signal ?? AbortSignal.timeout(PROVIDER_TIMEOUT_MS) };
+}
 
 function verifySignature(rawBody: string, header: string, secret: string): boolean {
   const parts = Object.fromEntries(header.split(',').map(part => {
@@ -31,9 +37,9 @@ function verifySignature(rawBody: string, header: string, secret: string): boole
 }
 
 async function stripeFetch(path: string, secret: string) {
-  return fetch('https://api.stripe.com/v1/' + path, {
+  return fetch('https://api.stripe.com/v1/' + path, providerRequest({
     headers: { Authorization: 'Bearer ' + secret },
-  });
+  }));
 }
 
 async function findUserForCustomer(customerId: string, secret: string): Promise<{ id: string; email: string } | null> {
