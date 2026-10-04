@@ -134,7 +134,8 @@ export default async function handler(request: Request): Promise<Response> {
       });
     } else if (resourceType === 'orders' && eventName === 'order_created') {
       const plan = variantId === monthlyVariant ? 'monthly' : variantId === lifetimeVariant ? 'lifetime' : null;
-      if (plan && attrs.status === 'paid' && attrs.refunded !== true && userId) {
+      if (plan && attrs.status === 'paid' && attrs.refunded !== true) {
+        if (!userId) throw new Error('user_not_found');
         await upsertEntitlement({
           user_id: userId,
           provider: 'lemon-squeezy',
@@ -162,17 +163,16 @@ export default async function handler(request: Request): Promise<Response> {
         expiresAt = endsAt;
       }
 
-      if (userId) {
-        await upsertEntitlement({
-          user_id: userId,
-          provider: 'lemon-squeezy',
-          plan,
-          status: entitlementStatus,
-          expires_at: expiresAt,
-          lemon_order_id: attrs.order_id ? String(attrs.order_id) : null,
-          lemon_subscription_id: resourceId,
-        });
-      }
+      if (!userId) throw new Error('user_not_found');
+      await upsertEntitlement({
+        user_id: userId,
+        provider: 'lemon-squeezy',
+        plan,
+        status: entitlementStatus,
+        expires_at: expiresAt,
+        lemon_order_id: attrs.order_id ? String(attrs.order_id) : null,
+        lemon_subscription_id: resourceId,
+      });
     }
 
     await markWebhookProcessed('lemon-squeezy', eventId);
