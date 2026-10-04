@@ -180,3 +180,5 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ verified: false, error: 'Stripe provider unavailable.' }, 502);
   }
 }
+
+export default { fetch: handler };
