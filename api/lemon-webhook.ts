@@ -52,7 +52,7 @@ function isValidSignature(rawBody: string, signature: string, secret: string): b
   return expectedBuffer.length === receivedBuffer.length && crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
 }
 
-export default async function handler(request: Request): Promise<Response> {
+async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return json({ received: false, error: 'Method not allowed' }, 405);
   if (webhookRateLimited(request)) return json({ received: false, error: 'Too many webhook requests.' }, 429);
 
