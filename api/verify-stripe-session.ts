@@ -1,4 +1,4 @@
-import { getAuthenticatedUser, upsertEntitlement } from './_supabase';
+import { getAuthenticatedUser, upsertEntitlement } from './_supabase.js';
 const VERIFY_WINDOW_MS = 60_000;
 const VERIFY_MAX_REQUESTS = 20;
 const PROVIDER_TIMEOUT_MS = 10_000;
