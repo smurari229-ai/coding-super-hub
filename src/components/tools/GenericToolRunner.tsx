@@ -115,7 +115,7 @@ export const GenericToolRunner: React.FC<GenericToolRunnerProps> = ({ tool, onOp
         <div className="space-y-1.5">
           <div className="flex items-center justify-between px-1 text-xs text-slate-400">
             <label htmlFor="generic-tool-output">Processed Output</label>
-            <span className={error ? 'text-amber-400' : 'text-emerald-400'}>{error ? 'Not executed' : 'Verified engine'}</span>
+            <span className={error ? 'text-amber-400' : 'text-emerald-400'}>{error ? 'Execution error' : 'Engine output'}</span>
           </div>
           <textarea
             id="generic-tool-output"
