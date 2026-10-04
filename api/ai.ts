@@ -41,10 +41,12 @@ function send(status: number, body: Record<string, unknown>): Response {
   });
 }
 
-async function handler(req: any, res: any) {
+async function handler(req: Request) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return send( 405, { error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'allow': 'POST' },
+    });
   }
 
   const contentLength = Number(req.headers?.['content-length'] || 0);
