@@ -186,3 +186,5 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ received: false, error: 'Stripe webhook processing failed; retry is safe.' }, 500);
   }
 }
+
+export default { fetch: handler };
