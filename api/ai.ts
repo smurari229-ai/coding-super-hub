@@ -130,3 +130,5 @@ export default async function handler(req: any, res: any) {
     return send(res, 502, { error: 'AI provider request failed' });
   }
 }
+
+export default { fetch: handler };
