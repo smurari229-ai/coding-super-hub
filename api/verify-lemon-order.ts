@@ -59,7 +59,7 @@ function resolveRequestUrl(request: Request): URL {
   return new URL(request.url, forwardedBase);
 }
 
-export default async function handler(request: Request): Promise<Response> {
+async function handler(request: Request): Promise<Response> {
   if (request.method !== 'GET') {
     return json({ verified: false, error: 'Method not allowed' }, 405);
   }
