@@ -200,3 +200,5 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ verified: false, error: 'Payment provider unavailable.' }, 502);
   }
 }
+
+export default { fetch: handler };
