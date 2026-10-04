@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { getAuthenticatedUser, getEntitlement, supabaseRpc } from './_supabase';
+import { getAuthenticatedUser, getEntitlement, supabaseRpc } from './_supabase.js';
 
 const MAX_CODE_LENGTH = 20_000;
 const MAX_INSTRUCTION_LENGTH = 4_000;
