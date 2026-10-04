@@ -33,10 +33,10 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({ isOpen, on
           <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
             <div className="flex items-center gap-2 font-semibold text-white">
               <Lock className="w-4 h-4 text-emerald-400" />
-              <span>1. 100% Client-Side Privacy Guarantee</span>
+              <span>1. Privacy-first local processing</span>
             </div>
             <p className="text-slate-400">
-              Your code, passwords, JWT tokens, hashes, and inputs <strong>never leave your computer</strong>. All cryptographic computations, formatting, and regex checks run entirely in your local browser sandbox.
+              Most formatting, conversion, cryptographic, and regex tools run locally in your browser. Tools that explicitly use remote services, such as AI features or payment/account verification, send only the data required for that service. Do not enter secrets into a tool unless you understand where its input is processed.
             </p>
           </div>
 
