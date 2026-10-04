@@ -1261,7 +1261,117 @@ const roiBatch7: Handler = (tool, input) => {
   }
 };
 
+const roiBatch9: Handler = (tool, input) => {
+  const lines = input.split(/\r?\n/).filter(Boolean);
+  switch (tool.id) {
+    case 'bencode-decoder': {
+      const source = input.trim();
+      let i = 0;
+      const parse = (): unknown => {
+        if (i >= source.length) throw new Error('Invalid bencode: unexpected end.');
+        const ch = source[i];
+        if (ch === 'i') {
+          i++;
+          const end = source.indexOf('e', i);
+          if (end < 0) throw new Error('Invalid bencode integer.');
+          const raw = source.slice(i, end);
+          if (!/^-?(0|[1-9]\d*)$/.test(raw)) throw new Error('Invalid bencode integer.');
+          i = end + 1;
+          return Number(raw);
+        }
+        if (ch === 'l' || ch === 'd') {
+          const dict = ch === 'd'; i++;
+          const out: unknown[] = [];
+          const obj: Record<string, unknown> = {};
+          while (source[i] !== 'e') {
+            if (i >= source.length) throw new Error('Invalid bencode container.');
+            const keyOrValue = parse();
+            if (dict) {
+              if (typeof keyOrValue !== 'string') throw new Error('Dictionary keys must be strings.');
+              const value = parse(); obj[keyOrValue] = value;
+            } else out.push(keyOrValue);
+          }
+          i++;
+          return dict ? obj : out;
+        }
+        const colon = source.indexOf(':', i);
+        if (colon < 0) throw new Error('Invalid bencode string.');
+        const len = Number(source.slice(i, colon));
+        if (!Number.isInteger(len) || len < 0) throw new Error('Invalid bencode string length.');
+        i = colon + 1;
+        const value = source.slice(i, i + len);
+        if (value.length !== len) throw new Error('Invalid bencode string length.');
+        i += len; return value;
+      };
+      const value = parse();
+      if (i !== source.length) throw new Error('Invalid bencode: trailing data.');
+      return JSON.stringify(value, null, 2);
+    }
+    case 'csv-to-sqlite-ddl': {
+      const rows = parseCsv(input);
+      if (!rows.length || !rows[0].length) throw new Error('Enter CSV data with a header row.');
+      const headers = rows[0].map((h, i) => (h.trim() || 'column_'+(i+1)).replace(/[^A-Za-z0-9_]/g, '_'));
+      const quote = (h: string) => '"' + h.replace(/"/g, '""') + '"';
+      const typeFor = (index: number) => {
+        const vals = rows.slice(1).map(r => (r[index] ?? '').trim()).filter(Boolean);
+        if (vals.length && vals.every(v => /^-?\\d+$/.test(v))) return 'INTEGER';
+        if (vals.length && vals.every(v => /^-?(?:\\d+\\.\\d+|\\d+)$/.test(v))) return 'REAL';
+        if (vals.length && vals.every(v => /^(true|false)$/i.test(v))) return 'INTEGER';
+        return 'TEXT';
+      };
+      return 'CREATE TABLE data (\\n  ' + headers.map((h,i)=>quote(h)+' '+typeFor(i)).join(',\\n  ') + '\\n);';
+    }
+    case 'mime-types-lookup': {
+      const map: Record<string,string> = { html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',xml:'application/xml',csv:'text/csv',txt:'text/plain',md:'text/markdown',pdf:'application/pdf',zip:'application/zip',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',svg:'image/svg+xml',webp:'image/webp',ico:'image/x-icon',mp3:'audio/mpeg',mp4:'video/mp4',webm:'video/webm',wasm:'application/wasm',yaml:'application/yaml',yml:'application/yaml'};
+      const key = input.trim().toLowerCase().replace(/^\./,'').split('/').pop()!.split('.').pop()!;
+      const mime = map[key];
+      return mime ? key+' → '+mime : 'Unknown MIME type for: '+key;
+    }
+    case 'api-request-builder': {
+      let cfg: any;
+      try { cfg = JSON.parse(input); } catch { throw new Error('Enter JSON like {"method":"POST","url":"https://example.com","headers":{"Content-Type":"application/json"},"body":"{}"}'); }
+      const method = String(cfg.method || 'GET').toUpperCase(), url = String(cfg.url || '').trim();
+      if (!/^https?:\\/\\//i.test(url)) throw new Error('URL must use http:// or https://.');
+      let out = method+' '+url+'\\n';
+      if (cfg.headers && typeof cfg.headers === 'object') for (const [k,v] of Object.entries(cfg.headers)) out += String(k)+': '+String(v)+'\\n';
+      if (cfg.body !== undefined) out += '\\n'+(typeof cfg.body === 'string' ? cfg.body : JSON.stringify(cfg.body));
+      return out.trim();
+    }
+    case 'kubernetes-pod-yaml': {
+      const name = (lines[0] || 'app').trim().replace(/[^a-z0-9-]/g,'-').slice(0,63) || 'app';
+      const image = (lines[1] || 'nginx:latest').trim();
+      return 'apiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: '+name+'\\nspec:\\n  replicas: 1\\n  selector:\\n    matchLabels:\\n      app: '+name+'\\n  template:\\n    metadata:\\n      labels:\\n        app: '+name+'\\n    spec:\\n      containers:\\n        - name: '+name+'\\n          image: '+image+'\\n          ports:\\n            - containerPort: 80';
+    }
+    case 'curl-command-builder': {
+      let cfg: any;
+      try { cfg = JSON.parse(input); } catch { throw new Error('Enter JSON config with url, method, headers, and optional body.'); }
+      const url = String(cfg.url || '').trim();
+      if (!/^https?:\\/\\//i.test(url)) throw new Error('URL must use http:// or https://.');
+      let cmd = 'curl -X '+String(cfg.method || 'GET').toUpperCase()+' '+JSON.stringify(url);
+      if (cfg.headers && typeof cfg.headers === 'object') for (const [k,v] of Object.entries(cfg.headers)) cmd += ' -H '+JSON.stringify(String(k)+': '+String(v));
+      if (cfg.body !== undefined) cmd += ' --data '+JSON.stringify(typeof cfg.body === 'string' ? cfg.body : JSON.stringify(cfg.body));
+      return cmd;
+    }
+    case 's3-bucket-policy-builder': {
+      const bucket = (input.trim() || 'BUCKET').replace(/[^A-Za-z0-9._-]/g,'');
+      if (!bucket) throw new Error('Enter a bucket name.');
+      return JSON.stringify({Version:'2012-10-17',Statement:[{Effect:'Allow',Principal:'*',Action:['s3:GetObject'],Resource:'arn:aws:s3:::'+bucket+'/*'}]},null,2);
+    }
+    case 'webhook-tester-format': {
+      try { const data = JSON.parse(input); return JSON.stringify(data,null,2); }
+      catch { throw new Error('Enter a valid JSON webhook payload.'); }
+    }
+    case 'github-profile-generator': {
+      const name = (lines[0] || 'Your Name').trim(), bio = (lines[1] || 'Developer').trim(), links = lines.slice(2);
+      return '# '+name+'\\n\\n'+bio+'\\n\\n## Links\\n'+(links.length ? links.map(x=>'- '+x).join('\\n') : '- GitHub: https://github.com/USERNAME')+'\\n\\n## About\\n- Building useful developer tools\\n- Open to collaboration';
+    }
+    default: return null;
+  }
+};
+
+
 const handlers: Handler[] = [
+  roiBatch9,
   roiBatch8,
   roiTextBatch1,
   roiBatch2,
