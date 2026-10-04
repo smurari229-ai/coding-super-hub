@@ -1,6 +1,7 @@
 import { getAuthenticatedUser, upsertEntitlement } from './_supabase';
 const VERIFY_WINDOW_MS = 60_000;
 const VERIFY_MAX_REQUESTS = 20;
+const PROVIDER_TIMEOUT_MS = 10_000;
 const verifyRateStore = new Map<string, { count: number; resetAt: number }>();
 
 function getClientIp(request: Request): string {
@@ -94,6 +95,7 @@ export default async function handler(request: Request): Promise<Response> {
           Accept: 'application/vnd.api+json',
           Authorization: `Bearer ${apiKey}`,
         },
+        signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       }
     );
 
