@@ -1314,12 +1314,12 @@ const roiBatch9: Handler = (tool, input) => {
       const quote = (h: string) => '"' + h.replace(/"/g, '""') + '"';
       const typeFor = (index: number) => {
         const vals = rows.slice(1).map(r => (r[index] ?? '').trim()).filter(Boolean);
-        if (vals.length && vals.every(v => /^-?\\d+$/.test(v))) return 'INTEGER';
-        if (vals.length && vals.every(v => /^-?(?:\\d+\\.\\d+|\\d+)$/.test(v))) return 'REAL';
+        if (vals.length && vals.every(v => /^-?\d+$/.test(v))) return 'INTEGER';
+        if (vals.length && vals.every(v => /^-?(?:\d+\.\d+|\d+)$/.test(v))) return 'REAL';
         if (vals.length && vals.every(v => /^(true|false)$/i.test(v))) return 'INTEGER';
         return 'TEXT';
       };
-      return 'CREATE TABLE data (\\n  ' + headers.map((h,i)=>quote(h)+' '+typeFor(i)).join(',\\n  ') + '\\n);';
+      return 'CREATE TABLE data (\n  ' + headers.map((h,i)=>quote(h)+' '+typeFor(i)).join(',\n  ') + '\n);';
     }
     case 'mime-types-lookup': {
       const map: Record<string,string> = { html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',xml:'application/xml',csv:'text/csv',txt:'text/plain',md:'text/markdown',pdf:'application/pdf',zip:'application/zip',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',svg:'image/svg+xml',webp:'image/webp',ico:'image/x-icon',mp3:'audio/mpeg',mp4:'video/mp4',webm:'video/webm',wasm:'application/wasm',yaml:'application/yaml',yml:'application/yaml'};
@@ -1331,22 +1331,22 @@ const roiBatch9: Handler = (tool, input) => {
       let cfg: any;
       try { cfg = JSON.parse(input); } catch { throw new Error('Enter JSON like {"method":"POST","url":"https://example.com","headers":{"Content-Type":"application/json"},"body":"{}"}'); }
       const method = String(cfg.method || 'GET').toUpperCase(), url = String(cfg.url || '').trim();
-      if (!/^https?:\\/\\//i.test(url)) throw new Error('URL must use http:// or https://.');
-      let out = method+' '+url+'\\n';
-      if (cfg.headers && typeof cfg.headers === 'object') for (const [k,v] of Object.entries(cfg.headers)) out += String(k)+': '+String(v)+'\\n';
-      if (cfg.body !== undefined) out += '\\n'+(typeof cfg.body === 'string' ? cfg.body : JSON.stringify(cfg.body));
+      if (!/^https?:\/\//i.test(url)) throw new Error('URL must use http:// or https://.');
+      let out = method+' '+url+'\n';
+      if (cfg.headers && typeof cfg.headers === 'object') for (const [k,v] of Object.entries(cfg.headers)) out += String(k)+': '+String(v)+'\n';
+      if (cfg.body !== undefined) out += '\n'+(typeof cfg.body === 'string' ? cfg.body : JSON.stringify(cfg.body));
       return out.trim();
     }
     case 'kubernetes-pod-yaml': {
       const name = (lines[0] || 'app').trim().replace(/[^a-z0-9-]/g,'-').slice(0,63) || 'app';
       const image = (lines[1] || 'nginx:latest').trim();
-      return 'apiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: '+name+'\\nspec:\\n  replicas: 1\\n  selector:\\n    matchLabels:\\n      app: '+name+'\\n  template:\\n    metadata:\\n      labels:\\n        app: '+name+'\\n    spec:\\n      containers:\\n        - name: '+name+'\\n          image: '+image+'\\n          ports:\\n            - containerPort: 80';
+      return 'apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: '+name+'\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: '+name+'\n  template:\n    metadata:\n      labels:\n        app: '+name+'\n    spec:\n      containers:\n        - name: '+name+'\n          image: '+image+'\n          ports:\n            - containerPort: 80';
     }
     case 'curl-command-builder': {
       let cfg: any;
       try { cfg = JSON.parse(input); } catch { throw new Error('Enter JSON config with url, method, headers, and optional body.'); }
       const url = String(cfg.url || '').trim();
-      if (!/^https?:\\/\\//i.test(url)) throw new Error('URL must use http:// or https://.');
+      if (!/^https?:\/\//i.test(url)) throw new Error('URL must use http:// or https://.');
       let cmd = 'curl -X '+String(cfg.method || 'GET').toUpperCase()+' '+JSON.stringify(url);
       if (cfg.headers && typeof cfg.headers === 'object') for (const [k,v] of Object.entries(cfg.headers)) cmd += ' -H '+JSON.stringify(String(k)+': '+String(v));
       if (cfg.body !== undefined) cmd += ' --data '+JSON.stringify(typeof cfg.body === 'string' ? cfg.body : JSON.stringify(cfg.body));
@@ -1363,7 +1363,7 @@ const roiBatch9: Handler = (tool, input) => {
     }
     case 'github-profile-generator': {
       const name = (lines[0] || 'Your Name').trim(), bio = (lines[1] || 'Developer').trim(), links = lines.slice(2);
-      return '# '+name+'\\n\\n'+bio+'\\n\\n## Links\\n'+(links.length ? links.map(x=>'- '+x).join('\\n') : '- GitHub: https://github.com/USERNAME')+'\\n\\n## About\\n- Building useful developer tools\\n- Open to collaboration';
+      return '# '+name+'\n\n'+bio+'\n\n## Links\n'+(links.length ? links.map(x=>'- '+x).join('\n') : '- GitHub: https://github.com/USERNAME')+'\n\n## About\n- Building useful developer tools\n- Open to collaboration';
     }
     default: return null;
   }
