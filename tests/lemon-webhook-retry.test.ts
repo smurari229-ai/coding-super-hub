@@ -12,7 +12,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../api/_supabase', () => mocks);
 
-import lemonWebhook from '../api/lemon-webhook';
+import lemonWebhookModule from '../api/lemon-webhook';
+const lemonWebhook = lemonWebhookModule.fetch;
 
 const originalEnv = { ...process.env };
 
