@@ -146,6 +146,7 @@ export default async function handler(request: Request): Promise<Response> {
             Accept: 'application/vnd.api+json',
             Authorization: `Bearer ${apiKey}`,
           },
+          signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
         }
       );
 
