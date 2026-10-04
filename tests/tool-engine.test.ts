@@ -5,18 +5,6 @@ import type { ToolItem } from '../src/types/tools';
 const tool = (id: string, name = id, tags: string[] = []): ToolItem => ({
   id, name, category: 'text-string', description: name, tags
 
-  it('closes the previously failing audit routes with deterministic outputs', () => {
-    expect(executeTool(tool('bencode-decoder', 'Bencode'), 'd3:foo3:bare').output).toContain('"foo": "bar"');
-    expect(executeTool(tool('csv-to-sqlite-ddl', 'CSV DDL'), 'name,age\nA,20').output).toContain('"age" INTEGER');
-    expect(executeTool(tool('mime-types-lookup', 'MIME Lookup'), 'application.json').output).toContain('application/json');
-    expect(executeTool(tool('api-request-builder', 'API Builder'), '{"method":"POST","url":"https://example.com","headers":{"X-Test":"1"},"body":"ok"}').output).toContain('POST https://example.com');
-    expect(executeTool(tool('kubernetes-pod-yaml', 'Kubernetes'), 'web\nnginx:alpine').output).toContain('kind: Deployment');
-    expect(executeTool(tool('curl-command-builder', 'cURL Builder'), '{"method":"GET","url":"https://example.com"}').output).toContain('curl -X GET');
-    expect(executeTool(tool('s3-bucket-policy-builder', 'S3 Policy'), 'demo-bucket').output).toContain('demo-bucket/*');
-    expect(executeTool(tool('webhook-tester-format', 'Webhook Formatter'), '{"event":"ping"}').output).toContain('"event": "ping"');
-    expect(executeTool(tool('github-profile-generator', 'GitHub Profile'), 'Murari\nDeveloper').output).toContain('# Murari');
-  });
-
 });
 
 describe('tool engine pure transforms', () => {
@@ -151,4 +139,16 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('saas-mrr-arr-calculator', 'MRR ARR'), '10 9').output).toContain('MRR: 90.00');
     expect(executeTool(tool('sprint-velocity-calculator', 'Sprint Velocity'), '40 4').output).toContain('10.00');
   });
+  it('closes the previously failing audit routes with deterministic outputs', () => {
+    expect(executeTool(tool('bencode-decoder', 'Bencode'), 'd3:foo3:bare').output).toContain('"foo": "bar"');
+    expect(executeTool(tool('csv-to-sqlite-ddl', 'CSV DDL'), 'name,age\nA,20').output).toContain('"age" INTEGER');
+    expect(executeTool(tool('mime-types-lookup', 'MIME Lookup'), 'application.json').output).toContain('application/json');
+    expect(executeTool(tool('api-request-builder', 'API Builder'), '{"method":"POST","url":"https://example.com","headers":{"X-Test":"1"},"body":"ok"}').output).toContain('POST https://example.com');
+    expect(executeTool(tool('kubernetes-pod-yaml', 'Kubernetes'), 'web\nnginx:alpine').output).toContain('kind: Deployment');
+    expect(executeTool(tool('curl-command-builder', 'cURL Builder'), '{"method":"GET","url":"https://example.com"}').output).toContain('curl -X GET');
+    expect(executeTool(tool('s3-bucket-policy-builder', 'S3 Policy'), 'demo-bucket').output).toContain('demo-bucket/*');
+    expect(executeTool(tool('webhook-tester-format', 'Webhook Formatter'), '{"event":"ping"}').output).toContain('"event": "ping"');
+    expect(executeTool(tool('github-profile-generator', 'GitHub Profile'), 'Murari\nDeveloper').output).toContain('# Murari');
+  });
+
 });
