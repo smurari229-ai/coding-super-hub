@@ -53,7 +53,7 @@ async function findUserForCustomer(customerId: string, secret: string): Promise<
   return id ? { id, email } : null;
 }
 
-export default async function handler(request: Request): Promise<Response> {
+async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return json({ received: false, error: 'Method not allowed' }, 405);
 
   const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
