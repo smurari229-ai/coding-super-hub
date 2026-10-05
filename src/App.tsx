@@ -268,6 +268,7 @@ export default function App() {
         onOpenSponsor={() => setIsSponsorOpen(true)}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
         onToggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+        isPro={isPro}
       />
 
       {/* Main Body Layout (Sidebar + Content Workspace) */}
