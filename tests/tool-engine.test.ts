@@ -170,4 +170,13 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('yaml-validator', 'YAML Validator'), 'name: hub\nactive: true').output).toContain('Valid');
     expect(executeTool(tool('toml-validator', 'TOML Validator'), 'name = "hub"').output).toContain('Valid');
   });
+  it('covers additional deterministic semantic routes', () => {
+    expect(executeTool(tool('base32-encoder', 'Base32'), 'foo').output).toBe('MZXW6===');
+    expect(executeTool(tool('markdown-to-html', 'Markdown to HTML'), '# Hello').output).toContain('<h1>Hello</h1>');
+    expect(executeTool(tool('xml-to-json-basic', 'XML to JSON'), '<root><name>hub</name></root>').output).toContain('"name": "hub"');
+    expect(executeTool(tool('url-parser-inspector', 'URL Parser'), 'https://example.com/a?q=1').output).toContain('Host: example.com');
+    expect(executeTool(tool('css-minifier-basic', 'CSS Minifier Basic'), 'a { color: red; }').output).toBe('a{color:red}');
+    expect(executeTool(tool('html-minifier-basic', 'HTML Minifier Basic'), '<div>  hi </div>').output).toBe('<div> hi </div>');
+  });
+
 });
