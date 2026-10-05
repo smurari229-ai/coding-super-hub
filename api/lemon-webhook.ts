@@ -183,4 +183,4 @@ async function handler(request: Request): Promise<Response> {
   }
 }
 
-export default handler;
+export function POST(request: Request): Promise<Response> { return handler(request); }
