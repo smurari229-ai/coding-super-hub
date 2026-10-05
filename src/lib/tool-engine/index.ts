@@ -1477,6 +1477,62 @@ const roiBatch10: Handler = (tool, input) => {
   }
 };
 
+const roiBatch11: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'base32-encoder': {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      const bytes = new TextEncoder().encode(input);
+      let bits = 0, value = 0, out = '';
+      for (const byte of bytes) {
+        value = (value << 8) | byte; bits += 8;
+        while (bits >= 5) { out += alphabet[(value >>> (bits - 5)) & 31]; bits -= 5; }
+      }
+      if (bits) out += alphabet[(value << (5 - bits)) & 31];
+      return out + '='.repeat((8 - (out.length % 8)) % 8);
+    }
+    case 'markdown-to-html':
+      return input
+        .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
+        .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
+        .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>\n');
+    case 'xml-to-json-basic': {
+      const source = input.trim();
+      const match = source.match(/^<([A-Za-z][\w.-]*)>([\s\S]*)<\/\1>$/);
+      if (!match) throw new Error('Enter simple XML with a single root element.');
+      const parse = (value: string): unknown => {
+        const child = value.match(/^<([A-Za-z][\w.-]*)>([\s\S]*)<\/\1>$/);
+        if (!child) return value.replace(/<[^>]+>/g, '').trim();
+        const children = [...child[2].matchAll(/<([A-Za-z][\w.-]*)>([\s\S]*?)<\/\1>/g)];
+        if (!children.length) return child[2].trim();
+        const obj: Record<string, unknown> = {};
+        for (const item of children) {
+          const key = item[1], parsed = parse(item[0]);
+          obj[key] = obj[key] === undefined ? parsed : Array.isArray(obj[key]) ? [...obj[key], parsed] : [obj[key], parsed];
+        }
+        return obj;
+      };
+      return JSON.stringify({ [match[1]]: parse(source) }, null, 2);
+    }
+    case 'url-parser-inspector': {
+      const url = new URL(input.trim());
+      return ['Protocol: ' + url.protocol.replace(':', ''), 'Host: ' + url.host,
+        'Path: ' + (url.pathname || '/'), 'Query: ' + url.search, 'Hash: ' + url.hash].join('\n');
+    }
+    case 'css-minifier-basic':
+      return minifyCss(input);
+    case 'html-minifier-basic':
+      return input.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ').trim();
+    default:
+      return null;
+  }
+};
+
 
 const handlers: Handler[] = [
   roiBatch9,
