@@ -1581,8 +1581,8 @@ const roiBatch12: Handler = (tool, input) => {
 
 
 
-const sha256Hex = (message: string): string => {
-  const bytes = new TextEncoder().encode(message);
+const sha256Hex = (message: string | Uint8Array): string => {
+  const bytes = typeof message === 'string' ? new TextEncoder().encode(message) : message;
   const K = [
     0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
     0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
@@ -1624,10 +1624,11 @@ const hmacSha256Hex = (secret: string, message: string): string => {
   key = key.concat(Array(blockSize-key.length).fill(0));
   const inner = key.map(byte => byte ^ 0x36);
   const outer = key.map(byte => byte ^ 0x5c);
-  const bytesToString = (bytes: number[]) => String.fromCharCode(...bytes);
-  const innerHex = sha256Hex(bytesToString(inner) + message);
-  const innerBytes = innerHex.match(/../g)!.map(pair => parseInt(pair,16));
-  return sha256Hex(bytesToString(outer) + bytesToString(innerBytes));
+  const messageBytes = new TextEncoder().encode(message);
+  const concat = (a: number[], b: Uint8Array) => new Uint8Array([...a, ...Array.from(b)]);
+  const innerHex = sha256Hex(concat(inner, messageBytes));
+  const innerBytes = new Uint8Array(innerHex.match(/../g)!.map(pair => parseInt(pair,16)));
+  return sha256Hex(concat(outer, innerBytes));
 };
 
 
