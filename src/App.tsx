@@ -32,6 +32,8 @@ import { DevCalculatorsTool } from './components/tools/DevCalculatorsTool';
 import { CodePlaygroundTool } from './components/tools/CodePlaygroundTool';
 import { AiCopilotTool } from './components/tools/AiCopilotTool';
 import { GenericToolRunner } from './components/tools/GenericToolRunner';
+import { Phase1LayoutTools } from './components/tools/Phase1LayoutTools';
+import { Phase1SecurityTools } from './components/tools/Phase1SecurityTools';
 
 import { Star, Share2, Check, Grid, Search } from 'lucide-react';
 
@@ -145,6 +147,25 @@ export default function App() {
   };
 
   const renderToolComponent = () => {
+    if (selectedTool.id === 'css-flexbox-playground' || selectedTool.id === 'css-grid-generator') {
+      return <Phase1LayoutTools tool={selectedTool} />;
+    }
+
+    const phase1SecurityIds = [
+      'csp-generator',
+      'security-headers-analyzer',
+      'password-entropy-meter',
+      'hash-identifier',
+      'cookie-flags-generator',
+      'rate-limit-header-builder',
+      'url-parser-inspector',
+      'json-schema-generator',
+    ];
+
+    if (phase1SecurityIds.includes(selectedTool.id)) {
+      return <Phase1SecurityTools tool={selectedTool} />;
+    }
+
     switch (selectedTool.dedicatedComponent) {
       case 'JsonFormatterTool': return <JsonFormatterTool toolId={selectedTool.id} />;
       case 'Base64ConverterTool': return <Base64ConverterTool toolId={selectedTool.id} />;

@@ -15,7 +15,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'Hashing, encryption, password generators, tokens, and CSP analyzers',
     icon: 'Shield',
     accentColor: 'emerald',
-    count: 65
+    count: 64
   },
   {
     id: 'web-frontend',
@@ -23,7 +23,7 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'CSS generators, color palettes, HTML meta, OpenGraph, and UI helpers',
     icon: 'Layout',
     accentColor: 'amber',
-    count: 105
+    count: 102
   },
   {
     id: 'data-formats',
@@ -63,11 +63,20 @@ export const CATEGORIES: CategoryMeta[] = [
     description: 'QR codes, dev scratchpad, cheatsheets, and developer quick utilities',
     icon: 'Sparkles',
     accentColor: 'orange',
-    count: 55
+    count: 54
   }
 ];
 
 // Helper to create tool definitions
+const inferActionType = (id: string, name: string, description: string): ToolItem['actionType'] => {
+  const haystack = (id + ' ' + name + ' ' + description).toLowerCase();
+  if (/(generator|generate|random|mock|fake-data|boilerplate|builder|creator|banner|manifest)/.test(haystack)) return 'generate';
+  if (/(validator|validate|lint|tester|tester|checker|debugger)/.test(haystack)) return 'validate';
+  if (/(calculator|calculate|converter|convert|percentage|gcd|lcm|factorial|prime|byte)/.test(haystack)) return 'calculate';
+  if (/(analyzer|analyser|inspector|inspect|explorer|statistics|frequency)/.test(haystack)) return 'inspect';
+  return 'transform';
+};
+
 function t(
   id: string, 
   name: string, 
@@ -82,6 +91,7 @@ function t(
     category,
     description,
     tags,
+    actionType: options.actionType ?? inferActionType(id, name, description),
     ...options
   };
 }
