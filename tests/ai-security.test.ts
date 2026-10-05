@@ -19,26 +19,14 @@ vi.mock('../api/_supabase', () => ({
   supabaseRpc: mocks.supabaseRpc,
 }));
 
-import aiHandler from '../api/ai';
+import { POST as aiHandler } from '../api/ai';
 
 function request(ip: string) {
-  return {
+  return new Request('https://example.com/api/ai', {
     method: 'POST',
-    headers: { 'content-length': '50', 'x-forwarded-for': ip },
-    body: { code: 'const x = 1;', instruction: 'Explain it.' },
-    socket: { remoteAddress: ip },
-  } as any;
-}
-
-function response() {
-  return {
-    statusCode: 0,
-    body: null as unknown,
-    headers: {} as Record<string, string>,
-    status(code: number) { this.statusCode = code; return this; },
-    setHeader(name: string, value: string) { this.headers[name] = value; return this; },
-    json(body: unknown) { this.body = body; return this; },
-  } as any;
+    headers: { 'content-length': '50', 'x-forwarded-for': ip, 'content-type': 'application/json' },
+    body: JSON.stringify({ code: 'const x = 1;', instruction: 'Explain it.' }),
+  });
 }
 
 beforeEach(() => {
@@ -52,11 +40,9 @@ beforeEach(() => {
 describe('/api/ai server authorization and quota', () => {
   it('rejects direct unauthenticated API access', async () => {
     mocks.getAuthenticatedUser.mockResolvedValue(null);
-    const res = response();
+    const res = await aiHandler(request('198.51.100.10'));
 
-    await aiHandler(request('198.51.100.10'), res);
-
-    expect(res.statusCode).toBe(401);
+    expect(res.status).toBe(401);
     expect(mocks.generateContent).not.toHaveBeenCalled();
   });
 
@@ -64,12 +50,10 @@ describe('/api/ai server authorization and quota', () => {
     mocks.getAuthenticatedUser.mockResolvedValue({ id: 'user-pro', email: 'pro@example.com' });
     mocks.getEntitlement.mockResolvedValue({ provider: 'stripe', plan: 'lifetime', status: 'active', expires_at: null });
     mocks.generateContent.mockResolvedValue({ text: 'ok' });
-    const res = response();
+    const res = await aiHandler(request('198.51.100.11'));
 
-    await aiHandler(request('198.51.100.11'), res);
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toMatchObject({ text: 'ok', plan: 'pro' });
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toMatchObject({ text: 'ok', plan: 'pro' });
     expect(mocks.supabaseRpc).not.toHaveBeenCalled();
   });
 
@@ -77,11 +61,9 @@ describe('/api/ai server authorization and quota', () => {
     mocks.getAuthenticatedUser.mockResolvedValue({ id: 'user-free', email: 'free@example.com' });
     mocks.getEntitlement.mockResolvedValue(null);
     mocks.supabaseRpc.mockResolvedValue(false);
-    const res = response();
+    const res = await aiHandler(request('198.51.100.12'));
 
-    await aiHandler(request('198.51.100.12'), res);
-
-    expect(res.statusCode).toBe(429);
+    expect(res.status).toBe(429);
     expect(mocks.supabaseRpc).toHaveBeenCalledWith('reserve_ai_quota', expect.objectContaining({
       p_user_id: 'user-free',
       p_limit: 10,
@@ -94,11 +76,9 @@ describe('/api/ai server authorization and quota', () => {
     mocks.getEntitlement.mockResolvedValue(null);
     mocks.supabaseRpc.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
     mocks.generateContent.mockRejectedValue(new Error('provider failure'));
-    const res = response();
+    const res = await aiHandler(request('198.51.100.13'));
 
-    await aiHandler(request('198.51.100.13'), res);
-
-    expect(res.statusCode).toBe(502);
+    expect(res.status).toBe(502);
     expect(mocks.supabaseRpc).toHaveBeenNthCalledWith(1, 'reserve_ai_quota', expect.objectContaining({
       p_user_id: 'user-free-2',
       p_limit: 10,
