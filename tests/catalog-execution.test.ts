@@ -106,6 +106,16 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'burn-rate-runway-calc': "10000 1000 500",
   'sprint-velocity-calculator': "30 3",
   'simple-interest-calculator': "1000 5 2",
+  'permission-octal-calculator': '755',
+  'base64-to-image': 'data:image/png;base64,iVBORw0KGgo=',
+  'cmyk-to-rgb-hex': '0 100 100 0',
+  'viewport-percentage-calc': '50 25 400 800',
+  'css-truncate-multiline': `3\nHello world`,
+  'bson-objectid-generator': '507f1f77bcf86cd799439011',
+  'color-hex-to-decimal': '#FFFFFF',
+  'color-decimal-to-hex': '16711680',
+  'clamp-number-math': '150 0 100',
+  'rgb-to-hex-code': '255 0 128',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
