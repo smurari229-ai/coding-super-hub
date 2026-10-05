@@ -11,8 +11,10 @@ type Session = {
 };
 
 function config() {
-  const url = import.meta.env.VITE_SUPABASE_URL?.trim();
-  const key = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY)?.trim();
+  const urlValue = import.meta.env.VITE_SUPABASE_URL;
+  const keyValue = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const url = typeof urlValue === 'string' ? urlValue.trim() : '';
+  const key = typeof keyValue === 'string' ? keyValue.trim() : '';
   if (!url || !key) throw new Error('Supabase Auth is not configured.');
   return { url: url.replace(/\/$/, ''), key };
 }
