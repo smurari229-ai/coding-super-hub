@@ -22,6 +22,15 @@ describe('tool engine pure transforms', () => {
   it('executes text reverse without echo fallback', () => {
     expect(executeTool(tool('text-reverser', 'Text Reverser', ['reverse']), 'abc').output).toBe('cba');
   });
+  it('generates a real HMAC-SHA256 signed URL spec', () => {
+    const out = executeTool(
+      tool('signed-url-builder-spec', 'Signed URL'),
+      '{"url":"https://example.com/file.bin?download=1","secret":"test-secret","expiresAt":1893456000}'
+    ).output;
+    expect(out).toContain('signature=264b19c6aa836dea6596545a8fb713c6f6171847063f067e7096bd9fdd6ce513');
+    expect(out).toContain('Canonical string: /file.bin?download=1&expires=1893456000');
+  });
+
   it('returns honest unsupported status', () => {
     const result = executeTool(tool('future-tool', 'Future Tool'), 'abc');
     expect(result.output).toBe('');
