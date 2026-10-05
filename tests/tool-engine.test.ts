@@ -179,4 +179,13 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('html-minifier-basic', 'HTML Minifier Basic'), '<div>  hi </div>').output).toBe('<div> hi </div>');
   });
 
+  it('covers additional text semantic routes', () => {
+    expect(executeTool(tool('case-title', 'Title Case'), 'the lord of the rings').output).toBe('The Lord of the Rings');
+    expect(executeTool(tool('quoted-printable-decoder', 'Quoted Printable'), 'Hello=20World=21').output).toBe('Hello World!');
+    expect(executeTool(tool('repeat-string', 'String Repeater'), '3\nHi').output).toBe('HiHiHi');
+    expect(executeTool(tool('text-compare-inline', 'Inline Diff'), 'hello world\nhello hub').output).toContain('[hub]');
+    expect(executeTool(tool('json-to-ts-interface', 'JSON to TypeScript'), '{"name":"hub","active":true}').output).toContain('name: string;');
+    expect(executeTool(tool('html-to-markdown', 'HTML to Markdown'), '<h1>Hello</h1><strong>World</strong>').output).toContain('# Hello');
+  });
+
 });
