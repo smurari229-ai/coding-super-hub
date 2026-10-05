@@ -25,8 +25,16 @@ function requireBaseAndSecret() {
   return { url, key };
 }
 
+export function getRequestHeader(req: any, name: string): string {
+  if (typeof req?.headers?.get === 'function') {
+    return req.headers.get(name) ?? '';
+  }
+  const value = req?.headers?.[name] ?? req?.headers?.[name.toLowerCase()];
+  return typeof value === 'string' ? value : '';
+}
+
 export async function getAuthenticatedUser(req: any): Promise<AuthUser | null> {
-  const authorization = typeof req?.headers?.authorization === 'string' ? req.headers.authorization : '';
+  const authorization = getRequestHeader(req, 'authorization');
   if (!authorization.startsWith('Bearer ')) return null;
   const token = authorization.slice(7).trim();
   const url = baseUrl();
