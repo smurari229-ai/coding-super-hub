@@ -187,5 +187,17 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('json-to-ts-interface', 'JSON to TypeScript'), '{"name":"hub","active":true}').output).toContain('name: string;');
     expect(executeTool(tool('html-to-markdown', 'HTML to Markdown'), '<h1>Hello</h1><strong>World</strong>').output).toContain('# Hello');
   });
+  it('covers additional high-ROI semantic routes', () => {
+    expect(executeTool(tool('permission-octal-calculator', 'Chmod'), '755').output).toContain('Owner:');
+    expect(executeTool(tool('cmyk-to-rgb-hex', 'CMYK'), '0 100 100 0').output).toContain('HEX: #FF0000');
+    expect(executeTool(tool('viewport-percentage-calc', 'Viewport'), '50 25 400 800').output).toContain('Width: 200');
+    expect(executeTool(tool('css-truncate-multiline', 'CSS Truncate'), '3\nHello world').output).toContain('-webkit-line-clamp: 3');
+    expect(executeTool(tool('bson-objectid-generator', 'ObjectId'), '507f1f77bcf86cd799439011').output).toContain('ObjectId: 507f1f77bcf86cd799439011');
+    expect(executeTool(tool('color-hex-to-decimal', 'HEX to Decimal'), '#FFFFFF').output).toBe('Decimal: 16777215');
+    expect(executeTool(tool('color-decimal-to-hex', 'Decimal to HEX'), '16711680').output).toBe('HEX: #FF0000');
+    expect(executeTool(tool('clamp-number-math', 'Clamp'), '150 0 100').output).toBe('Clamped: 100');
+    expect(executeTool(tool('rgb-to-hex-code', 'RGB to HEX'), '255 0 128').output).toBe('#FF0080');
+  });
+
 
 });
