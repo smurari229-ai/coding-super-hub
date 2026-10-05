@@ -1,27 +1,54 @@
 import { describe, expect, it } from 'vitest';
 import { TOOLS_CATALOG } from '../src/data/tools-catalog';
-import { executeTool } from '../src/lib/tool-engine';
+import { defaultInput, executeTool } from '../src/lib/tool-engine';
 
-const inputFor = (tool: (typeof TOOLS_CATALOG)[number]) => {
-  if (tool.defaultInput) return tool.defaultInput;
-  const text = (tool.id + ' ' + tool.name + ' ' + tool.description + ' ' + tool.tags.join(' ')).toLowerCase();
-  if (text.includes('json')) return '{"name":"hub","active":true}';
-  if (text.includes('csv')) return 'name,age\nA,20';
-  if (text.includes('url') || text.includes('domain')) return 'https://example.com';
-  if (text.includes('hex')) return '48656c6c6f';
-  if (text.includes('binary')) return '01001000 01101001';
-  if (text.includes('base64')) return 'SGVsbG8=';
-  if (text.includes('regex')) return '^hello$';
-  if (text.includes('number') || text.includes('calculator') || text.includes('math') || text.includes('ratio') || text.includes('percent')) return '10 20 30';
-  if (text.includes('color')) return '#112233';
-  if (text.includes('html') || text.includes('css') || text.includes('xml')) return '<p>Hello</p>';
-  if (text.includes('git') || text.includes('docker') || text.includes('ssh') || text.includes('yaml')) return 'example';
-  return 'The quick brown fox jumps over the lazy dog.';
+const SPECIAL_INPUTS: Record<string, string> = {
+  'hex-to-string': '48 65 6c 6c 6f',
+  'binary-to-text': '01001000 01100101 01101100 01101100 01101111',
+  'url-parser-inspector': 'https://example.com/search?q=hello',
+  'json-path-finder': '$.name\n{"name":"Coding Super Hub","active":true}',
+  'csv-column-extractor': 'name\nname,age\nAlice,20\nBob,30',
+  'json-to-csv': '[{"name":"Alice","age":20},{"name":"Bob","age":30}]',
+  'csv-to-json': 'name,age\nAlice,20\nBob,30',
+  'sql-insert-generator': '[{"name":"Alice","age":20}]',
+  'curl-to-fetch': 'curl -X GET https://example.com',
+  'ip-subnet-calculator': '192.168.1.0/24',
+  'contrast-checker': '#000000 #ffffff',
+  'css-clamp-calculator': '16 3 32',
+  'number-base-converter': '42',
+  'timestamp-converter': '2026-09-28T12:00:00.000Z',
+  'speed-distance-time': '100 2',
+  'percentage-calculator': '20 150',
+  'gcd-calculator': '48 18',
+  'lcm-calculator': '48 18',
+  'factorial-calculator': '5',
+  'prime-checker': '97',
+  'chmod-calculator': '755',
+  'password-strength-meter': 'StrongPassword123!',
+  'csp-generator': 'https://example.com',
+  'cors-header-builder': 'https://example.com',
+  'json-to-ts-interface': '{"name":"Alice","active":true}',
+  'json-schema-generator': '{"name":"Alice","active":true}',
+  'escape-json-string': 'Hello "Coding Super Hub"\\n',
+  'repeat-string': '3\\nHello',
+  'string-wrapper': '20\\nThe quick brown fox jumps over the lazy dog.',
+  'string-truncate': '20\\nThe quick brown fox jumps over the lazy dog.',
+  'text-compare-inline': 'hello world\\nhello brave world',
+  'case-title': 'the quick brown fox',
+  'markdown-to-html': '# Hello\\n\\nThis is **bold**.',
+  'html-to-markdown': '<h1>Hello</h1><p>This is <strong>bold</strong>.</p>',
+  'xml-formatter': '<root><item>Hello</item></root>',
+  'yaml-validator': 'name: Coding Super Hub\\nactive: true',
+  'toml-validator': 'name = "Coding Super Hub"'
 };
 
+const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
+  SPECIAL_INPUTS[tool.id] ?? defaultInput(tool);
+
 describe('535-tool catalog execution smoke oracle', () => {
-  it('measures route coverage without converting smoke into semantic PASS claims', () => {
+  it('runs every catalog entry with deterministic representative input and reports evidence without fake semantic PASS claims', () => {
     expect(TOOLS_CATALOG).toHaveLength(535);
+
     const ids = TOOLS_CATALOG.map(tool => tool.id);
     const names = TOOLS_CATALOG.map(tool => tool.name);
     expect(new Set(ids).size).toBe(535);
@@ -30,18 +57,39 @@ describe('535-tool catalog execution smoke oracle', () => {
     expect(names.every(Boolean)).toBe(true);
 
     const rows = TOOLS_CATALOG.map(tool => {
-      const result = executeTool(tool, inputFor(tool));
-      return { id: tool.id, routed: Boolean(result.output), error: result.error ?? '' };
+      const input = auditInputFor(tool);
+      const result = executeTool(tool, input);
+      const error = result.error ?? '';
+      const comingSoon = /Coming soon/i.test(error);
+      const validation = /Enter |Invalid |Malformed |Input must|needs a|must use|outside the safe|not found|does not exist/i.test(error);
+      return {
+        id: tool.id,
+        actionType: tool.actionType,
+        output: Boolean(result.output && result.output.trim()),
+        comingSoon,
+        validation,
+        unexpectedError: Boolean(error && !comingSoon && !validation),
+        error
+      };
     });
-    const routed = rows.filter(row => row.routed).length;
-    const unsupported = rows.filter(row => /Coming soon/.test(row.error)).length;
-    const runtimeErrors = rows.filter(row => !row.routed && !/Coming soon/.test(row.error)).length;
+
+    const output = rows.filter(row => row.output).length;
+    const comingSoon = rows.filter(row => row.comingSoon).length;
+    const validation = rows.filter(row => row.validation).length;
+    const unexpectedErrors = rows.filter(row => row.unexpectedError).length;
+
     console.log(JSON.stringify({
       catalog: rows.length,
-      routedWithSmokeInput: routed,
-      comingSoon: unsupported,
-      runtimeOrValidationErrors: runtimeErrors
+      deterministicInput: true,
+      outputObserved: output,
+      comingSoon,
+      validationOrInputMismatch: validation,
+      unexpectedErrors,
+      semanticPassNotClaimed: true,
+      unexpectedErrorIds: rows.filter(row => row.unexpectedError).map(row => row.id),
+      validationIds: rows.filter(row => row.validation).map(row => row.id)
     }));
-    // This is a route/input smoke measurement, not a semantic oracle: generic inputs can legitimately trigger validation errors. Do not convert these counts into PASS claims.
+
+    expect(unexpectedErrors).toBe(0);
   });
 });
