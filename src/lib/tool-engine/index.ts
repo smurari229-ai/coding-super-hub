@@ -1581,6 +1581,9 @@ const roiBatch12: Handler = (tool, input) => {
 
 
 const handlers: Handler[] = [
+  roiBatch12,
+  roiBatch11,
+  roiBatch10,
   roiBatch9,
   roiBatch8,
   roiTextBatch1,
