@@ -1,29 +1,24 @@
-# Coding Super Hub — Architecture
+# Architecture
 
-## Current architecture (2026-09-26)
-- Frontend: React 19 + Vite + TypeScript.
-- Styling: Tailwind CSS v4 via Vite plugin.
-- Tool catalog: a static TypeScript catalog with 535 registered tools.
-- Rendering: dedicated React renderers for high-value tools plus `GenericToolRunner` for the generic catalog path.
-- Client persistence: browser `localStorage` for favorites and recent tools.
-- AI boundary: Vercel serverless function at `/api/ai` using the server-only `GEMINI_API_KEY` environment variable.
-- Identity: Supabase Auth email OTP; the browser stores only the signed session tokens needed to authenticate requests, while the server verifies the user through Supabase Auth.
-- Billing: existing `public.pro_entitlements` is the server authorization source of truth; `public.billing_webhook_events` provides durable webhook idempotency.
-- AI quota: existing Supabase project now has `public.ai_usage_daily` with atomic reserve/release RPCs; it is separate from billing and never client-authoritative.
-- Deployment: Vercel.
+Coding Super Hub is a React 19 + TypeScript + Vite 8 application.
 
-## Current request flow
-Tool input → client-side validation/processing → rendered result → copy/download/reset where implemented.
+## Runtime layers
 
-AI request → authenticated Supabase user → `/api/ai` → method/body/input limits + IP rate limit → durable entitlement lookup → atomic Free quota reservation when needed → Gemini → bounded response → client.
+- `src/data/tools-catalog.ts`: the 535-entry metadata catalog.
+- `src/lib/tool-engine/`: deterministic tool execution handlers.
+- `src/components/tools/`: dedicated React UIs for high-value tools.
+- `src/lib/auth.ts`: browser session handling for Supabase Auth.
+- `src/lib/pro.ts`: client display state only; server verification remains authoritative.
+- `api/`: server-side AI and payment verification/webhook handlers.
+- `supabase/migrations/`: database constraints and RLS-related schema changes.
+- `public/`: static manifest, robots, and sitemap assets.
 
-## Explicitly not implemented yet
-- Database-backed workspace.
-- Cross-device favorites/history.
-- Token/cost ledger beyond quota counters.
-- Team/advanced entitlement tiers.
-- Project generator.
-- GitHub repository write integration.
-- Durable analytics pipeline.
+## Security boundaries
 
-These are roadmap gaps, not reasons to alter the existing tool engine without evidence.
+Gemini and payment-provider secrets stay server-side. The browser sends an authenticated Supabase access token to protected API routes. Pro entitlement is verified server-side and persisted in Supabase.
+
+The Code Playground executes user-supplied HTML/CSS/JS inside a sandboxed iframe with `allow-scripts` only and no `allow-same-origin`.
+
+## Release principle
+
+A passing TypeScript check, test suite, and build are necessary but not sufficient for a release. Production smoke testing, payment-provider verification, Supabase configuration, accessibility, and mobile checks must also be verified before claiming release readiness.
