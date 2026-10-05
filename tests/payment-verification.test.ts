@@ -14,6 +14,7 @@ vi.mock('../api/_supabase', () => ({
   updateEntitlementByProviderField: vi.fn(async () => undefined),
   supabaseRest: vi.fn(),
   supabaseRpc: vi.fn(),
+  getRequestHeader: vi.fn((request: Request, name: string) => request.headers.get(name)),
 }));
 
 const originalEnv = { ...process.env };
