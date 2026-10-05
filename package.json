@@ -1,7 +1,7 @@
 {
   "name": "coding-super-hub",
-  "version": "0.1.0",
-  "description": "Privacy-first all-in-one developer toolbox",
+  "version": "1.0.0",
+  "description": "Privacy-aware developer toolbox with 535 registered tools, sandboxed coding utilities, and server-protected AI Copilot.",
   "private": true,
   "type": "module",
   "repository": {
@@ -11,18 +11,20 @@
   "bugs": {
     "url": "https://github.com/smurari229-ai/coding-super-hub/issues"
   },
-  "homepage": "https://github.com/smurari229-ai/coding-super-hub#readme",
+  "homepage": "https://coding-super-hub.vercel.app/",
   "author": "Coding Super Hub",
   "license": "MIT",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "npx --yes rimraf@6.1.3 dist server.js",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "npm run lint && npm test && npm run build",
+    "format": "npx --yes prettier@3.9.9 --write .",
+    "format:check": "npx --yes prettier@3.9.9 --check ."
   },
   "dependencies": {
     "@google/genai": "2.24.0",
@@ -49,5 +51,8 @@
     "tsx": "4.23.15",
     "typescript": "7.0.2",
     "vitest": "5.0.3"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   }
 }
