@@ -1580,7 +1580,83 @@ const roiBatch12: Handler = (tool, input) => {
 };
 
 
+
+const roiBatch13: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'permission-octal-calculator':
+      return chmodCalculator(input);
+    case 'cmyk-to-rgb-hex': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 4 || values.some(v => v < 0 || v > 100)) {
+        throw new Error('Enter C, M, Y, K percentages from 0 to 100.');
+      }
+      const [c, m, y, k] = values;
+      const r = Math.round(255 * (1 - c / 100) * (1 - k / 100));
+      const g = Math.round(255 * (1 - m / 100) * (1 - k / 100));
+      const b = Math.round(255 * (1 - y / 100) * (1 - k / 100));
+      const hex = [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+      return 'RGB: ' + r + ', ' + g + ', ' + b + '\\nHEX: #' + hex;
+    }
+    case 'viewport-percentage-calc': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 4) throw new Error('Enter vw, vh, viewport width, and viewport height.');
+      const [vw, vh, width, height] = values;
+      return 'Width: ' + (width * vw / 100) + ' px\\nHeight: ' + (height * vh / 100) + ' px';
+    }
+    case 'css-truncate-multiline': {
+      const lines = input.split(/\\r?\\n/);
+      const count = Math.trunc(Number(lines[0]));
+      if (!Number.isInteger(count) || count < 1 || count > 20) throw new Error('First line must be a line count from 1 to 20.');
+      const text = lines.slice(1).join(' ').trim() || 'Your text here';
+      return '.truncate {\\n  display: -webkit-box;\\n  -webkit-box-orient: vertical;\\n  -webkit-line-clamp: ' + count + ';\\n  overflow: hidden;\\n}\\n\\nText: ' + text;
+    }
+    case 'bson-objectid-generator': {
+      const requested = input.trim();
+      if (requested && !/^[0-9a-f]{24}$/i.test(requested)) throw new Error('Enter a 24-hex ObjectId to inspect, or leave blank to generate one.');
+      const id = requested || Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join('');
+      const seconds = parseInt(id.slice(0, 8), 16);
+      const date = new Date(seconds * 1000);
+      return 'ObjectId: ' + id + '\\nTimestamp: ' + (Number.isFinite(date.getTime()) ? date.toISOString() : 'Unknown');
+    }
+    case 'color-hex-to-decimal': {
+      const clean = input.trim().replace(/^#/, '');
+      if (!/^[0-9a-f]{6}$/i.test(clean)) throw new Error('Enter a six-digit HEX color such as #FFFFFF.');
+      return 'Decimal: ' + parseInt(clean, 16);
+    }
+    case 'color-decimal-to-hex': {
+      const value = Number(input.trim());
+      if (!Number.isInteger(value) || value < 0 || value > 0xffffff) throw new Error('Enter an integer from 0 to 16777215.');
+      return 'HEX: #' + value.toString(16).padStart(6, '0').toUpperCase();
+    }
+    case 'clamp-number-math': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 3) throw new Error('Enter value, min, and max.');
+      const [value, min, max] = values;
+      if (min > max) throw new Error('Minimum cannot be greater than maximum.');
+      return 'Clamped: ' + Math.min(max, Math.max(min, value));
+    }
+    case 'rgb-to-hex-code': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 3 || values.slice(0, 3).some(v => v < 0 || v > 255)) {
+        throw new Error('Enter RGB values from 0 to 255, e.g. 255 0 128.');
+      }
+      const hex = values.slice(0, 3).map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase();
+      return '#' + hex;
+    }
+    case 'base64-to-image': {
+      const value = input.trim();
+      const match = value.match(/^data:image\\/(png|jpeg|jpg|gif|webp);base64,([A-Za-z0-9+/=]+)$/i);
+      if (!match) throw new Error('Enter a valid image data URL such as data:image/png;base64,...');
+      const bytes = atob(match[2]).length;
+      return 'Image type: ' + match[1].toUpperCase() + '\\nDecoded bytes: ' + bytes;
+    }
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch13,
   roiBatch12,
   roiBatch11,
   roiBatch10,
