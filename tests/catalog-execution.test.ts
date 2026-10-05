@@ -116,6 +116,7 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'color-decimal-to-hex': '16711680',
   'clamp-number-math': '150 0 100',
   'rgb-to-hex-code': '255 0 128',
+  'signed-url-builder-spec': '{"url":"https://example.com/file.bin?download=1","secret":"test-secret","expiresAt":1893456000}',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
