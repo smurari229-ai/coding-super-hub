@@ -136,21 +136,25 @@ describe('535-tool catalog execution smoke oracle', () => {
       const input = auditInputFor(tool);
       const result = executeTool(tool, input);
       const error = result.error ?? '';
-      const comingSoon = /Coming soon/i.test(error);
-      const validation = /Enter |Invalid |Malformed |Input must|needs a|must use|outside the safe|not found|does not exist/i.test(error);
+      const output = Boolean(result.output && result.output.trim());
+      const comingSoon = !output && /Coming soon/i.test(error);
+      const dedicatedUi = !output && Boolean(tool.dedicatedComponent) && !comingSoon;
+      const validation = !output && !dedicatedUi && /Enter |Invalid |Malformed |Input must|needs a|must use|must be|outside the safe|not found|does not exist/i.test(error);
       return {
         id: tool.id,
         actionType: tool.actionType,
-        output: Boolean(result.output && result.output.trim()),
+        output,
         comingSoon,
+        dedicatedUi,
         validation,
-        unexpectedError: Boolean(error && !comingSoon && !validation),
+        unexpectedError: Boolean(error && !output && !comingSoon && !dedicatedUi && !validation),
         error
       };
     });
 
     const output = rows.filter(row => row.output).length;
     const comingSoon = rows.filter(row => row.comingSoon).length;
+    const dedicatedUi = rows.filter(row => row.dedicatedUi).length;
     const validation = rows.filter(row => row.validation).length;
     const unexpectedErrors = rows.filter(row => row.unexpectedError).length;
 
@@ -160,6 +164,7 @@ describe('535-tool catalog execution smoke oracle', () => {
       outputObserved: output,
       comingSoon,
       validationOrInputMismatch: validation,
+      dedicatedUi,
       unexpectedErrors,
       semanticPassNotClaimed: true,
       unexpectedErrorIds: rows.filter(row => row.unexpectedError).map(row => row.id),
