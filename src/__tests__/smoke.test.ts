@@ -35,7 +35,7 @@ describe('application smoke test', () => {
 
     try {
       const html = renderToString(React.createElement(App));
-      expect(html).toContain('Text & String');
+      expect(html).toContain('Coding Super Hub');
       expect(consoleError).not.toHaveBeenCalled();
     } finally {
       console.error = originalError;
