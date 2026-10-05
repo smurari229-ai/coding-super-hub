@@ -1533,6 +1533,52 @@ const roiBatch11: Handler = (tool, input) => {
   }
 };
 
+const roiBatch12: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'case-title': {
+      const small = new Set(['a','an','the','and','or','but','for','nor','on','at','to','from','by','of','in']);
+      const parts = input.trim().toLowerCase().split(/\s+/);
+      return parts.map((word, i) => i > 0 && i < parts.length - 1 && small.has(word) ? word : word[0]?.toUpperCase() + word.slice(1)).join(' ');
+    }
+    case 'quoted-printable-decoder':
+      return input.replace(/=\r?\n/g, '').replace(/=([0-9A-F]{2})/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
+    case 'repeat-string': {
+      const lines = input.split(/\r?\n/);
+      const count = Math.trunc(Number(lines[0]));
+      if (!Number.isInteger(count) || count < 1 || count > 1000) throw new Error('First line must be a repeat count from 1 to 1000.');
+      return Array(count).fill(lines.slice(1).join('\n')).join('');
+    }
+    case 'text-compare-inline': {
+      const lines = input.split(/\r?\n/);
+      if (lines.length < 2) throw new Error('Use two lines: original text and changed text.');
+      const a = lines[0].split(/\s+/), b = lines[1].split(/\s+/);
+      return b.map((word, i) => word === a[i] ? word : '[' + word + ']').join(' ');
+    }
+    case 'json-to-ts-interface': {
+      const data = JSON.parse(input);
+      const typeOf = (value: unknown): string => {
+        if (value === null) return 'null';
+        if (Array.isArray(value)) return value.length ? typeOf(value[0]) + '[]' : 'unknown[]';
+        if (typeof value === 'object') return 'object';
+        return typeof value === 'number' && Number.isInteger(value) ? 'number' : typeof value;
+      };
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Input must be a JSON object.');
+      const lines = Object.entries(data as Record<string, unknown>).map(([key, value]) => '  ' + key.replace(/[^A-Za-z0-9_$]/g, '_') + ': ' + typeOf(value) + ';');
+      return 'interface Generated {\n' + lines.join('\n') + '\n}';
+    }
+    case 'html-to-markdown':
+      return input
+        .replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, (_, text: string) => '# ' + text.trim() + '\n')
+        .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
+        .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, '*$1*')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .trim();
+    default:
+      return null;
+  }
+};
+
 
 const handlers: Handler[] = [
   roiBatch9,
