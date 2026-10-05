@@ -1,43 +1,27 @@
 ---
 name: Bug report
 about: Report a reproducible defect
-title: "[Bug]: "
+title: "[Bug] "
 labels: bug
 assignees: ""
 ---
 
-## Description
+## Summary
+<!-- What is broken? -->
 
-Describe the problem clearly.
-
-## Reproduction steps
-
+## Reproduction
 1.
 2.
 3.
 
 ## Expected behavior
 
-What should have happened?
-
 ## Actual behavior
 
-What happened instead?
-
 ## Environment
-
-- Browser:
+- Browser/device:
 - OS:
-- Screen size:
-- Tool name or URL:
-- Commit or deployment:
+- Commit/branch:
 
 ## Evidence
-
-Add screenshots, console output, or a minimal reproduction. Remove secrets and personal data.
-
-## Checklist
-
-- [ ] I searched existing issues.
-- [ ] I removed secrets and sensitive data.
-- [ ] I can reproduce this issue.
+<!-- Screenshots, console output, or logs. Never include secrets. -->
