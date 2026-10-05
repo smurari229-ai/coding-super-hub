@@ -1,64 +1,34 @@
 # Security Policy
 
-## Supported versions
-
-| Version | Supported |
-| --- | --- |
-| 0.1.x | Yes |
-| Older versions | Best effort only |
-
-Security fixes are developed against the current supported branch. Users should upgrade to the latest released patch in a supported minor line.
-
 ## Reporting a vulnerability
 
-Do not open a public issue for a suspected security vulnerability.
+Please do not disclose exploitable vulnerabilities publicly before maintainers have had an opportunity to investigate.
 
-Private email: `__REPLACE_ME_EMAIL__`
-GitHub Security Advisory: https://github.com/smurari229-ai/coding-super-hub/security/advisories/new
+Use GitHub's private security reporting feature for this repository when available. If private reporting is unavailable, contact the repository maintainer through a private channel listed on the repository profile.
 
-If the private email placeholder has not been configured, use the private GitHub Security Advisory channel. Include a clear description, affected version or commit, reproduction steps, impact, and any safe proof of concept. Remove credentials, payment data, personal data, and other secrets from the report.
+Include:
+- affected file/route and version or commit;
+- concise reproduction steps;
+- impact;
+- suggested mitigation, if known.
 
-## Response timeline
-
-- Acknowledgement target: within 48 hours.
-- Initial triage and severity assessment: as soon as practical after acknowledgement.
-- Fix target: within 7 days for confirmed high-impact vulnerabilities when technically and operationally feasible.
-- Coordinated disclosure timing is agreed with the reporter when additional time is required.
+Do not include real API keys, payment credentials, access tokens, customer data, or other secrets in a report.
 
 ## Scope
 
-Security reports are especially relevant to:
+Security-sensitive areas include:
+- server API routes and authentication;
+- Supabase RLS and service credentials;
+- Stripe/Lemon Squeezy verification and webhooks;
+- AI provider integration;
+- sandboxed iframe execution;
+- CSP and other response headers;
+- XSS, injection, and unsafe URL handling.
 
-- Client-side XSS, injection, unsafe HTML rendering, or content escaping failures.
-- CodePlayground sandbox escape, unsafe iframe configuration, or message-channel isolation failures.
-- Authentication or authorization bypasses.
-- AI endpoint identity, quota, or entitlement bypasses.
-- Billing entitlement manipulation, webhook signature bypass, replay, or idempotency failures.
-- Dependency vulnerabilities that materially affect application security.
-- API key leakage, secret exposure, security-header, CSP, CORS, or server-side request handling defects.
+## Supported versions
 
-## Out of scope
+The default branch and the current release/audit branch are the supported development targets. Security fixes should be backported only when the maintainer explicitly decides to support an older release.
 
-- General feature requests or product feedback.
-- Cosmetic UI issues without a security impact.
-- Denial-of-service claims against third-party providers or infrastructure outside this repository's control.
-- Social engineering or phishing unrelated to a defect in this project.
-- Physical attacks or physical compromise of devices or infrastructure.
-- Vulnerabilities that require the reporter to already control the maintainer's credentials.
-- Automated scanner output without a reproducible security impact.
+## Secret handling
 
-## Security boundaries
-
-Client localStorage is not an authorization source. Paid entitlement, authentication, AI access, and quota enforcement must remain server-authoritative. Never commit API keys, webhook secrets, payment credentials, or private environment values.
-
-## Placeholder policy
-
-The token `__REPLACE_ME_EMAIL__` is intentionally non-functional and must be replaced by a maintainer before publishing a direct private-email contact. No real email address or secret belongs in the repository.
-
-## Disclosure
-
-Please allow maintainers reasonable time to investigate and release a fix before public disclosure. We will credit reporters when they request credit and it is safe to do so.
-
-## Safe harbor
-
-Good-faith security research is welcome when it is conducted without intentionally harming users, degrading service availability, accessing data that does not belong to the researcher, or committing fraud. Researchers should stop testing and report promptly when they encounter sensitive data or a potential security impact. We will not pursue legal action for authorized, good-faith research that follows this policy and applicable law.
+Browser-exposed `VITE_*` values must contain only public configuration. Server-only credentials such as payment secrets, webhook secrets, Supabase secret keys, and Gemini API keys must never be prefixed with `VITE_`.
