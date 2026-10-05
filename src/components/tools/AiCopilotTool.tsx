@@ -69,7 +69,11 @@ export const AiCopilotTool: React.FC = () => {
       setError('Sign in is required before using AI Copilot.');
       return;
     }
-    if (!aiConsent) {\n      setError('Please confirm that your code and instructions will be sent to Google Gemini for AI processing.');\n      return;\n    }\n    setLoading(true);
+    if (!aiConsent) {
+      setError('Please confirm that your code and instructions will be sent to Google Gemini for AI processing.');
+      return;
+    }
+    setLoading(true);
     setError(null);
     setResponse('');
 
