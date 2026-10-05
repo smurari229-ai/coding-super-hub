@@ -1239,12 +1239,42 @@ const roiBatch6: Handler = (tool, input) => {
     case 'standard-normal-z-score': {const x=n[0],mean=n[1]??0,sd=n[2]??1;if(!Number.isFinite(x)||sd<=0)throw new Error('Enter value, mean, and positive standard deviation.');return 'Z-score: '+((x-mean)/sd);}
     case 'dpi-ppi-calculator': {if(n.length<2||n[1]<=0)throw new Error('Enter pixels and physical size.');return 'Density: '+n[0]/n[1]+' px/unit';}
     case 'aspect-ratio-calculator': {if(n.length<3||n[1]===0)throw new Error('Enter width height targetWidth.');return 'Target height: '+n[2]*n[1]/n[0];}
-    case 'average-mean-median-mode': return null;
-    case 'big-o-notation-cheatsheet': return 'O(1): constant\nO(log n): binary search\nO(n): single pass\nO(n log n): efficient comparison sort\nO(n²): nested pairwise loops\nO(2^n): subset-style recursion';
-    case 'modulo-arithmetic-calc': return null;
-    case 'logarithm-calculator': return null;
-    case 'pythagorean-theorem-calc': return null;
-    case 'circle-area-perimeter': return null;
+    case 'average-mean-median-mode': {
+      const values = n.filter(Number.isFinite);
+      if (!values.length) throw new Error('Enter one or more numbers.');
+      const sorted = [...values].sort((a,b)=>a-b);
+      const mean = values.reduce((sum,v)=>sum+v,0)/values.length;
+      const mid = Math.floor(sorted.length/2);
+      const median = sorted.length % 2 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
+      const counts = new Map<number,number>();
+      for (const v of values) counts.set(v,(counts.get(v)??0)+1);
+      const maxCount = Math.max(...counts.values());
+      const modes = maxCount > 1 ? [...counts.entries()].filter(([,count])=>count===maxCount).map(([v])=>v) : [];
+      return ['Count: '+values.length,'Mean: '+mean,'Median: '+median,'Mode: '+(modes.length ? modes.join(', ') : 'No mode')].join('\\n');
+    }
+    case 'big-o-notation-cheatsheet': return 'O(1): constant\\nO(log n): binary search\\nO(n): single pass\\nO(n log n): efficient comparison sort\\nO(n²): nested pairwise loops\\nO(2^n): subset-style recursion';
+    case 'modulo-arithmetic-calc': {
+      if (n.length < 2 || !Number.isInteger(n[1]) || n[1] === 0) throw new Error('Enter integer a and a non-zero integer modulus.');
+      const [a,m] = n.map(Math.trunc);
+      return 'a mod m: '+((a % m)+Math.abs(m))%Math.abs(m)+'\\nJavaScript remainder: '+(a % m);
+    }
+    case 'logarithm-calculator': {
+      if (!Number.isFinite(n[0]) || n[0] <= 0) throw new Error('Enter a positive value.');
+      const value=n[0], base=n[1] ?? 10;
+      if (!Number.isFinite(base) || base <= 0 || base === 1) throw new Error('Base must be positive and not equal to 1.');
+      return 'log_'+base+'('+value+') = '+(Math.log(value)/Math.log(base));
+    }
+    case 'pythagorean-theorem-calc': {
+      if (n.length < 2) throw new Error('Enter two sides.');
+      const [a,b]=n;
+      if (a < 0 || b < 0) throw new Error('Sides must be non-negative.');
+      return 'Hypotenuse: '+Math.hypot(a,b);
+    }
+    case 'circle-area-perimeter': {
+      if (!Number.isFinite(n[0]) || n[0] < 0) throw new Error('Enter a non-negative radius.');
+      const radius=n[0];
+      return 'Area: '+(Math.PI*radius*radius)+'\\nCircumference: '+(2*Math.PI*radius);
+    }
     default:return null;
   }
 };
