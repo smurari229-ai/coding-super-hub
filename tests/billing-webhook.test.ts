@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../api/_supabase', () => mocks);
 
-import stripeWebhook from '../api/stripe-webhook';
+import { POST as stripeWebhook } from '../api/stripe-webhook';
 
 const originalEnv = { ...process.env };
 
