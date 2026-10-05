@@ -1,8 +1,8 @@
 ## Summary
-- 
+-
 
 ## Why
-- 
+-
 
 ## Verification
 - [ ] npm run lint
