@@ -104,7 +104,7 @@ console.log('Sandbox loaded successfully!');`;
             // Capture console.log
             const origLog = console.log;
             console.log = function(...args) {
-              window.parent.postMessage({ type: 'CONSOLE_LOG', message: args.join(' ') }, '*');
+              window.parent.postMessage({ type: 'CONSOLE_LOG', message: args.map(String).join(' ').slice(0, 2000) }, '*');
               origLog.apply(console, args);
             };
           </script>
