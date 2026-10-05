@@ -42,5 +42,6 @@ describe('535-tool catalog execution smoke oracle', () => {
       comingSoon: unsupported,
       runtimeOrValidationErrors: runtimeErrors
     }));
+    expect(runtimeErrors).toBe(0);
   });
 });
