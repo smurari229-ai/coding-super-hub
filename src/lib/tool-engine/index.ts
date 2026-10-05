@@ -1604,11 +1604,11 @@ const roiBatch13: Handler = (tool, input) => {
       return 'Width: ' + (width * vw / 100) + ' px\\nHeight: ' + (height * vh / 100) + ' px';
     }
     case 'css-truncate-multiline': {
-      const lines = input.split(/\\r?\\n/);
+      const lines = input.split(/\r?\n/);
       const count = Math.trunc(Number(lines[0]));
       if (!Number.isInteger(count) || count < 1 || count > 20) throw new Error('First line must be a line count from 1 to 20.');
       const text = lines.slice(1).join(' ').trim() || 'Your text here';
-      return '.truncate {\\n  display: -webkit-box;\\n  -webkit-box-orient: vertical;\\n  -webkit-line-clamp: ' + count + ';\\n  overflow: hidden;\\n}\\n\\nText: ' + text;
+      return '.truncate {\n  display: -webkit-box;\n  -webkit-box-orient: vertical;\n  -webkit-line-clamp: ' + count + ';\n  overflow: hidden;\n}\n\nText: ' + text;
     }
     case 'bson-objectid-generator': {
       const requested = input.trim();
