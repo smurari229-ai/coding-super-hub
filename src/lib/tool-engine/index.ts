@@ -1645,7 +1645,7 @@ const roiBatch13: Handler = (tool, input) => {
     }
     case 'base64-to-image': {
       const value = input.trim();
-      const match = value.match(/^data:image\\/(png|jpeg|jpg|gif|webp);base64,([A-Za-z0-9+/=]+)$/i);
+      const match = value.match(/^data:image\/(png|jpeg|jpg|gif|webp);base64,([A-Za-z0-9+/=]+)$/i);
       if (!match) throw new Error('Enter a valid image data URL such as data:image/png;base64,...');
       const bytes = atob(match[2]).length;
       return 'Image type: ' + match[1].toUpperCase() + '\\nDecoded bytes: ' + bytes;
