@@ -154,7 +154,7 @@ describe('tool engine pure transforms', () => {
 
   it('covers previously unhandled deterministic math routes', () => {
     expect(executeTool(tool('average-mean-median-mode', 'Mean Median Mode'), '1 2 2 4').output).toContain('Median: 2');
-    expect(executeTool(tool('modulo-arithmetic-calc', 'Modulo'), '17 5').output).toContain('a mod m: 2');
+    expect(executeTool(tool('modulo-arithmetic-calc', 'Modulo'), '17 5').output).toBe('2');
     expect(executeTool(tool('logarithm-calculator', 'Logarithm'), '100 10').output).toContain('2');
     expect(executeTool(tool('pythagorean-theorem-calc', 'Pythagorean'), '3 4').output).toContain('5');
     expect(executeTool(tool('circle-area-perimeter', 'Circle'), '2').output).toContain('Area:');
