@@ -160,3 +160,16 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('circle-area-perimeter', 'Circle'), '2').output).toContain('Area:');
   });
 });
+
+  it('covers deterministic semantic batch 10 routes', () => {
+    expect(executeTool(tool('rot13-cipher', 'ROT13 Cipher'), 'Hello').output).toBe('Uryyb');
+    expect(executeTool(tool('shuffle-words', 'Shuffle Words'), 'one two three').output.split(/\\s+/)).toHaveLength(3);
+    expect(executeTool(tool('escape-json-string', 'Escape JSON String'), 'a"b').output).toBe('a\\\"b');
+    expect(executeTool(tool('json-flatten', 'JSON Flatten'), '{"user":{"name":"Murari"}}').output).toContain('"user.name": "Murari"');
+    expect(executeTool(tool('markdown-table-builder', 'Markdown Table Builder'), 'Name,Age\\nA,20').output).toContain('| Name | Age |');
+    expect(executeTool(tool('json-schema-generator', 'JSON Schema Generator'), '{"name":"hub","active":true}').output).toContain('"type": "object"');
+    expect(executeTool(tool('xml-formatter', 'XML Formatter'), '<root><item>1</item></root>').output).toContain('<root>');
+    expect(executeTool(tool('yaml-validator', 'YAML Validator'), 'name: hub\\nactive: true').output).toContain('Valid');
+    expect(executeTool(tool('toml-validator', 'TOML Validator'), 'name = "hub"').output).toContain('Valid');
+  });
+}
