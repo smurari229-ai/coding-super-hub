@@ -136,4 +136,4 @@ async function handler(req: Request) {
   }
 }
 
-export default { fetch: handler };
+export default handler;
