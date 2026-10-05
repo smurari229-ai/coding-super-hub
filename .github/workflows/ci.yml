@@ -10,7 +10,7 @@ permissions:
 
 env:
   BUN_VERSION: 1.4.0
-  NODE_VERSION: 20.19.4
+  NODE_VERSION: 22.22.2
 
 jobs:
   install:
