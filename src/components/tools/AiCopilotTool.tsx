@@ -33,7 +33,8 @@ export const AiCopilotTool: React.FC = () => {
   const [email, setEmail] = useState(getAuthSession()?.user.email ?? '');
   const [otp, setOtp] = useState('');
   const [authReady, setAuthReady] = useState(Boolean(getAuthSession()));
-  const [otpSent, setOtpSent] = useState(false);\n  const [aiConsent, setAiConsent] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [aiConsent, setAiConsent] = useState(false);
 
   useEffect(() => {
     setAuthReady(Boolean(getAuthSession()));
