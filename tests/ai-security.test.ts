@@ -17,6 +17,7 @@ vi.mock('../api/_supabase', () => ({
   getAuthenticatedUser: mocks.getAuthenticatedUser,
   getEntitlement: mocks.getEntitlement,
   supabaseRpc: mocks.supabaseRpc,
+  getRequestHeader: vi.fn((request: Request, name: string) => request.headers.get(name)),
 }));
 
 import { POST as aiHandler } from '../api/ai';
