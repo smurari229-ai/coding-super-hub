@@ -1400,6 +1400,84 @@ const roiBatch9: Handler = (tool, input) => {
 };
 
 
+const roiBatch10: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'rot13-cipher':
+      return caesar(input, 13);
+    case 'ascii-art-banner':
+      return input.trim().split(/\s+/).map(word => word.toUpperCase().split('').join(' ')).join('\n');
+    case 'shuffle-words': {
+      const wordsList = input.trim().split(/\s+/).filter(Boolean);
+      for (let i = wordsList.length - 1; i > 0; i -= 1) {
+        const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i + 1);
+        [wordsList[i], wordsList[j]] = [wordsList[j], wordsList[i]];
+      }
+      return wordsList.join(' ');
+    }
+    case 'escape-json-string':
+      return JSON.stringify(input).slice(1, -1);
+    case 'json-flatten': {
+      const data = JSON.parse(input);
+      const out: Record<string, unknown> = {};
+      const visit = (value: unknown, path: string) => {
+        if (Array.isArray(value)) value.forEach((item, index) => visit(item, path ? path + '.' + index : String(index)));
+        else if (value && typeof value === 'object') Object.entries(value as Record<string, unknown>)
+          .forEach(([key, item]) => visit(item, path ? path + '.' + key : key));
+        else out[path] = value;
+      };
+      visit(data, '');
+      return JSON.stringify(out, null, 2);
+    }
+    case 'markdown-table-builder': {
+      const rows = parseCsv(input);
+      if (!rows.length) throw new Error('Enter CSV-style rows.');
+      return ['| ' + rows[0].map(encodeHtml).join(' | ') + ' |',
+        '| ' + rows[0].map(() => '---').join(' | ') + ' |',
+        ...rows.slice(1).map(row => '| ' + row.map(encodeHtml).join(' | ') + ' |')].join('\n');
+    }
+    case 'json-schema-generator': {
+      const data = JSON.parse(input);
+      const schemaType = (value: unknown): Record<string, unknown> => {
+        if (value === null) return { type: 'null' };
+        if (Array.isArray(value)) return { type: 'array', items: value.length ? schemaType(value[0]) : {} };
+        if (typeof value === 'object') {
+          const properties: Record<string, unknown> = {};
+          for (const [key, item] of Object.entries(value as Record<string, unknown>)) properties[key] = schemaType(item);
+          return { type: 'object', properties };
+        }
+        return { type: typeof value };
+      };
+      return JSON.stringify({ $schema: 'https://json-schema.org/draft/2020-12/schema', ...schemaType(data) }, null, 2);
+    }
+    case 'xml-formatter': {
+      const source = input.trim().replace(/>\s*</g, '><');
+      if (!/^<[\s\S]+>$/.test(source)) throw new Error('Enter valid XML-like markup.');
+      let depth = 0;
+      return source.replace(/(<[^>]+>)/g, '\n$1').split('\n').filter(Boolean).map(token => {
+        if (/^<\//.test(token)) depth = Math.max(0, depth - 1);
+        const line = '  '.repeat(depth) + token;
+        if (/^<[^!?/][^>]*[^/]?>$/.test(token) && !/<[^>]+>[^<]*<\/[^>]+>$/.test(token)) depth += 1;
+        return line;
+      }).join('\n');
+    }
+    case 'yaml-validator':
+      yamlToJson(input);
+      return 'Valid basic YAML mapping.';
+    case 'toml-validator': {
+      const lines = input.split(/\r?\n/);
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') || /^\[[^\]]+\]$/.test(trimmed)) continue;
+        if (!/^[A-Za-z0-9_.-]+\s*=\s*.+$/.test(trimmed)) throw new Error('Invalid basic TOML key/value line: ' + trimmed);
+      }
+      return 'Valid basic TOML key/value document.';
+    }
+    default:
+      return null;
+  }
+};
+
+
 const handlers: Handler[] = [
   roiBatch9,
   roiBatch8,
