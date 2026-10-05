@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { getAuthenticatedUser, getEntitlement, supabaseRpc } from './_supabase.js';
+import { getAuthenticatedUser, getEntitlement, getRequestHeader, supabaseRpc } from './_supabase.js';
 
 const MAX_CODE_LENGTH = 20_000;
 const MAX_INSTRUCTION_LENGTH = 4_000;
@@ -13,8 +13,8 @@ type RateEntry = { count: number; resetAt: number };
 const rateStore = new Map<string, RateEntry>();
 
 function getClientIp(req: any): string {
-  const forwarded = typeof req?.headers?.['x-forwarded-for'] === 'string' ? req.headers['x-forwarded-for'] : '';
-  return forwarded.split(',')[0].trim() || req?.socket?.remoteAddress || 'unknown';
+  const forwarded = getRequestHeader(req, 'x-forwarded-for');
+  return forwarded.split(',')[0].trim() || 'unknown';
 }
 
 function rateLimited(ip: string): boolean {
@@ -49,7 +49,7 @@ async function handler(req: Request) {
     });
   }
 
-  const contentLength = Number(req.headers?.['content-length'] || 0);
+  const contentLength = Number(getRequestHeader(req, 'content-length') || 0);
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_LENGTH) {
     return send( 413, { error: 'AI request is too large' });
   }
@@ -65,8 +65,13 @@ async function handler(req: Request) {
   const user = await getAuthenticatedUser(req);
   if (!user?.id) return send( 401, { error: 'Sign in is required before using AI Copilot.' });
 
-  const body = req.body;
-  if (!body || typeof body !== 'object' || Array.isArray(body)) return send( 400, { error: 'Invalid request body' });
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return send(400, { error: 'Invalid request body' });
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return send(400, { error: 'Invalid request body' });
 
   const code = typeof body.code === 'string' ? body.code : '';
   const instruction = typeof body.instruction === 'string' ? body.instruction : '';
