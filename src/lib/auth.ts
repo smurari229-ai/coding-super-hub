@@ -1,5 +1,8 @@
 const STORAGE_KEY = 'csh_auth_session';
 
+// Auth tokens are intentionally session-scoped: they are cleared when the browser tab/session ends.
+// Do not move this back to localStorage.
+
 type Session = {
   access_token: string;
   refresh_token: string;
@@ -16,7 +19,7 @@ function config() {
 
 function readSession(): Session | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const session = JSON.parse(raw) as Session;
     return session?.access_token && session?.refresh_token && session?.user?.id ? session : null;
@@ -27,8 +30,8 @@ function readSession(): Session | null {
 
 function saveSession(session: Session | null) {
   try {
-    if (session) localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-    else localStorage.removeItem(STORAGE_KEY);
+    if (session) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    else sessionStorage.removeItem(STORAGE_KEY);
   } catch {}
 }
 
