@@ -31,6 +31,19 @@ describe('tool engine pure transforms', () => {
     expect(out).toContain('Canonical string: /file.bin?download=1&expires=1893456000');
   });
 
+  it('covers the deterministic text and encoding batch', () => {
+    expect(executeTool(tool('base64-text-encoder', 'Base64 Text Encoder'), 'Hello 🚀').output).toBe('SGVsbG8g8J+agA==');
+    expect(executeTool(tool('url-encoder-decoder', 'URL Encoder'), 'hello world?q=1&x=2').output).toBe('hello%20world%3Fq%3D1%26x%3D2');
+    expect(executeTool(tool('case-converter', 'Case Converter'), 'hello world').output).toContain('camelCase: helloWorld');
+    expect(executeTool(tool('string-slugifier', 'Slugifier'), 'Déjà Vu — Production Tools!').output).toBe('deja-vu-production-tools');
+    expect(executeTool(tool('html-entity-encoder', 'HTML Entities'), '<tag a="1">').output).toContain('&lt;tag');
+    expect(executeTool(tool('hex-to-string', 'Hex to String'), '48 65 6c 6c 6f').output).toBe('Hello');
+    expect(executeTool(tool('binary-to-text', 'Binary to Text'), '01001000 01101001').output).toBe('Hi');
+    expect(executeTool(tool('morse-code-converter', 'Morse'), 'SOS').output).toBe('... --- ...');
+    expect(executeTool(tool('morse-code-converter', 'Morse'), '... --- ...').output).toBe('SOS');
+    expect(executeTool(tool('word-frequency-analyzer', 'Word Frequency'), 'Cat cat dog').output).toContain('cat: 2');
+  });
+
   it('returns honest unsupported status', () => {
     const result = executeTool(tool('future-tool', 'Future Tool'), 'abc');
     expect(result.output).toBe('');
