@@ -1783,7 +1783,91 @@ const roiBatch13: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch18: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'diff-checker-unified': {
+      const [left = '', right = ''] = input.split(/\r?\n---\r?\n/);
+      const a = left.split(/\r?\n/);
+      const b = right.split(/\r?\n/);
+      const max = Math.max(a.length, b.length);
+      const out: string[] = [];
+      for (let i = 0; i < max; i++) {
+        if (a[i] === b[i]) out.push('  ' + (a[i] ?? ''));
+        else {
+          if (a[i] !== undefined) out.push('- ' + a[i]);
+          if (b[i] !== undefined) out.push('+ ' + b[i]);
+        }
+      }
+      return out.join('\n');
+    }
+    case 'hex-dump-generator': {
+      const bytes = new TextEncoder().encode(input);
+      const rows: string[] = [];
+      for (let offset = 0; offset < bytes.length; offset += 16) {
+        const chunk = Array.from(bytes.slice(offset, offset + 16));
+        const hex = chunk.map(b => b.toString(16).padStart(2, '0')).join(' ').padEnd(47, ' ');
+        const ascii = chunk.map(b => b >= 32 && b <= 126 ? String.fromCharCode(b) : '.').join('');
+        rows.push(offset.toString(16).padStart(8, '0') + '  ' + hex + '  |' + ascii + '|');
+      }
+      return rows.join('\n');
+    }
+    case 'cors-header-builder':
+      return [
+        'Access-Control-Allow-Origin: ' + (input.trim() || '*'),
+        'Access-Control-Allow-Methods: GET,POST,PUT,PATCH,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers: Content-Type, Authorization'
+      ].join('\n');
+    case 'csp-generator': {
+      const origin = input.trim() || "'self'";
+      return [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "connect-src 'self' " + origin,
+        "font-src 'self' data:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'"
+      ].join('; ') + ';';
+    }
+    case 'security-headers-analyzer': {
+      const lower = input.toLowerCase();
+      const checks = [
+        ['Content-Security-Policy', lower.includes('content-security-policy')],
+        ['Strict-Transport-Security', lower.includes('strict-transport-security')],
+        ['X-Content-Type-Options', lower.includes('x-content-type-options')],
+        ['Referrer-Policy', lower.includes('referrer-policy')],
+        ['Permissions-Policy', lower.includes('permissions-policy')]
+      ];
+      return checks.map(([name, present]) => name + ': ' + (present ? 'present' : 'missing')).join('\n');
+    }
+    case 'password-entropy-meter': {
+      const value = input;
+      let pool = 0;
+      if (/[a-z]/.test(value)) pool += 26;
+      if (/[A-Z]/.test(value)) pool += 26;
+      if (/\d/.test(value)) pool += 10;
+      if (/[^A-Za-z0-9]/.test(value)) pool += 32;
+      const entropy = pool > 0 ? value.length * Math.log2(pool) : 0;
+      const strength = entropy < 40 ? 'Weak' : entropy < 60 ? 'Moderate' : entropy < 80 ? 'Strong' : 'Very strong';
+      return 'Entropy: ' + entropy.toFixed(1) + ' bits\nStrength: ' + strength;
+    }
+    case 'cors-preflight-inspector': {
+      const lower = input.toLowerCase();
+      const method = input.match(/access-control-request-method:\s*([^\r\n]+)/i)?.[1]?.trim() || 'GET';
+      const origin = input.match(/origin:\s*([^\r\n]+)/i)?.[1]?.trim() || 'unknown';
+      const allowed = lower.includes('access-control-allow-origin');
+      return 'Origin: ' + origin + '\nRequested method: ' + method + '\nCORS response header: ' + (allowed ? 'present' : 'missing');
+    }
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch18,
   roiBatch13,
   roiBatch12,
   roiBatch11,
