@@ -44,6 +44,11 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('word-frequency-analyzer', 'Word Frequency'), 'Cat cat dog').output).toContain('cat: 2');
   });
 
+  it('covers legacy hash semantic batch 22', () => {
+    expect(executeTool(tool('sha1-hash', 'SHA-1 Hash'), 'abc').output).toBe('a9993e364706816aba3e25717850c26c9cd0d89d');
+    expect(executeTool(tool('md5-hash', 'MD5 Hash'), 'abc').output).toBe('900150983cd24fb0d6963f7d28e17f72');
+  });
+
   it('returns honest unsupported status', () => {
     const result = executeTool(tool('future-tool', 'Future Tool'), 'abc');
     expect(result.output).toBe('');
