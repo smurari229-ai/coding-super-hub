@@ -2119,7 +2119,52 @@ const roiBatch23: Handler = (tool, input) => {
   }
 };
 
+const roiBatch24: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'number-base-converter': {
+      const parts = input.trim().split(/\s+/);
+      if (parts.length < 3) throw new Error('Enter number, source base, target base, e.g. FF 16 10.');
+      const [value, sourceRaw, targetRaw] = parts;
+      const source = Number(sourceRaw), target = Number(targetRaw);
+      if (!Number.isInteger(source) || !Number.isInteger(target) || source < 2 || source > 36 || target < 2 || target > 36) throw new Error('Bases must be integers from 2 to 36.');
+      const decimal = parseInt(value, source);
+      if (!Number.isFinite(decimal)) throw new Error('Invalid number for the selected source base.');
+      return 'Decimal: ' + decimal + '\nBase ' + target + ': ' + decimal.toString(target).toUpperCase();
+    }
+    case 'random-number-range': {
+      const parts = input.trim().split(/\s+/).map(Number);
+      if (parts.length < 2 || !parts.every(Number.isFinite)) throw new Error('Enter min and max, e.g. 1 100.');
+      const [min, max] = parts;
+      if (min > max) throw new Error('Minimum cannot exceed maximum.');
+      const random = Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min);
+      return String(random);
+    }
+    case 'hex-to-rgb-code': {
+      const clean = input.trim().replace(/^#/, '');
+      const expanded = clean.length === 3 ? clean.split('').map(x => x+x).join('') : clean;
+      if (!/^[0-9a-f]{6}$/i.test(expanded)) throw new Error('Enter a 3- or 6-digit HEX color.');
+      return 'RGB: ' + [0,2,4].map(i => parseInt(expanded.slice(i,i+2),16)).join(', ');
+    }
+    case 'format-currency-intl': {
+      const [amountRaw, currency='USD', locale='en-US'] = input.trim().split(/\s+/);
+      const amount = Number(amountRaw);
+      if (!Number.isFinite(amount)) throw new Error('Enter amount, currency, and optional locale, e.g. 1234.5 INR en-IN.');
+      try { return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount); }
+      catch { throw new Error('Invalid currency or locale.'); }
+    }
+    case 'format-number-compact': {
+      const [valueRaw, locale='en-US'] = input.trim().split(/\s+/);
+      const value = Number(valueRaw);
+      if (!Number.isFinite(value)) throw new Error('Enter a valid number, e.g. 1250000 en-US.');
+      return new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+    }
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch24,
   roiBatch23,
   roiBatch22,
   roiBatch21,
