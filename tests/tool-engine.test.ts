@@ -251,4 +251,15 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('json-path-finder', 'JSONPath'), 'user.name\n{"user":{"name":"Murari"}}').output).toBe('"Murari"');
   });
 
+
+  it('handles deterministic security batch 18', () => {
+    expect(executeTool(tool('diff-checker-unified', 'Unified Diff'), 'one\ntwo\n---\none\nthree').output).toContain('- two');
+    expect(executeTool(tool('hex-dump-generator', 'Hex Dump'), 'ABC').output).toContain('41 42 43');
+    expect(executeTool(tool('cors-header-builder', 'CORS Builder'), 'https://example.com').output).toContain('Access-Control-Allow-Origin: https://example.com');
+    expect(executeTool(tool('csp-generator', 'CSP'), 'https://api.example.com').output).toContain('connect-src');
+    expect(executeTool(tool('security-headers-analyzer', 'Security Headers'), 'Content-Security-Policy: default-src \'self\'').output).toContain('Content-Security-Policy: present');
+    expect(executeTool(tool('password-entropy-meter', 'Password Entropy'), 'Abc123!').output).toContain('Entropy:');
+    expect(executeTool(tool('cors-preflight-inspector', 'CORS Preflight'), 'Origin: https://example.com\nAccess-Control-Request-Method: POST').output).toContain('Requested method: POST');
+  });
+
 });
