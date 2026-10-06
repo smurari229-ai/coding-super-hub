@@ -297,3 +297,14 @@ describe('tool engine pure transforms', () => {
   });
 
 });
+
+
+describe('semantic web batch 22', () => {
+  it('covers deterministic web and CSS utilities', () => {
+    expect(executeTool(tool('color-palette-generator', 'Color Palette Generator'), '#3366FF').output).toContain('Base: #3366FF');
+    expect(executeTool(tool('contrast-checker', 'Contrast Checker'), '#000000 #ffffff').output).toContain('21.00:1');
+    expect(executeTool(tool('css-box-shadow-generator', 'CSS Box Shadow'), '0 4 12 0 #00000033').output).toContain('box-shadow: 0px 4px 12px 0px #00000033;');
+    expect(executeTool(tool('css-flexbox-playground', 'CSS Flexbox'), 'row\nspace-between\ncenter\n24').output).toContain('justify-content: space-between;');
+    expect(executeTool(tool('css-grid-generator', 'CSS Grid'), '4\n3\n12').output).toContain('repeat(4, minmax(0, 1fr))');
+  });
+});
