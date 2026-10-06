@@ -1632,6 +1632,68 @@ const hmacSha256Hex = (secret: string, message: string): string => {
 };
 
 
+const roiBatch14: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'base64-text-encoder':
+      return encodeBase64Utf8(input);
+    case 'url-encoder-decoder': {
+      const lines = input.split(/\r?\n/);
+      const mode = (lines[0] || '').trim().toLowerCase();
+      const value = lines.slice(1).join('\n');
+      if (mode === 'decode' || mode === 'decodeuri' || mode === 'decodeuricomponent') {
+        try { return decodeURIComponent(value); } catch { throw new Error('Enter valid percent-encoded URL text.'); }
+      }
+      return encodeURIComponent(mode === 'encode' || mode === 'encodeuri' || mode === 'encodeuricomponent' ? value : input);
+    }
+    case 'case-converter': {
+      const parts = caseWords(input);
+      const lower = parts.map(part => part.toLowerCase());
+      const pascal = lower.map(part => part ? part[0].toUpperCase() + part.slice(1) : '').join('');
+      const camel = lower.map((part, i) => i === 0 ? part : part ? part[0].toUpperCase() + part.slice(1) : '').join('');
+      return [
+        'camelCase: ' + camel,
+        'snake_case: ' + lower.join('_'),
+        'kebab-case: ' + lower.join('-'),
+        'PascalCase: ' + pascal,
+        'CONSTANT_CASE: ' + lower.join('_').toUpperCase(),
+        'Title Case: ' + lower.map(part => part ? part[0].toUpperCase() + part.slice(1) : '').join(' ')
+      ].join('\n');
+    }
+    case 'string-slugifier':
+      return slugify(input);
+    case 'html-entity-encoder': {
+      const trimmed = input.trim();
+      if (/^&(amp|lt|gt|quot|apos|#39|#x[0-9a-f]+|#\d+);/i.test(trimmed) || /&(?:amp|lt|gt|quot|apos|#39|#x[0-9a-f]+|#\d+);/i.test(trimmed)) {
+        return decodeHtml(input);
+      }
+      return encodeHtml(input);
+    }
+    case 'hex-to-string':
+      return decodeHex(input);
+    case 'binary-to-text':
+      return decodeBinary(input);
+    case 'morse-code-converter': {
+      const tokens = input.trim().split(/\s+/);
+      const looksLikeMorse = tokens.length > 0 && tokens.every(token => /^[.\-\/]+$/.test(token));
+      if (looksLikeMorse) {
+        const reverse: Record<string, string> = Object.fromEntries(Object.entries(MORSE).map(([letter, code]) => [code, letter]));
+        return tokens.map(token => token === '/' ? ' ' : reverse[token] ?? '?').join('');
+      }
+      return input.toUpperCase().split('').map(char => char === ' ' ? '/' : MORSE[char] ?? char).join(' ');
+    }
+    case 'word-frequency-analyzer': {
+      const counts = new Map<string, number>();
+      for (const word of words(input)) counts.set(word, (counts.get(word) ?? 0) + 1);
+      const rows = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+      if (!rows.length) throw new Error('Enter text containing words.');
+      return rows.map(([word, count]) => word + ': ' + count).join('\n');
+    }
+    default:
+      return null;
+  }
+};
+
+
 const roiBatch13: Handler = (tool, input) => {
   switch (tool.id) {
     case 'permission-octal-calculator':
