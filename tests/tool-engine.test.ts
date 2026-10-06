@@ -308,3 +308,15 @@ describe('semantic web batch 22', () => {
     expect(executeTool(tool('css-grid-generator', 'CSS Grid'), '4\n3\n12').output).toContain('repeat(4, minmax(0, 1fr))');
   });
 });
+
+
+describe('semantic data batch 23', () => {
+  it('covers JSON/YAML/query/timestamp utilities', () => {
+    expect(executeTool(tool('json-to-yaml', 'JSON to YAML'), '{"name":"Murari","count":2}').output).toContain('name: Murari');
+    expect(executeTool(tool('yaml-to-json', 'YAML to JSON'), 'name: Murari\ncount: 2').output).toContain('"count": 2');
+    expect(executeTool(tool('query-string-to-json', 'Query String to JSON'), '?page=2&tag=a&tag=b').output).toContain('"tag": [');
+    expect(executeTool(tool('json-to-query-string', 'JSON to Query String'), '{"page":2,"tag":["a","b"]}').output).toContain('page=2');
+    expect(executeTool(tool('json-size-calculator', 'JSON Size Calculator'), '{"a":1}').output).toContain('UTF-8 bytes: 7');
+    expect(executeTool(tool('timestamp-converter', 'Timestamp Converter'), '0').output).toContain('1970-01-01T00:00:00.000Z');
+  });
+});
