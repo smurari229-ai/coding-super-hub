@@ -1581,6 +1581,60 @@ const roiBatch12: Handler = (tool, input) => {
 
 
 
+const sha1Hex = (message: string): string => {
+  const bytes = new TextEncoder().encode(message);
+  const bitLength = bytes.length * 8;
+  const padded = new Uint8Array(((bytes.length + 9 + 63) >> 6) * 64);
+  padded.set(bytes); padded[bytes.length] = 0x80;
+  const view = new DataView(padded.buffer);
+  view.setUint32(padded.length - 8, Math.floor(bitLength / 0x100000000));
+  view.setUint32(padded.length - 4, bitLength >>> 0);
+  let h0=0x67452301,h1=0xefcdab89,h2=0x98badcfe,h3=0x10325476,h4=0xc3d2e1f0;
+  const rol=(x:number,n:number)=>(x<<n)|(x>>>(32-n));
+  for(let off=0;off<padded.length;off+=64){
+    const w=new Uint32Array(80);
+    for(let i=0;i<16;i++) w[i]=view.getUint32(off+i*4);
+    for(let i=16;i<80;i++) w[i]=rol(w[i-3]^w[i-8]^w[i-14]^w[i-16],1)>>>0;
+    let a=h0,b=h1,c=h2,d=h3,e=h4;
+    for(let i=0;i<80;i++){
+      const f=i<20?(b&c)|((~b)&d):i<40?b^c^d:i<60?(b&c)|(b&d)|(c&d):b^c^d;
+      const k=i<20?0x5a827999:i<40?0x6ed9eba1:i<60?0x8f1bbcdc:0xca62c1d6;
+      const t=(rol(a,5)+f+e+k+w[i])>>>0;e=d;d=c;c=rol(b,30)>>>0;b=a;a=t;
+    }
+    h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;
+  }
+  return [h0,h1,h2,h3,h4].map(v=>v.toString(16).padStart(8,'0')).join('');
+};
+
+const md5Hex = (message: string): string => {
+  const bytes = new TextEncoder().encode(message);
+  const bitLength = bytes.length * 8;
+  const padded = new Uint8Array(((bytes.length + 9 + 63) >> 6) * 64);
+  padded.set(bytes); padded[bytes.length] = 0x80;
+  const view = new DataView(padded.buffer);
+  view.setUint32(padded.length - 8, bitLength >>> 0, true);
+  view.setUint32(padded.length - 4, Math.floor(bitLength / 0x100000000), true);
+  const s=[7,12,17,22,5,9,14,20,4,11,16,23,6,10,15,21];
+  const k=Array.from({length:64},(_,i)=>Math.floor(Math.abs(Math.sin(i+1))*0x100000000)>>>0);
+  let a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+  const rol=(x:number,n:number)=>(x<<n)|(x>>>(32-n));
+  for(let off=0;off<padded.length;off+=64){
+    const m=new Uint32Array(16); for(let i=0;i<16;i++) m[i]=view.getUint32(off+i*4,true);
+    let a=a0,b=b0,c=c0,d=d0;
+    for(let i=0;i<64;i++){
+      let f=0,g=0;
+      if(i<16){f=(b&c)|((~b)&d);g=i;} else if(i<32){f=(d&b)|((~d)&c);g=(5*i+1)%16;}
+      else if(i<48){f=b^c^d;g=(3*i+5)%16;} else {f=c^(b|(~d));g=(7*i)%16;}
+      const shift=s[(i>>4)*4+(i%4)];
+      const t=(a+f+k[i]+m[g])>>>0;a=d;d=c;c=b;b=(b+rol(t,shift))>>>0;
+    }
+    a0=(a0+a)>>>0;b0=(b0+b)>>>0;c0=(c0+c)>>>0;d0=(d0+d)>>>0;
+  }
+  const out=new Uint8Array(16), v=new DataView(out.buffer);
+  [a0,b0,c0,d0].forEach((x,i)=>v.setUint32(i*4,x,true));
+  return Array.from(out,b=>b.toString(16).padStart(2,'0')).join('');
+};
+
 const sha256Hex = (message: string | Uint8Array): string => {
   const bytes = typeof message === 'string' ? new TextEncoder().encode(message) : message;
   const K = [
@@ -1972,6 +2026,7 @@ const roiBatch21: Handler = (tool, input) => {
 };
 
 const handlers: Handler[] = [
+  roiBatch22,
   roiBatch21,
   roiBatch20,
   roiBatch19,
