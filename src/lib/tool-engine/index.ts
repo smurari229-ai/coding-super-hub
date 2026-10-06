@@ -1866,7 +1866,40 @@ const roiBatch18: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch19: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'json-formatter': return JSON.stringify(JSON.parse(input), null, 2);
+    case 'json-minifier': return JSON.stringify(JSON.parse(input));
+    case 'jwt-debugger': {
+      const parts = input.trim().split('.');
+      if (parts.length !== 3) throw new Error('JWT must contain header, payload, and signature parts.');
+      const decode = (part: string) => decodeBase64Utf8(part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '='));
+      return 'Header:\n' + JSON.stringify(JSON.parse(decode(parts[0])), null, 2) +
+        '\nPayload:\n' + JSON.stringify(JSON.parse(decode(parts[1])), null, 2) +
+        '\nSignature: ' + parts[2];
+    }
+    case 'markdown-previewer': {
+      let out = encodeHtml(input);
+      out = out.replace(/^###### (.+)$/gm, '<h6>$1</h6>').replace(/^##### (.+)$/gm, '<h5>$1</h5>')
+        .replace(/^#### (.+)$/gm, '<h4>$1</h4>').replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>').replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\x60([^\x60]+)\x60/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>');
+      return out.split(/\r?\n/).map(line => /^<h\d|^<strong|^<em|^<code|^<a/.test(line) ? line : line ? '<p>' + line + '</p>' : '').filter(Boolean).join('\n');
+    }
+    case 'punycode-converter': {
+      const value = input.trim();
+      if (!value) return '';
+      return new URL(/^https?:\/\//i.test(value) ? value : 'http://' + value).hostname;
+    }
+    default: return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch19,
   roiBatch18,
   roiBatch13,
   roiBatch12,
