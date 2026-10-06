@@ -320,3 +320,15 @@ describe('semantic data batch 23', () => {
     expect(executeTool(tool('timestamp-converter', 'Timestamp Converter'), '0').output).toContain('1970-01-01T00:00:00.000Z');
   });
 });
+
+
+describe('semantic utility batch 24', () => {
+  it('covers number base, random range, color and Intl formatting', () => {
+    expect(executeTool(tool('number-base-converter', 'Number Base Converter'), 'FF 16 10').output).toContain('Decimal: 255');
+    const random = Number(executeTool(tool('random-number-range', 'Random Number Range'), '1 3').output);
+    expect(random).toBeGreaterThanOrEqual(1); expect(random).toBeLessThanOrEqual(3);
+    expect(executeTool(tool('hex-to-rgb-code', 'Hex to RGB'), '#3366FF').output).toBe('RGB: 51, 102, 255');
+    expect(executeTool(tool('format-currency-intl', 'Currency Formatter'), '1234.5 INR en-IN').output).toContain('₹');
+    expect(executeTool(tool('format-number-compact', 'Compact Number Formatter'), '1250000 en-US').output).toContain('1.25M');
+  });
+});
