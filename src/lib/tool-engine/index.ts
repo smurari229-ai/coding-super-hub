@@ -2074,7 +2074,53 @@ const roiBatch22: Handler = (tool, input) => {
   }
 };
 
+const roiBatch23: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'json-to-yaml':
+      return jsonToYaml(input);
+    case 'yaml-to-json':
+      return yamlToJson(input);
+    case 'query-string-to-json': {
+      const raw = input.trim().replace(/^\?/, '');
+      if (!raw) throw new Error('Enter a query string such as ?page=2&sort=name.');
+      const params = new URLSearchParams(raw);
+      const out: Record<string, string | string[]> = {};
+      params.forEach((value, key) => {
+        const previous = out[key];
+        out[key] = previous === undefined ? value : Array.isArray(previous) ? [...previous, value] : [previous, value];
+      });
+      return JSON.stringify(out, null, 2);
+    }
+    case 'json-to-query-string': {
+      const data = JSON.parse(input);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Input must be a JSON object.');
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+        if (Array.isArray(value)) value.forEach(item => params.append(key, String(item)));
+        else if (value !== null && value !== undefined) params.set(key, String(value));
+      }
+      return '?' + params.toString();
+    }
+    case 'json-size-calculator': {
+      const data = JSON.parse(input);
+      const compact = JSON.stringify(data);
+      const pretty = JSON.stringify(data, null, 2);
+      const bytes = new TextEncoder().encode(compact).length;
+      return 'Compact characters: ' + compact.length + '\nUTF-8 bytes: ' + bytes + '\nPretty characters: ' + pretty.length;
+    }
+    case 'timestamp-converter': {
+      const value = input.trim();
+      const date = /^\d+$/.test(value) ? new Date(Number(value) < 1e12 ? Number(value) * 1000 : Number(value)) : new Date(value);
+      if (!Number.isFinite(date.getTime())) throw new Error('Enter a valid ISO date or Unix timestamp.');
+      return 'ISO 8601: ' + date.toISOString() + '\nUnix seconds: ' + Math.floor(date.getTime() / 1000) + '\nUnix milliseconds: ' + date.getTime();
+    }
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch23,
   roiBatch22,
   roiBatch21,
   roiBatch20,
