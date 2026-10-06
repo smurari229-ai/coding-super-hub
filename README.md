@@ -2,9 +2,9 @@
 
 > **A privacy-aware developer toolbox with 535 registered catalog entries, dedicated tools, an honest generic engine, live sandboxes, AI Copilot, and built-in monetization.**
 
-[![React 19](https://img.shields.io/badge/React-19.0-blue.svg)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.0-38bdf8.svg)](https://tailwindcss.com)
+[![React 19](https://img.shields.io/badge/React-19.3-blue.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.x-blue.svg)](https://www.typescriptlang.org)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.3-38bdf8.svg)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/smurari229-ai/coding-super-hub/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smurari229-ai/coding-super-hub/actions/workflows/ci.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -88,7 +88,7 @@ Public checkout, sponsor, affiliate, and placeholder configuration is documented
 
 ## 🧪 Verification
 
-`npm run lint` checks TypeScript. `npm test` runs the pure engine suite with Vitest 5. `npm run build` performs the production Vite build. CI runs all three checks on pushes and pull requests.
+`npm run lint` checks TypeScript. `npm test` runs the pure engine suite with Vitest 5. `npm run build` performs the production Vite build. CI runs install, lint, typecheck, tests, and build checks on pushes and pull requests.
 
 ### Minimal release smoke checklist
 - [ ] Open 5 dedicated UI tools and verify their primary action.
