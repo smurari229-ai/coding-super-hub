@@ -1898,7 +1898,36 @@ const roiBatch19: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch20: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'sha256-hash':
+      return sha256Hex(input);
+    case 'hmac-sha256': {
+      const lines = input.split(/\r?\n/);
+      if (lines.length < 2 || !lines[0]) throw new Error('Use secret on line 1 and message on line 2.');
+      return hmacSha256Hex(lines[0], lines.slice(1).join('\n'));
+    }
+    case 'uuid-v7-generator': {
+      const now = Date.now();
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      bytes[0] = (now / 0x10000000000) & 0xff;
+      bytes[1] = (now / 0x100000000) & 0xff;
+      bytes[2] = (now / 0x1000000) & 0xff;
+      bytes[3] = (now / 0x10000) & 0xff;
+      bytes[4] = (now / 0x100) & 0xff;
+      bytes[5] = now & 0xff;
+      bytes[6] = (bytes[6] & 0x0f) | 0x70;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+      return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
+    }
+    default: return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch20,
   roiBatch19,
   roiBatch18,
   roiBatch13,
