@@ -1873,6 +1873,32 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
       return { output: lines.slice(1).map((line) => line.split(',')[index] ?? '').join('\n') };
     }
 
+    if (tool.id === 'leet-speak-generator') {
+      const map: Record<string, string> = { a: '4', e: '3', i: '1', o: '0', s: '5', t: '7', g: '6', b: '8' };
+      return { output: input.replace(/[aeiostgb]/gi, (ch) => map[ch.toLowerCase()] ?? ch) };
+    }
+
+    if (tool.id === 'upside-down-text') {
+      const map: Record<string, string> = { a: 'ɐ', b: 'q', c: 'ɔ', d: 'p', e: 'ǝ', f: 'ɟ', g: 'ƃ', h: 'ɥ', i: 'ᴉ', j: 'ɾ', k: 'ʞ', l: 'ʃ', m: 'ɯ', n: 'u', o: 'o', p: 'd', q: 'b', r: 'ɹ', s: 's', t: 'ʇ', u: 'n', v: 'ʌ', w: 'ʍ', x: 'x', y: 'ʎ', z: 'z', '0': '0', '1': 'Ɩ', '2': '2', '3': 'Ɛ', '4': 'ㄣ', '5': '5', '6': '9', '7': 'ㄥ', '8': '8', '9': '6' };
+      return { output: [...input].reverse().map((ch) => map[ch.toLowerCase()] ?? ch).join('') };
+    }
+
+    if (tool.id === 'zalgo-text-generator') {
+      const marks = ['\\u0301', '\\u0308', '\\u0336'];
+      return { output: [...input].map((ch, i) => ch + (/[A-Za-z]/.test(ch) ? marks[i % marks.length] : '')).join('') };
+    }
+
+    if (tool.id === 'json-path-finder') {
+      try {
+        const [pathLine, ...jsonLines] = input.split(/\r?\n/);
+        const data = JSON.parse(jsonLines.join('\n') || '{}');
+        const path = pathLine.trim().replace(/^\$\.?/, '').split('.').filter(Boolean);
+        let current: unknown = data;
+        for (const key of path) current = (current as Record<string, unknown>)?.[key];
+        return { output: JSON.stringify(current, null, 2) };
+      } catch { return { output: '', error: 'Invalid JSON or JSONPath.' }; }
+    }
+
     return { output: '', error: 'Coming soon — this catalog entry does not have a verified execution algorithm yet.' };
   } catch (error) {
     return { output: '', error: error instanceof Error ? error.message : 'Unable to process input.' };
