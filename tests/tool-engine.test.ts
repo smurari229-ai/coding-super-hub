@@ -279,4 +279,16 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('uuid-v7-generator', 'UUID v7'), 'demo').output).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
+
+  it('handles security utility batch 21', () => {
+    expect(executeTool(tool('hash-identifier', 'Hash identifier'), 'a'.repeat(64)).output).toContain('SHA-256');
+    expect(executeTool(tool('rsa-key-template', 'RSA template'), 'x').output).toContain('BEGIN PRIVATE KEY');
+    const password = executeTool(tool('password-generator', 'Password'), '20').output;
+    expect(password).toHaveLength(20);
+    expect(executeTool(tool('random-pin-generator', 'PIN'), '6').output).toMatch(/^\\d{6}$/);
+    const url = executeTool(tool('oauth2-auth-url-builder', 'OAuth URL'), JSON.stringify({authorizationEndpoint:'https://auth.example.com/authorize',clientId:'abc',redirectUri:'https://app.example.com/cb',scope:'openid profile',state:'xyz'})).output;
+    expect(url).toContain('client_id=abc');
+    expect(url).toContain('response_type=code');
+  });
+
 });
