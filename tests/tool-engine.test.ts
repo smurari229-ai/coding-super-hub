@@ -222,4 +222,16 @@ describe('tool engine pure transforms', () => {
   });
 
 
+
+  it('handles deterministic utility batch 15', () => {
+    expect(executeTool(tool('regex-tester', 'Regex'), '^a', 'apple\nbanana').output).toBe('a');
+    expect(executeTool(tool('text-diff-checker', 'Diff'), 'one\ntwo\n---\none\nthree').output).toContain('- two');
+    expect(executeTool(tool('uuid-generator', 'UUID'), 'demo').output).toMatch(/^00000000-0000-4000-8000-/);
+    expect(executeTool(tool('nanoid-generator', 'NanoID'), 'demo').output).toHaveLength(21);
+    expect(executeTool(tool('lorem-ipsum-generator', 'Lorem'), '5').output.split(' ').length).toBe(5);
+    expect(executeTool(tool('random-string-generator', 'Random'), '12').output).toHaveLength(12);
+    expect(executeTool(tool('cron-expression-builder', 'Cron'), '0 0 * * *').output).toBe('Every day at 00:00');
+    expect(executeTool(tool('csv-column-extractor', 'CSV'), '1\na,b\nc,d').output).toBe('b\nd');
+  });
+
 });
