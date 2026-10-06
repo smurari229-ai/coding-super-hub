@@ -234,4 +234,12 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('csv-column-extractor', 'CSV'), '1\na,b\nc,d').output).toBe('b\nd');
   });
 
+
+  it('handles deterministic text batch 16', () => {
+    expect(executeTool(tool('leet-speak-generator', 'Leet'), 'Elite hackers').output).toBe('3l1t3 h4ck3r5');
+    expect(executeTool(tool('upside-down-text', 'Upside Down'), 'abc').output).toBe('ɔqɐ');
+    expect(executeTool(tool('zalgo-text-generator', 'Zalgo'), 'abc').output).toContain('a');
+    expect(executeTool(tool('json-path-finder', 'JSONPath'), 'user.name\n{"user":{"name":"Murari"}}').output).toBe('"Murari"');
+  });
+
 });
