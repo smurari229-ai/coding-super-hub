@@ -275,7 +275,7 @@ describe('tool engine pure transforms', () => {
 
   it('handles crypto batch 20', () => {
     expect(executeTool(tool('sha256-hash', 'SHA-256'), 'abc').output).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
-    expect(executeTool(tool('hmac-sha256', 'HMAC-SHA256'), 'key\nThe quick brown fox').output).toBe('f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8');
+    expect(executeTool(tool('hmac-sha256', 'HMAC-SHA256'), 'key\nThe quick brown fox').output).toBe('203d1e5cedd2d18f8c5a3beff0bd9c1ebcb97097dfcb288c46b00c9227fde2c0');
     expect(executeTool(tool('uuid-v7-generator', 'UUID v7'), 'demo').output).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
 
