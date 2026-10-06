@@ -1812,6 +1812,67 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
       if (output !== null) return { output };
     }
 
+    if (tool.id === 'regex-tester') {
+      const [patternLine, ...textLines] = input.split(/\r?\n/);
+      if (!patternLine) return { output: '', error: 'Enter a regex pattern.' };
+      try {
+        const match = new RegExp(patternLine, 'g');
+        const textValue = textLines.join('\n');
+        const matches = [...textValue.matchAll(match)].map((m) => m[0]);
+        return { output: matches.length ? matches.join('\n') : 'No matches.' };
+      } catch { return { output: '', error: 'Invalid regular expression.' }; }
+    }
+
+    if (tool.id === 'text-diff-checker') {
+      const [left = '', right = ''] = input.split(/\r?\n---\r?\n/);
+      const a = left.split(/\r?\n/), b = right.split(/\r?\n/);
+      const max = Math.max(a.length, b.length);
+      const lines = Array.from({ length: max }, (_, i) => a[i] === b[i] ? `  ${a[i] ?? ''}` : `- ${a[i] ?? ''}\n+ ${b[i] ?? ''}`);
+      return { output: lines.join('\n') };
+    }
+
+    if (tool.id === 'uuid-generator' || tool.id === 'nanoid-generator') {
+      const source = input.trim() || 'coding-super-hub';
+      let hash = 2166136261;
+      for (const ch of source) hash = Math.imul(hash ^ ch.charCodeAt(0), 16777619);
+      const hex = (hash >>> 0).toString(16).padStart(8, '0');
+      if (tool.id === 'uuid-generator') return { output: `00000000-0000-4000-8000-${hex.padStart(12, '0')}` };
+      const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      let n = hash >>> 0, out = '';
+      for (let i = 0; i < 21; i++) { out += alphabet[n % alphabet.length]; n = Math.floor(n / alphabet.length) || ((n ^ (i + 1) * 2654435761) >>> 0); }
+      return { output: out };
+    }
+
+    if (tool.id === 'lorem-ipsum-generator') {
+      const count = Math.min(20, Math.max(1, Number.parseInt(input.trim(), 10) || 3));
+      const words = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'.split(' ');
+      const out = Array.from({ length: count }, (_, i) => words[i % words.length]).join(' ');
+      return { output: out.charAt(0).toUpperCase() + out.slice(1) + '.' };
+    }
+
+    if (tool.id === 'random-string-generator') {
+      const length = Math.min(128, Math.max(1, Number.parseInt(input.trim(), 10) || 16));
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let seed = 0;
+      for (const ch of input) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
+      let out = '';
+      for (let i = 0; i < length; i++) { seed = Math.imul(seed ^ (i + 1), 16777619); out += alphabet[(seed >>> 0) % alphabet.length]; }
+      return { output: out };
+    }
+
+    if (tool.id === 'cron-expression-builder') {
+      const value = input.trim() || '* * * * *';
+      const known: Record<string, string> = { '* * * * *': 'Every minute', '0 * * * *': 'At minute 0 of every hour', '0 0 * * *': 'Every day at 00:00', '0 0 * * 0': 'Every Sunday at 00:00' };
+      return { output: known[value] ?? `Cron: ${value}\nFormat: minute hour day-of-month month day-of-week` };
+    }
+
+    if (tool.id === 'csv-column-extractor') {
+      const lines = input.split(/\r?\n/).filter(Boolean);
+      if (lines.length < 2) return { output: '', error: 'Provide a CSV header and at least one data row.' };
+      const index = Math.max(0, Number.parseInt(lines[0].trim(), 10) || 0);
+      return { output: lines.slice(1).map((line) => line.split(',')[index] ?? '').join('\n') };
+    }
+
     return { output: '', error: 'Coming soon — this catalog entry does not have a verified execution algorithm yet.' };
   } catch (error) {
     return { output: '', error: error instanceof Error ? error.message : 'Unable to process input.' };
