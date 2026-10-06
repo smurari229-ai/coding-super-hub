@@ -1926,7 +1926,53 @@ const roiBatch20: Handler = (tool, input) => {
   }
 };
 
+
+const roiBatch21: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'hash-identifier': {
+      const value = input.trim();
+      if (!value) throw new Error('Enter a hash string.');
+      const compact = value.replace(/\s+/g, '');
+      const candidates = compact.length === 32 && /^[0-9a-f]+$/i.test(compact) ? ['MD5', 'NTLM'] :
+        compact.length === 40 && /^[0-9a-f]+$/i.test(compact) ? ['SHA-1', 'RIPEMD-160'] :
+        compact.length === 64 && /^[0-9a-f]+$/i.test(compact) ? ['SHA-256', 'SHA3-256', 'BLAKE2s-256'] :
+        compact.length === 128 && /^[0-9a-f]+$/i.test(compact) ? ['SHA-512', 'SHA3-512', 'BLAKE2b-512'] : [];
+      return candidates.length ? 'Possible algorithms: ' + candidates.join(', ') : 'No common fixed-length hexadecimal hash pattern detected.';
+    }
+    case 'rsa-key-template':
+      return '-----BEGIN PRIVATE KEY-----\nREPLACE_WITH_SECURELY_GENERATED_KEY_MATERIAL\n-----END PRIVATE KEY-----\n\nNote: This is a template only; never use placeholder material as a real private key.';
+    case 'password-generator': {
+      const length = Math.trunc(Number(input.trim() || 16));
+      if (length < 8 || length > 128) throw new Error('Password length must be between 8 and 128.');
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*';
+      const bytes = crypto.getRandomValues(new Uint8Array(length));
+      return Array.from(bytes, b => chars[b % chars.length]).join('');
+    }
+    case 'random-pin-generator': {
+      const length = Math.trunc(Number(input.trim() || 6));
+      if (length < 4 || length > 12) throw new Error('PIN length must be between 4 and 12.');
+      const bytes = crypto.getRandomValues(new Uint8Array(length));
+      return Array.from(bytes, b => String(b % 10)).join('');
+    }
+    case 'oauth2-auth-url-builder': {
+      let data: { authorizationEndpoint?: string; clientId?: string; redirectUri?: string; scope?: string; state?: string };
+      try { data = JSON.parse(input) as typeof data; } catch { throw new Error('Input must be JSON with authorizationEndpoint, clientId, and redirectUri.'); }
+      if (!data.authorizationEndpoint || !data.clientId || !data.redirectUri) throw new Error('authorizationEndpoint, clientId, and redirectUri are required.');
+      let url: URL;
+      try { url = new URL(data.authorizationEndpoint); } catch { throw new Error('authorizationEndpoint must be an absolute URL.'); }
+      url.searchParams.set('response_type', 'code');
+      url.searchParams.set('client_id', data.clientId);
+      url.searchParams.set('redirect_uri', data.redirectUri);
+      url.searchParams.set('scope', data.scope || 'openid');
+      if (data.state) url.searchParams.set('state', data.state);
+      return url.toString();
+    }
+    default: return null;
+  }
+};
+
 const handlers: Handler[] = [
+  roiBatch21,
   roiBatch20,
   roiBatch19,
   roiBatch18,
