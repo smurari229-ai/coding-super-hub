@@ -1873,6 +1873,39 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
       return { output: lines.slice(1).map((line) => line.split(',')[index] ?? '').join('\n') };
     }
 
+    if (tool.id === 'ascii-art-banner') {
+      const lines = input.split(/\r?\n/).filter(Boolean).slice(0, 12);
+      const text = lines.join(' ');
+      return { output: text.split('').map(ch => ch === ' ' ? ' ' : '█').join('') };
+    }
+
+    if (tool.id === 'unicode-character-inspector') {
+      const chars = [...input].slice(0, 200);
+      return { output: chars.map(ch => {
+        const code = ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0');
+        const bytes = Array.from(new TextEncoder().encode(ch), byte => byte.toString(16).padStart(2, '0')).join(' ');
+        return ch + ' — U+' + code + ' — UTF-8: ' + bytes;
+      }).join('\n') };
+    }
+
+    if (tool.id === 'remove-html-tags') {
+      return { output: input.replace(/<[^>]*>/g, '') };
+    }
+
+    if (tool.id === 'text-prefix-suffix') {
+      const [prefix = '', suffix = '', ...textLines] = input.split(/\r?\n/);
+      const text = textLines.join('\n');
+      return { output: text.split(/\r?\n/).map(line => prefix + line + suffix).join('\n') };
+    }
+
+    if (tool.id === 'escape-json-string') {
+      return { output: JSON.stringify(input).slice(1, -1) };
+    }
+
+    if (tool.id === 'slug-to-text') {
+      return { output: input.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim() };
+    }
+
     if (tool.id === 'leet-speak-generator') {
       const map: Record<string, string> = { a: '4', e: '3', i: '1', o: '0', s: '5', t: '7', g: '6', b: '8' };
       return { output: input.replace(/[aeiostgb]/gi, (ch) => map[ch.toLowerCase()] ?? ch) };
