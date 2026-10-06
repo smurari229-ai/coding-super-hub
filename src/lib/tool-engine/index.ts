@@ -1884,7 +1884,7 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
     }
 
     if (tool.id === 'zalgo-text-generator') {
-      const marks = ['\\u0301', '\\u0308', '\\u0336'];
+      const marks = ['\u0301', '\u0308', '\u0336'];
       return { output: [...input].map((ch, i) => ch + (/[A-Za-z]/.test(ch) ? marks[i % marks.length] : '')).join('') };
     }
 
