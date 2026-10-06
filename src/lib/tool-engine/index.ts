@@ -2025,6 +2025,55 @@ const roiBatch21: Handler = (tool, input) => {
   }
 };
 
+const roiBatch22: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'color-palette-generator': {
+      const clean = input.trim().replace(/^#/, '');
+      if (!/^[0-9a-f]{6}$/i.test(clean)) throw new Error('Enter a six-digit HEX color such as #3366FF.');
+      const base = parseInt(clean, 16);
+      const channel = (shift: number) => (base >> shift) & 255;
+      const mix = (target: number, amount: number, value: number) => Math.round(value * (1 - amount) + target * amount);
+      const toHex = (r: number, g: number, b: number) => '#' + [r,g,b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('').toUpperCase();
+      const r = channel(16), g = channel(8), b = channel(0);
+      return ['Base: #' + clean.toUpperCase(),
+        'Light 20%: ' + toHex(mix(255, .2, r), mix(255, .2, g), mix(255, .2, b)),
+        'Light 40%: ' + toHex(mix(255, .4, r), mix(255, .4, g), mix(255, .4, b)),
+        'Dark 20%: ' + toHex(mix(0, .2, r), mix(0, .2, g), mix(0, .2, b)),
+        'Dark 40%: ' + toHex(mix(0, .4, r), mix(0, .4, g), mix(0, .4, b)),
+        'RGB: ' + r + ', ' + g + ', ' + b].join('\n');
+    }
+    case 'contrast-checker': {
+      const colors = input.match(/#[0-9a-f]{3,6}/gi) ?? [];
+      if (colors.length < 2) throw new Error('Enter two HEX colors, e.g. #000000 #ffffff.');
+      return contrastRatio(colors[0], colors[1]);
+    }
+    case 'css-box-shadow-generator': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 2) throw new Error('Enter X and Y offsets, e.g. 0 4 12 0 #00000033.');
+      const [x, y, blur = 12, spread = 0] = values;
+      const color = input.match(/#[0-9a-f]{3,8}/i)?.[0] ?? '#00000033';
+      return 'box-shadow: ' + x + 'px ' + y + 'px ' + blur + 'px ' + spread + 'px ' + color + ';';
+    }
+    case 'css-flexbox-playground': {
+      const lines = input.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+      const direction = /^(row|column|row-reverse|column-reverse)$/.test(lines[0] ?? '') ? lines[0] : 'row';
+      const justify = /^(flex-start|center|flex-end|space-between|space-around|space-evenly)$/.test(lines[1] ?? '') ? lines[1] : 'center';
+      const align = /^(stretch|flex-start|center|flex-end|baseline)$/.test(lines[2] ?? '') ? lines[2] : 'center';
+      const gap = Number(lines[3]) || 16;
+      return '.flex-container {\n  display: flex;\n  flex-direction: ' + direction + ';\n  justify-content: ' + justify + ';\n  align-items: ' + align + ';\n  gap: ' + gap + 'px;\n}';
+    }
+    case 'css-grid-generator': {
+      const lines = input.split(/\r?\n/).map(v => v.trim());
+      const columns = Math.max(1, Math.min(12, Math.trunc(Number(lines[0]) || 3)));
+      const rows = Math.max(1, Math.min(12, Math.trunc(Number(lines[1]) || 2)));
+      const gap = Math.max(0, Math.min(200, Number(lines[2]) || 16));
+      return '.grid-container {\n  display: grid;\n  grid-template-columns: repeat(' + columns + ', minmax(0, 1fr));\n  grid-template-rows: repeat(' + rows + ', auto);\n  gap: ' + gap + 'px;\n}';
+    }
+    default:
+      return null;
+  }
+};
+
 const handlers: Handler[] = [
   roiBatch22,
   roiBatch21,
