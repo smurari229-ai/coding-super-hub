@@ -262,4 +262,14 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('cors-preflight-inspector', 'CORS Preflight'), 'Origin: https://example.com\nAccess-Control-Request-Method: POST').output).toContain('Requested method: POST');
   });
 
+
+  it('handles deterministic data batch 19', () => {
+    expect(executeTool(tool('json-formatter', 'JSON Formatter'), '{"a":1}').output).toContain('\n  "a": 1');
+    expect(executeTool(tool('json-minifier', 'JSON Minifier'), '{ "a": 1 }').output).toBe('{"a":1}');
+    const token = 'eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjMifQ.signature';
+    expect(executeTool(tool('jwt-debugger', 'JWT Debugger'), token).output).toContain('"sub": "123"');
+    expect(executeTool(tool('markdown-previewer', 'Markdown Previewer'), '# Hello').output).toContain('<h1>Hello</h1>');
+    expect(executeTool(tool('punycode-converter', 'Punycode'), 'münich.com').output).toContain('xn--');
+  });
+
 });
