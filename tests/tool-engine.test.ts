@@ -235,6 +235,15 @@ describe('tool engine pure transforms', () => {
   });
 
 
+  it('handles deterministic text batch 17', () => {
+    expect(executeTool(tool('ascii-art-banner', 'ASCII'), 'ab').output).toBe('██');
+    expect(executeTool(tool('unicode-character-inspector', 'Unicode'), 'A').output).toContain('U+0041');
+    expect(executeTool(tool('remove-html-tags', 'Remove HTML'), '<p>Hello</p>').output).toBe('Hello');
+    expect(executeTool(tool('text-prefix-suffix', 'Prefix'), '>\n<\nhello\nworld').output).toBe('>hello<\n>world<');
+    expect(executeTool(tool('escape-json-string', 'Escape JSON'), 'a"b').output).toBe('a\\"b');
+    expect(executeTool(tool('slug-to-text', 'Slug'), 'hello-world_test').output).toBe('hello world test');
+  });
+
   it('handles deterministic text batch 16', () => {
     expect(executeTool(tool('leet-speak-generator', 'Leet'), 'Elite hackers').output).toBe('3l1t3 h4ck3r5');
     expect(executeTool(tool('upside-down-text', 'Upside Down'), 'abc').output).toBe('ɔqɐ');
