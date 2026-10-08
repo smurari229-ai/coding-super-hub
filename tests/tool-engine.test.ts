@@ -41,7 +41,7 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('binary-to-text', 'Binary to Text'), '01001000 01101001').output).toBe('Hi');
     expect(executeTool(tool('morse-code-converter', 'Morse'), 'SOS').output).toBe('... --- ...');
     expect(executeTool(tool('morse-code-converter', 'Morse'), '... --- ...').output).toBe('SOS');
-    expect(executeTool(tool('word-frequency-analyzer', 'Word Frequency'), 'Cat cat dog').output).toContain('cat: 2');
+    expect(executeTool(tool('word-frequency-analyzer', 'Word Frequency'), 'Cat cat dog').output).toContain('cat : 2');
   });
 
   it('covers legacy hash semantic batch 22', () => {
