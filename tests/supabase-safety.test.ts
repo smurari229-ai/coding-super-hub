@@ -83,4 +83,22 @@ describe('Supabase server helper safety', () => {
 
     expect(calls).toEqual(['POST', 'PATCH', 'PATCH']);
   });
+  it('does not silently accept a failed processed-status write', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('database unavailable', { status: 503 })));
+    const { markWebhookProcessed } = await import('../api/_supabase');
+    await expect(markWebhookProcessed('stripe', 'evt_write_failure')).rejects.toThrow(/mark webhook event as processed/i);
+  });
+
+  it('does not silently accept a failed status write for a failed webhook', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('database unavailable', { status: 503 })));
+    const { markWebhookFailed } = await import('../api/_supabase');
+    await expect(markWebhookFailed('lemon-squeezy', 'evt_write_failure', 'processing_failed')).rejects.toThrow(/mark webhook event as failed/i);
+  });
+
+  it('treats a zero-row webhook status update as a persistence failure', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('[]', { status: 200 })));
+    const { markWebhookProcessed } = await import('../api/_supabase');
+    await expect(markWebhookProcessed('stripe', 'evt_missing')).rejects.toThrow(/webhook event was not updated/i);
+  });
+
 });
