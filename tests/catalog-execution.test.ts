@@ -3,6 +3,7 @@ import { TOOLS_CATALOG } from '../src/data/tools-catalog';
 import { defaultInput, executeTool } from '../src/lib/tool-engine';
 
 const SPECIAL_INPUTS: Record<string, string> = {
+  'string-joiner': ',\napple\nbanana\ncherry',
   'punycode-converter': 'bücher.de',
   'oauth2-auth-url-builder': '{"authorizationEndpoint":"https://accounts.example.com/oauth2/authorize","clientId":"demo-client","redirectUri":"https://example.com/callback","scope":"openid profile","state":"test-state"}',
   'random-pin-generator': '6',
@@ -184,5 +185,6 @@ describe('535-tool catalog execution smoke oracle', () => {
     }));
 
     expect(unexpectedErrors).toBe(0);
+    expect(unclassified).toBe(0);
   });
 });
