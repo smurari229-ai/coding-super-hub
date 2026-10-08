@@ -45,6 +45,7 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Improved representative catalog smoke inputs for Punycode, OAuth URL, PIN, base conversion, random range, HEX-to-RGB, currency/compact formatting, and string joining.
 - Added an explicit assertion that the 535-tool smoke oracle has no unclassified outcomes.
 - Hardened webhook status persistence: processing now throws if Supabase reports a failed status write or updates zero rows; added regression tests for these cases.
+- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests are being run on the latest code.
 - Latest CI run validates these changes on the audit branch only.
 
 ## Supabase / billing
@@ -62,6 +63,12 @@ Live project checked read-only: `psujvwayiqnzkhbhatks` (`ap-south-1`, healthy).
 ### Migration reproducibility blocker
 
 The live database migration history contains versions/names not represented by matching canonical migration files in the repository (including `harden_billing_rls`, `remove_unused_entitlement_index`, and `tighten_ai_usage_rls_cleanup_duplicate_indexes`). The checked-in migration filenames use date-only prefixes, while the live history uses timestamp versions. Do **not** run or invent schema migrations blindly; reconcile the exact applied SQL/history and commit a reproducible migration chain before claiming a clean-project bootstrap.
+
+## Vercel environment configuration
+
+Read-only inventory of the Vercel project environment variables found only the branch-specific public browser variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` for the audit preview. No server-side `GEMINI_API_KEY`, `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY`, Stripe secrets/price IDs, or Lemon Squeezy API/webhook secrets/store/variant IDs were present in the returned project environment inventory. Secret values were not requested or exposed.
+
+This means real AI and billing flows cannot be declared configured from current evidence. Add the actual credentials/IDs in Vercel's encrypted environment settings; do not commit them or fabricate values.
 
 ## Security and integration verification still pending
 
