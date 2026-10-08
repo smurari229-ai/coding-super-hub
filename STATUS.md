@@ -5,14 +5,14 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest verified application/billing code head: `ad3ddcf5009c5b780d539843e79488d374286a30` (CI passed); consult the live branch/PR for the current documentation-only head.
+- Latest verified application/tool-engine code head: `a9cc98954b141ad67879ad2d0753365a469fbe56`; passing full test/fixture head: `4a3268021bf70306d41974f1ad4c0f5ece4eea2d`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 - Current compare: **diverged / 44 commits behind main**; the ahead count changes with audit-only commits.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
-- Latest app/billing CI: [run 37855568997](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855568997) — **5/5 jobs PASS**, **11 test files / 96 tests PASS**. Latest canonical migration CI: [run 37855849989](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855849989) — **5/5 jobs PASS**, **12 test files / 99 tests PASS**.
-- Latest confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. Later branch commits are migration/test-only; verify the latest preview again after their deployment finishes.
-- Latest preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML and security headers observed.
+- Latest full CI after utility/catalog changes: [run 37856312051](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37856312051) — **5/5 jobs PASS**, **12 test files / 101 tests PASS**.
+- Last confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. The latest 12-handler utility batch has passed GitHub CI but a matching Vercel preview deployment is not yet verified.
+- Last confirmed preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML, JS/CSS assets, deep-link HTML fallback, CSP and baseline security headers observed. These checks predate the latest utility batch.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
 ## Safeguards
