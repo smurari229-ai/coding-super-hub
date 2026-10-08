@@ -2170,6 +2170,23 @@ const roiBatch24: Handler = (tool, input) => {
 
 const releaseHardeningBatch: Handler = (tool, input) => {
   switch (tool.id) {
+    case 'case-converter': {
+      const parts = caseWords(input);
+      const lower = parts.map(part => part.toLowerCase());
+      const title = parts.map(part => part ? part[0].toUpperCase() + part.slice(1).toLowerCase() : '').join(' ');
+      const camel = lower.map((part, index) => index === 0 ? part : part ? part[0].toUpperCase() + part.slice(1) : '').join('');
+      const pascal = lower.map(part => part ? part[0].toUpperCase() + part.slice(1) : '').join('');
+      return [
+        'camelCase: ' + camel,
+        'snake_case: ' + lower.join('_'),
+        'kebab-case: ' + lower.join('-'),
+        'PascalCase: ' + pascal,
+        'CONSTANT_CASE: ' + lower.join('_').toUpperCase(),
+        'Title Case: ' + title,
+      ].join('\n');
+    }
+    case 'slug-to-text':
+      return input.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
     case 'url-encoder-decoder': {
       const lines = input.split(/\r?\n/);
       const mode = (lines[0] || '').trim().toLowerCase();
