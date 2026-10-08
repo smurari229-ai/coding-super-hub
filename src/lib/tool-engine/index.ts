@@ -2168,6 +2168,238 @@ const roiBatch24: Handler = (tool, input) => {
   }
 };
 
+const roiBatch25: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'binary-to-text': {
+      const raw = input.trim();
+      if (!raw) throw new Error('Enter 8-bit binary bytes separated by spaces, e.g. 01001000 01101001.');
+      const chunks = raw.split(/\s+/);
+      const bits = chunks.length > 1 ? chunks : raw.match(/.{8}/g) ?? [];
+      if (!bits.length || bits.some(bits => !/^[01]{8}$/.test(bits))) {
+        throw new Error('Use complete 8-bit binary groups, separated by spaces or without separators.');
+      }
+      try {
+        return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(bits, bits => parseInt(bits, 2)));
+      } catch {
+        throw new Error('Binary bytes are not valid UTF-8 text.');
+      }
+    }
+    case 'crc32-checksum': {
+      let crc = 0xffffffff;
+      for (const byte of new TextEncoder().encode(input)) {
+        crc ^= byte;
+        for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+      }
+      return 'CRC32: ' + ((crc ^ 0xffffffff) >>> 0).toString(16).padStart(8, '0').toUpperCase();
+    }
+    case 'csv-delimiter-changer': {
+      const firstLine = input.split(/\r?\n/).find(line => line.trim()) ?? '';
+      const delimiters = [',', ';', '\t', '|'];
+      const counts = delimiters.map(delimiter => {
+        let quoted = false, count = 0;
+        for (let i = 0; i < firstLine.length; i += 1) {
+          if (firstLine[i] === '"' && firstLine[i + 1] === '"') { i += 1; continue; }
+          if (firstLine[i] === '"') quoted = !quoted;
+          else if (!quoted && firstLine[i] === delimiter) count += 1;
+        }
+        return count;
+      });
+      const max = Math.max(...counts);
+      if (max === 0) throw new Error('Could not detect a CSV delimiter in the first non-empty row.');
+      const source = delimiters[counts.indexOf(max)];
+      if (source === ',') return input;
+      let out = '', quoted = false;
+      for (let i = 0; i < input.length; i += 1) {
+        const char = input[i];
+        if (char === '"' && input[i + 1] === '"') { out += '""'; i += 1; continue; }
+        if (char === '"') { quoted = !quoted; out += char; continue; }
+        out += !quoted && char === source ? ',' : char;
+      }
+      if (quoted) throw new Error('Malformed CSV: unterminated quote.');
+      return out;
+    }
+    case 'json-diff-keys': {
+      const parts = input.split(/\r?\n---\r?\n/);
+      if (parts.length !== 2) throw new Error('Provide two JSON objects separated by a line containing --- .');
+      const left = JSON.parse(parts[0]) as unknown;
+      const right = JSON.parse(parts[1]) as unknown;
+      if (!left || typeof left !== 'object' || Array.isArray(left) || !right || typeof right !== 'object' || Array.isArray(right)) {
+        throw new Error('Both inputs must be JSON objects.');
+      }
+      const a = left as Record<string, unknown>, b = right as Record<string, unknown>;
+      const added = Object.keys(b).filter(key => !(key in a));
+      const missing = Object.keys(a).filter(key => !(key in b));
+      const changed = Object.keys(a).filter(key => key in b && typeof a[key] !== typeof b[key]);
+      return [
+        'Added keys: ' + (added.join(', ') || 'None'),
+        'Missing keys: ' + (missing.join(', ') || 'None'),
+        'Changed value types: ' + (changed.join(', ') || 'None')
+      ].join('\n');
+    }
+    case 'json-to-markdown-table': {
+      const data = JSON.parse(input);
+      if (!Array.isArray(data) || !data.length || data.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {
+        throw new Error('Input must be a non-empty JSON array of objects.');
+      }
+      const keys = Array.from(new Set(data.flatMap(row => Object.keys(row as object))));
+      if (!keys.length) throw new Error('JSON objects must contain at least one key.');
+      const cell = (value: unknown) => String(value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : value).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+      return [
+        '| ' + keys.map(cell).join(' | ') + ' |',
+        '| ' + keys.map(() => '---').join(' | ') + ' |',
+        ...data.map(row => '| ' + keys.map(key => cell((row as Record<string, unknown>)[key])).join(' | ') + ' |')
+      ].join('\n');
+    }
+    case 'markdown-table-to-json': {
+      const lines = input.split(/\r?\n/).map(line => line.trim()).filter(line => line.startsWith('|'));
+      if (lines.length < 2) throw new Error('Enter a Markdown table with a header row and at least one data row.');
+      const parseRow = (line: string) => line.replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim().replace(/\\\|/g, '|'));
+      const headers = parseRow(lines[0]);
+      const rows = lines.slice(1).filter(line => !parseRow(line).every(cell => /^:?-{3,}:?$/.test(cell))).map(parseRow);
+      if (!headers.length || headers.some(header => !header) || !rows.length) throw new Error('Markdown table needs non-empty headers and data rows.');
+      return JSON.stringify(rows.map(row => Object.fromEntries(headers.map((header, i) => [header, row[i] ?? '']))), null, 2);
+    }
+    case 'json-to-env': {
+      const data = JSON.parse(input);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Input must be a JSON object.');
+      const rows: string[] = [];
+      const walk = (value: unknown, prefix: string) => {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          for (const [key, child] of Object.entries(value as Record<string, unknown>)) walk(child, prefix ? prefix + '_' + key : key);
+          return;
+        }
+        const key = prefix.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').toUpperCase();
+        const text = value == null ? '' : typeof value === 'string' ? value : JSON.stringify(value);
+        rows.push(key + '=' + (/[#\r\n\s]/.test(text) ? JSON.stringify(text) : text));
+      };
+      walk(data, '');
+      if (!rows.length) throw new Error('JSON object contains no scalar values.');
+      return rows.join('\n');
+    }
+    case 'env-to-json': {
+      const result: Record<string, string> = {};
+      for (const rawLine of input.split(/\r?\n/)) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('#')) continue;
+        const normalized = line.startsWith('export ') ? line.slice(7) : line;
+        const separator = normalized.indexOf('=');
+        if (separator <= 0) throw new Error('Each non-comment line must use KEY=value format.');
+        const key = normalized.slice(0, separator).trim();
+        if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) throw new Error('Invalid environment variable name: ' + key);
+        let value = normalized.slice(separator + 1).trim();
+        if (value.startsWith('"') && value.endsWith('"')) {
+          try { value = JSON.parse(value) as string; } catch { throw new Error('Malformed quoted value for ' + key + '.'); }
+        } else if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+        result[key] = value;
+      }
+      if (!Object.keys(result).length) throw new Error('Enter at least one KEY=value line.');
+      return JSON.stringify(result, null, 2);
+    }
+    case 'gps-dms-to-decimal': {
+      const pattern = /(-?\d{1,3})\s*°?\s*(\d{1,2})\s*['′]?\s*(\d{1,2}(?:\.\d+)?)?\s*["″]?\s*([NSEW])/gi;
+      const matches = Array.from(input.matchAll(pattern));
+      if (!matches.length) throw new Error('Enter DMS coordinates such as 40°26\\'46"N 79°58\\'55"W.');
+      return matches.map(match => {
+        const degrees = Number(match[1]), minutes = Number(match[2]), seconds = Number(match[3] || 0);
+        const hemisphere = match[4].toUpperCase();
+        if (minutes >= 60 || seconds >= 60) throw new Error('Minutes and seconds must be below 60.');
+        let decimal = Math.abs(degrees) + minutes / 60 + seconds / 3600;
+        if (hemisphere === 'S' || hemisphere === 'W') decimal *= -1;
+        return hemisphere + ': ' + decimal.toFixed(6);
+      }).join('\n');
+    }
+    case 'gps-decimal-to-dms': {
+      const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+      if (values.length < 2 || values[0] < -90 || values[0] > 90 || values[1] < -180 || values[1] > 180) {
+        throw new Error('Enter latitude and longitude in decimal degrees, e.g. 40.446 -79.982.');
+      }
+      const format = (value: number, positive: string, negative: string) => {
+        const absolute = Math.abs(value);
+        const degrees = Math.floor(absolute);
+        const minutesFloat = (absolute - degrees) * 60;
+        const minutes = Math.floor(minutesFloat);
+        const seconds = ((minutesFloat - minutes) * 60).toFixed(2);
+        return degrees + '° ' + minutes + "' " + seconds + '" ' + (value < 0 ? negative : positive);
+      };
+      return 'Latitude: ' + format(values[0], 'N', 'S') + '\nLongitude: ' + format(values[1], 'E', 'W');
+    }
+    case 'timezone-converter': {
+      const [dateRaw, ...zonesRaw] = input.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+      const date = new Date(dateRaw);
+      if (!Number.isFinite(date.getTime())) throw new Error('First line must be an ISO date/time, e.g. 2026-10-09T12:00:00Z.');
+      const zones = zonesRaw.length ? zonesRaw : ['UTC', 'Asia/Kolkata', 'America/New_York'];
+      return zones.map(zone => {
+        try {
+          return zone + ': ' + new Intl.DateTimeFormat('en-GB', {
+            dateStyle: 'medium', timeStyle: 'long', timeZone: zone
+          }).format(date);
+        } catch {
+          throw new Error('Unknown IANA timezone: ' + zone);
+        }
+      }).join('\n');
+    }
+    case 'npm-scripts-generator': {
+      const manager = input.trim().toLowerCase() || 'vite';
+      const scripts: Record<string, string> = {
+        dev: manager === 'next' ? 'next dev' : manager === 'vite' ? 'vite' : 'npm run dev',
+        build: manager === 'next' ? 'next build' : manager === 'vite' ? 'tsc -b && vite build' : 'npm run build',
+        test: 'vitest run',
+        lint: 'eslint .',
+        typecheck: 'tsc --noEmit'
+      };
+      return JSON.stringify({ scripts }, null, 2);
+    }
+    case 'pip-requirements-builder': {
+      const rows = input.split(/\r?\n/).map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+      if (!rows.length) throw new Error('Enter one Python package requirement per line.');
+      if (rows.some(line => !/^[A-Za-z0-9_.-]+(?:\[[A-Za-z0-9_,.-]+\])?(?:\s*(?:===|==|~=|>=|<=|!=|>|<)\s*[A-Za-z0-9.*+!_-]+)?$/.test(line))) {
+        throw new Error('Use package names with optional version pins, e.g. requests==2.32.0.');
+      }
+      return Array.from(new Set(rows)).join('\n') + '\n';
+    }
+    case 'dark-mode-css-generator': {
+      const colors = input.match(/#[0-9a-f]{3,8}\b/gi) ?? [];
+      const background = colors[0] ?? '#111827';
+      const foreground = colors[1] ?? '#F9FAFB';
+      return [
+        '@media (prefers-color-scheme: dark) {',
+        '  :root {',
+        '    color-scheme: dark;',
+        '    --color-background: ' + background + ';',
+        '    --color-foreground: ' + foreground + ';',
+        '  }',
+        '}'
+      ].join('\n');
+    }
+    case 'print-stylesheet-generator': {
+      const selectors = input.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+      const hidden = selectors.length ? selectors : ['nav', 'header', 'footer', '.no-print'];
+      if (hidden.some(selector => !/^[.#]?[A-Za-z_][\w-]*(?:\s+[.#]?[A-Za-z_][\w-]*)*$/.test(selector))) {
+        throw new Error('Enter simple CSS selectors, one per line.');
+      }
+      return '@media print {\n  ' + hidden.join(',\n  ') + ' { display: none !important; }\n  body { color: #000; background: #fff; }\n  a[href]::after { content: \" (\" attr(href) \")\"; }\n}';
+    }
+    case 'css-gradient-border': {
+      const colors = input.match(/#[0-9a-f]{3,8}\b/gi) ?? [];
+      const first = colors[0] ?? '#4F46E5';
+      const second = colors[1] ?? '#EC4899';
+      const width = Number(input.match(/\b(\d{1,2})\s*px\b/i)?.[1] ?? 2);
+      if (width < 1 || width > 20) throw new Error('Border width must be between 1px and 20px.');
+      return 'border: ' + width + 'px solid transparent;\nbackground: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, ' + first + ', ' + second + ') border-box;';
+    }
+    case 'js-debounce-throttle': {
+      const name = input.trim().match(/[A-Za-z_$][\w$]*/)?.[0] ?? 'callback';
+      return 'export function debounce<T extends (...args: any[]) => void>(fn: T, delay = 250) {\\n  let timer: ReturnType<typeof setTimeout>;\\n  return (...args: Parameters<T>) => {\\n    clearTimeout(timer);\\n    timer = setTimeout(() => fn(...args), delay);\\n  };\\n}\\n\\nexport function throttle<T extends (...args: any[]) => void>(fn: T, delay = 250) {\\n  let last = 0;\\n  return (...args: Parameters<T>) => {\\n    const now = Date.now();\\n    if (now - last >= delay) { last = now; fn(...args); }\\n  };\\n}\\n\\n// Example: const run = debounce(' + name + ', 300);';
+    }
+    case 'safe-json-parse': {
+      const variable = input.trim().match(/[A-Za-z_$][\w$]*/)?.[0] ?? 'input';
+      return 'export function safeJsonParse<T>(text: string, fallback: T): T {\\n  try { return JSON.parse(text) as T; }\\n  catch { return fallback; }\\n}\\n\\nconst result = safeJsonParse(' + variable + ', {});';
+    }
+    default:
+      return null;
+  }
+};
+
 const releaseHardeningBatch: Handler = (tool, input) => {
   switch (tool.id) {
     case 'case-converter': {
@@ -2249,6 +2481,7 @@ const releaseHardeningBatch: Handler = (tool, input) => {
 };
 
 const handlers: Handler[] = [
+  roiBatch25,
   releaseHardeningBatch,
   roiBatch24,
   roiBatch23,
