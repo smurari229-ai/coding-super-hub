@@ -2232,6 +2232,7 @@ const releaseHardeningBatch: Handler = (tool, input) => {
 };
 
 const handlers: Handler[] = [
+  releaseHardeningBatch,
   roiBatch24,
   roiBatch23,
   roiBatch22,
