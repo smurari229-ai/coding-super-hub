@@ -1216,7 +1216,7 @@ const roiBatch5: Handler = (tool, input) => {
     case 'csv-duplicate-remover': {const seen=new Set<string>();return parseCsv(input).filter(row=>{const k=JSON.stringify(row);if(seen.has(k))return false;seen.add(k);return true}).map(row=>row.join(',')).join('\n');}
     case 'excel-date-converter': {const serial=nums[0];if(!Number.isFinite(serial))throw new Error('Enter an Excel serial date.');const d=new Date(Date.UTC(1899,11,30)+serial*86400000);return d.toISOString();}
     case 'regex-cheat-sheet': return 'Anchors: ^ start, $ end\nClasses: \\d digit, \\w word, \\s whitespace\nQuantifiers: * zero+, + one+, ? optional, {n,m} range\nGroups: (...) capture, (?:...) non-capture\nLookaround: (?=...) lookahead, (?!...) negative lookahead';
-    case 'escape-sql-string': return input.replace(/\\/g,'\\\').replace(/'/g,"''");
+    case 'escape-sql-string': return input.replace(/\\/g,'\\\\').replace(/'/g,"''");
     case 'text-obfuscator': return Array.from(input).map(ch=>'&#'+ch.codePointAt(0)+';').join('');
     case 'html-to-markdown': return input.replace(/<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi,(_,level,text)=>'#'.repeat(Number(level))+' '+text+'\n').replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi,'**$1**').replace(/<em[^>]*>([\s\S]*?)<\/em>/gi,'*$1*').replace(/<br\s*\/?>(?=.)/gi,'\n').replace(/<[^>]+>/g,'').trim();
     default:return null;
