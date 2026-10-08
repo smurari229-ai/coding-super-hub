@@ -130,6 +130,24 @@ describe('Stripe webhook security and idempotency', () => {
     expect(mocks.markWebhookProcessed).toHaveBeenCalledWith('stripe', 'evt_test_1');
   });
 
+  it('revokes Pro for a fully refunded Stripe charge', async () => {
+    const body = event({
+      type: 'charge.refunded',
+      data: { object: { id: 'ch_test', payment_intent: 'pi_test_1', refunded: true, amount: 1000, amount_refunded: 1000 } },
+    });
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': signed(body, 'stripe-hook-secret') },
+      body,
+    }));
+    expect(response.status).toBe(200);
+    expect(mocks.updateEntitlementByProviderField).toHaveBeenCalledWith(
+      'stripe_payment_intent_id',
+      'pi_test_1',
+      expect.objectContaining({ status: 'refunded' }),
+    );
+  });
+
   it('does not process a durable duplicate event', async () => {
     mocks.claimWebhookEvent.mockResolvedValue(false);
     const body = event();
