@@ -178,7 +178,12 @@ async function handler(request: Request): Promise<Response> {
     await markWebhookProcessed('lemon-squeezy', eventId);
     return json({ received: true, processed: true, event: eventName });
   } catch (error) {
-    await markWebhookFailed('lemon-squeezy', eventId, error instanceof Error ? error.message : 'processing_failed');
+    try {
+      await markWebhookFailed('lemon-squeezy', eventId, error instanceof Error ? error.message : 'processing_failed');
+    } catch {
+      // Keep the provider response retryable even if status persistence is unavailable.
+      // Stale "processing" claims are recovered by claimWebhookEvent after the timeout.
+    }
     return json({ received: false, error: 'Webhook processing failed; retry is safe.' }, 500);
   }
 }
