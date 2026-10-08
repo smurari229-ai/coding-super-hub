@@ -102,6 +102,68 @@ describe('Lemon webhook retry safety', () => {
     expect(mocks.markWebhookProcessed).toHaveBeenCalledWith('lemon-squeezy', expect.any(String));
   });
 
+  it('fails closed when an active monthly subscription has no renewal boundary', async () => {
+    mocks.findUserIdByEmail.mockResolvedValue('user-1');
+    const body = JSON.stringify({
+      meta: { event_name: 'subscription_created' },
+      data: {
+        type: 'subscriptions',
+        id: 'sub_missing_period',
+        attributes: {
+          store_id: 1,
+          variant_id: 10,
+          status: 'active',
+          order_id: 123,
+          user_email: 'buyer@example.com',
+        },
+      },
+    });
+
+    const response = await lemonWebhook(new Request('https://example.com/api/lemon-webhook', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-signature': signed(body, 'lemon-hook-secret') },
+      body,
+    }));
+
+    expect(response.status).toBe(500);
+    expect(mocks.upsertEntitlement).not.toHaveBeenCalled();
+    expect(mocks.markWebhookFailed).toHaveBeenCalledWith('lemon-squeezy', expect.any(String), 'missing_subscription_period');
+  });
+
+  it('stores the renewal boundary for an active monthly subscription', async () => {
+    mocks.findUserIdByEmail.mockResolvedValue('user-1');
+    const renewsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const body = JSON.stringify({
+      meta: { event_name: 'subscription_created' },
+      data: {
+        type: 'subscriptions',
+        id: 'sub_with_period',
+        attributes: {
+          store_id: 1,
+          variant_id: 10,
+          status: 'active',
+          renews_at: renewsAt,
+          order_id: 123,
+          user_email: 'buyer@example.com',
+        },
+      },
+    });
+
+    const response = await lemonWebhook(new Request('https://example.com/api/lemon-webhook', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-signature': signed(body, 'lemon-hook-secret') },
+      body,
+    }));
+
+    expect(response.status).toBe(200);
+    expect(mocks.upsertEntitlement).toHaveBeenCalledWith(expect.objectContaining({
+      plan: 'monthly',
+      status: 'active',
+      expires_at: renewsAt,
+      lemon_subscription_id: 'sub_with_period',
+    }));
+  });
+
   it('returns non-200 and records failure when a subscription has no matching account', async () => {
     const body = JSON.stringify({
       meta: { event_name: 'subscription_created' },
