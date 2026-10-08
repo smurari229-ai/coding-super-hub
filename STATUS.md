@@ -5,13 +5,13 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest prior fully verified application/test HEAD: `52d3028a3d1f85aa64c0b4cd1a7b7cf7b7d0be8e`; latest changes under CI: `7b5de20954e52beda4fad4fc721663996841e0d0`
+- Latest verified application/test HEAD: `7b5de20954e52beda4fad4fc721663996841e0d0`; latest status-document commit: `4f2bf41ff4dc9befc9d2bc0d79fefaa13d84ef94`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 - Current compare: **407 commits ahead / 44 behind main** (diverged)
 - PR #4: **OPEN / UNMERGED / mergeable=false**
-- Latest completed CI before current fix: [run 37853651665](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37853651665) on `b9488e3` — **5/5 jobs PASS**. New HTML-entity regression fix and test are awaiting their own final CI result: [run 37855039433](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855039433).
-- Latest confirmed preview deployment: [READY](https://vercel.com/earnal-hub/coding-super-hub/9ENCrqJR9SA7sNAgwfjoR5hBfc68), commit `b9488e3`. A preview for the new HTML-entity fix is pending deployment verification.
+- CI for the HTML-entity fix/test: [run 37855052036](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855052036) — **5/5 jobs PASS**, **11 test files / 88 tests PASS**. Status-doc CI: [run 37855080159](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855080159) — **5/5 jobs PASS**.
+- Latest confirmed audit preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/HafooJNneGVBCvzaTDV9KW8ShsXZ), commit `4f2bf41`. The preview returns HTTP 200 with the expected 535-tool app HTML and security headers.
 - Latest preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML and security headers observed.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
@@ -45,7 +45,8 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Improved representative catalog smoke inputs for Punycode, OAuth URL, PIN, base conversion, random range, HEX-to-RGB, currency/compact formatting, and string joining.
 - Added an explicit assertion that the 535-tool smoke oracle has no unclassified outcomes.
 - Hardened webhook status persistence: processing now throws if Supabase reports a failed status write or updates zero rows; added regression tests for these cases.
-- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests passed in the previous CI; the newly added HTML entity regression test is awaiting the current CI result.
+- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests passed in CI.
+- Fixed HTML entity decoding to handle case-insensitive named entities and preserve invalid Unicode numeric entities rather than throwing; regression test added and CI passed (88 total tests).
 - Latest CI run validates these changes on the audit branch only.
 
 ## Supabase / billing
