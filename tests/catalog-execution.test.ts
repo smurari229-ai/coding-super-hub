@@ -214,7 +214,9 @@ describe('535-tool catalog execution smoke oracle', () => {
       unclassified,
       semanticPassNotClaimed: true,
       unexpectedErrorIds: rows.filter(row => row.unexpectedError).map(row => row.id),
+      unexpectedErrorDetails: rows.filter(row => row.unexpectedError).map(row => ({ id: row.id, error: row.error })),
       validationIds: rows.filter(row => row.validation).map(row => row.id),
+      validationDetails: rows.filter(row => row.validation).map(row => ({ id: row.id, error: row.error })),
       unclassifiedIds: rows.filter(row => row.unclassified).map(row => row.id),
       comingSoonIds: rows.filter(row => row.comingSoon).map(row => row.id)
     }));
