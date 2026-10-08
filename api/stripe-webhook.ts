@@ -166,7 +166,13 @@ async function handler(request: Request): Promise<Response> {
       if (!owner) throw new Error('user_not_found');
 
       const currentPeriodEnd = Number(subscription?.current_period_end || 0);
-      const expiresAt = currentPeriodEnd ? new Date(currentPeriodEnd * 1000).toISOString() : null;
+      const hasValidPeriod = Number.isFinite(currentPeriodEnd) && currentPeriodEnd > 0;
+      if (['active', 'trialing'].includes(String(subscription?.status || '')) && !hasValidPeriod) {
+        // Null expiry is treated as unlimited Pro; do not create it from an
+        // incomplete subscription event.
+        throw new Error('missing_subscription_period');
+      }
+      const expiresAt = hasValidPeriod ? new Date(currentPeriodEnd * 1000).toISOString() : null;
       const cancelAtPeriodEnd = subscription?.cancel_at_period_end === true;
       const status = subscription?.status === 'canceled'
         ? 'expired'
