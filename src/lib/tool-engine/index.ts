@@ -2298,7 +2298,7 @@ const roiBatch25: Handler = (tool, input) => {
     case 'gps-dms-to-decimal': {
       const pattern = /(-?\d{1,3})\s*°?\s*(\d{1,2})\s*['′]?\s*(\d{1,2}(?:\.\d+)?)?\s*["″]?\s*([NSEW])/gi;
       const matches = Array.from(input.matchAll(pattern));
-      if (!matches.length) throw new Error('Enter DMS coordinates such as 40°26\'46"N 79°58\'55"W.');
+      if (!matches.length) throw new Error("Enter DMS coordinates such as 40°26'46\"N 79°58'55\"W.");
       return matches.map(match => {
         const degrees = Number(match[1]), minutes = Number(match[2]), seconds = Number(match[3] || 0);
         const hemisphere = match[4].toUpperCase();
