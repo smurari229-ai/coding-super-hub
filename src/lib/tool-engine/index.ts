@@ -2177,6 +2177,129 @@ const roiBatch24: Handler = (tool, input) => {
   }
 };
 
+const utilityBatch26: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'flatten-deep-array': {
+      const value = JSON.parse(input);
+      if (!Array.isArray(value)) throw new Error('Enter a JSON array, including nested arrays.');
+      return JSON.stringify(value.flat(Infinity), null, 2);
+    }
+    case 'chunk-array-utility': {
+      const value = JSON.parse(input);
+      if (!value || !Array.isArray(value.items) || !Number.isInteger(value.size) || value.size < 1 || value.size > 1000) throw new Error('Enter JSON like {"items":[1,2,3],"size":2}.');
+      const chunks: unknown[][] = [];
+      for (let i = 0; i < value.items.length; i += value.size) chunks.push(value.items.slice(i, i + value.size));
+      return JSON.stringify(chunks, null, 2);
+    }
+    case 'difference-intersection-arrays': {
+      const value = JSON.parse(input);
+      if (!value || !Array.isArray(value.a) || !Array.isArray(value.b)) throw new Error('Enter JSON with arrays a and b.');
+      const key = (item: unknown) => JSON.stringify(item);
+      const aKeys = new Set(value.a.map(key)), bKeys = new Set(value.b.map(key));
+      return JSON.stringify({
+        difference: value.a.filter((item: unknown) => !bKeys.has(key(item))),
+        intersection: value.a.filter((item: unknown) => bKeys.has(key(item))),
+        bOnly: value.b.filter((item: unknown) => !aKeys.has(key(item))),
+      }, null, 2);
+    }
+    case 'group-by-array-object': {
+      const value = JSON.parse(input);
+      if (!value || !Array.isArray(value.items) || typeof value.key !== 'string' || !value.key) throw new Error('Enter JSON like {"key":"team","items":[{"team":"A"}]}.');
+      const groups: Record<string, unknown[]> = Object.create(null);
+      for (const item of value.items) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error('Every item must be a JSON object.');
+        const group = String((item as Record<string, unknown>)[value.key] ?? 'null');
+        (groups[group] ??= []).push(item);
+      }
+      return JSON.stringify(groups, null, 2);
+    }
+    case 'random-array-item': {
+      const value = JSON.parse(input);
+      if (!Array.isArray(value) || !value.length) throw new Error('Enter a non-empty JSON array.');
+      const selected = value[Math.floor(Math.random() * value.length)];
+      return typeof selected === 'string' ? selected : JSON.stringify(selected, null, 2);
+    }
+    case 'currency-code-lookup': {
+      const code = input.trim().toUpperCase();
+      if (!/^[A-Z]{3}$/.test(code)) throw new Error('Enter a three-letter ISO currency code, e.g. INR.');
+      const name = new Intl.DisplayNames(['en'], { type: 'currency' }).of(code);
+      if (!name || name.toUpperCase() === code) throw new Error('Unknown currency code: ' + code);
+      return code + ' — ' + name;
+    }
+    case 'country-code-lookup': {
+      const code = input.trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(code)) throw new Error('Enter a two-letter ISO country code, e.g. IN, US, GB.');
+      const name = new Intl.DisplayNames(['en'], { type: 'region' }).of(code);
+      if (!name || name.toUpperCase() === code) throw new Error('Unknown country code: ' + code);
+      return code + ' — ' + name;
+    }
+    case 'json-to-go-struct': {
+      const value = JSON.parse(input);
+      if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Enter a JSON object.');
+      const goName = (key: string) => {
+        const words = key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').split(/[^a-zA-Z0-9]+/).filter(Boolean);
+        const name = words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        return /^[A-Za-z_]/.test(name) ? name : 'Field' + name;
+      };
+      const goType = (item: unknown): string => {
+        if (item === null) return 'any';
+        if (typeof item === 'string') return 'string';
+        if (typeof item === 'boolean') return 'bool';
+        if (typeof item === 'number') return Number.isInteger(item) ? 'int64' : 'float64';
+        if (Array.isArray(item)) return '[]' + (item.length ? goType(item[0]) : 'any');
+        return 'map[string]any';
+      };
+      const fields = Object.entries(value).map(([key, item]) => '  ' + goName(key) + ' ' + goType(item) + ' ' + '`json:"' + key.replace(/"/g, '') + '"`');
+      return 'type Generated struct {\n' + fields.join('\n') + '\n}';
+    }
+    case 'crontab-syntax-generator': {
+      const fields = input.trim().split(/\s+/);
+      if (fields.length !== 5 || fields.some(field => !/^[0-9*/,-]+$/.test(field))) throw new Error('Enter five cron fields (minute hour day month weekday), e.g. 0 9 * * 1-5.');
+      return '# minute hour day month weekday\n' + fields.join(' ') + ' /path/to/command';
+    }
+    case 'mock-api-response-maker': {
+      const value = JSON.parse(input), status = Number(value?.status ?? 200);
+      if (!Number.isInteger(status) || status < 100 || status > 599) throw new Error('HTTP status must be an integer from 100 to 599.');
+      const body = value && Object.prototype.hasOwnProperty.call(value, 'body') ? value.body : { message: 'Mock response' };
+      return 'HTTP/1.1 ' + status + '\nContent-Type: application/json\n\n' + JSON.stringify(body, null, 2);
+    }
+    case 'sorting-algorithm-visualizer': {
+      const values = input.trim().split(/[\s,]+/).map(Number);
+      if (!values.length || values.some(value => !Number.isFinite(value))) throw new Error('Enter numbers separated by spaces or commas.');
+      if (values.length > 100) throw new Error('Use at most 100 numbers for the step-by-step trace.');
+      const list = [...values], trace = ['Start: ' + list.join(', ')];
+      for (let end = list.length - 1; end > 0; end -= 1) {
+        let swapped = false;
+        for (let i = 0; i < end; i += 1) if (list[i] > list[i + 1]) {
+          [list[i], list[i + 1]] = [list[i + 1], list[i]]; swapped = true;
+          trace.push('Swap positions ' + i + ' and ' + (i + 1) + ': ' + list.join(', '));
+        }
+        if (!swapped) break;
+      }
+      trace.push('Sorted: ' + list.join(', '));
+      return trace.join('\n');
+    }
+    case 'binary-search-visualizer': {
+      const value = JSON.parse(input);
+      if (!value || !Array.isArray(value.array) || typeof value.target !== 'number' || value.array.some((n: unknown) => typeof n !== 'number' || !Number.isFinite(n))) throw new Error('Enter JSON like {"array":[1,3,5,7],"target":5}.');
+      const list: number[] = value.array;
+      if (list.some((n, i) => i > 0 && list[i - 1] > n)) throw new Error('Array must be sorted ascending.');
+      let low = 0, high = list.length - 1;
+      const trace = ['Array: [' + list.join(', ') + ']', 'Target: ' + value.target];
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        trace.push('low=' + low + ', mid=' + mid + ', high=' + high + ' → ' + list[mid]);
+        if (list[mid] === value.target) { trace.push('Found at index ' + mid); return trace.join('\n'); }
+        if (list[mid] < value.target) low = mid + 1; else high = mid - 1;
+      }
+      trace.push('Target not found');
+      return trace.join('\n');
+    }
+    default:
+      return null;
+  }
+};
+
 const roiBatch25: Handler = (tool, input) => {
   switch (tool.id) {
     case 'binary-to-text': {
@@ -2490,6 +2613,7 @@ const releaseHardeningBatch: Handler = (tool, input) => {
 };
 
 const handlers: Handler[] = [
+  utilityBatch26,
   roiBatch25,
   releaseHardeningBatch,
   roiBatch24,
