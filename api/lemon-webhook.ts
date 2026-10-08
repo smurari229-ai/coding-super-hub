@@ -152,6 +152,7 @@ async function handler(request: Request): Promise<Response> {
     } else if (resourceType === 'subscriptions') {
       const plan = variantId === monthlyVariant ? 'monthly' : variantId === lifetimeVariant ? 'lifetime' : null;
       if (!plan) throw new Error('unsupported_subscription_variant');
+      if (!userId) throw new Error('user_not_found');
 
       const status = String(attrs.status || '');
       const endsAt = typeof attrs.ends_at === 'string' ? attrs.ends_at : null;
@@ -175,7 +176,6 @@ async function handler(request: Request): Promise<Response> {
         expiresAt = endsAt;
       }
 
-      if (!userId) throw new Error('user_not_found');
       await upsertEntitlement({
         user_id: userId,
         provider: 'lemon-squeezy',
