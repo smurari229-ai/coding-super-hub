@@ -169,9 +169,9 @@ async function handler(request: Request): Promise<Response> {
         plan === 'monthly' && subscription?.status === 'canceled'
           ? 'cancelled'
           : 'active',
-      expires_at: plan === 'monthly' ? new Date(subscription!.current_period_end * 1000).toISOString() : null,
+      expires_at: plan === 'monthly' ? new Date(Number(subscription!.current_period_end) * 1000).toISOString() : null,
       stripe_session_id: sessionId,
-      stripe_subscription_id: plan === 'monthly' ? subscription!.id : null,
+      stripe_subscription_id: plan === 'monthly' ? String(subscription!.id) : null,
       stripe_payment_intent_id: typeof payload.payment_intent === 'string' ? payload.payment_intent : null,
     });
 
