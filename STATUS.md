@@ -29,15 +29,15 @@ Latest CI output from `tests/catalog-execution.test.ts`:
 
 | Classification | Count |
 |---|---:|
-| Non-empty engine output observed | 334 |
-| Explicit Coming-soon | 189 |
+| Non-empty engine output observed | 346 |
+| Explicit Coming-soon | 177 |
 | Dedicated-UI entries returning generic fallback and needing UI-level smoke | 12 |
 | Validation/input mismatches | 0 |
 | Unexpected errors | 0 |
 | Unclassified outcomes | 0 |
 | **Total** | **535** |
 
-Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is a deterministic smoke classification, **not semantic correctness PASS**. The 189 Coming-soon entries remain unsupported by the generic engine; the 334 outputs still need representative correctness assertions by tool family. All 48 dedicated components need UI interaction tests; 12 currently return generic engine fallback.
+Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is a deterministic smoke classification, **not semantic correctness PASS**. The 177 Coming-soon entries remain unsupported by the generic engine; the 346 outputs still need representative correctness assertions by tool family. All 48 dedicated components need UI interaction tests; 12 currently return generic engine fallback.
 
 ## Changes made in this audit pass
 
@@ -47,7 +47,8 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Hardened webhook status persistence: processing now throws if Supabase reports a failed status write or updates zero rows; added regression tests for these cases.
 - Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500.
 - Fixed HTML entity decoding to handle case-insensitive named entities and preserve invalid Unicode numeric entities rather than throwing.
-- Fixed monthly Pro entitlement boundaries across Stripe and Lemon verification/webhook paths: monthly entitlements require a valid provider period end; Lemon monthly order events alone no longer grant unbounded Pro. Regression tests pass in CI (96 total tests).
+- Fixed monthly Pro entitlement boundaries across Stripe and Lemon verification/webhook paths: monthly entitlements require a valid provider period end; Lemon monthly order events alone no longer grant unbounded Pro.
+- Implemented 12 additional deterministic utility handlers (array flatten/chunk/group/set operations, random array pick, ISO currency/country lookup, JSON-to-Go, cron, mock API response, sorting trace, and binary-search trace) with representative catalog inputs and focused regression tests. Latest completed CI on the feature/test head: **5/5 jobs PASS, 12 test files / 101 tests PASS**; catalog smoke now observes 346 outputs, 177 explicit Coming-soon, 0 input mismatches, 0 unexpected errors, and 0 unclassified outcomes.
 - Latest CI run validates these changes on the audit branch only.
 
 ## Supabase / billing
@@ -79,7 +80,7 @@ This means real AI and billing flows cannot be declared configured from current 
 - Confirm Vercel environment-variable presence/configuration without exposing secret values.
 - Browser-level smoke for tool execution, `?tool=` deep links, Markdown rendering, CodePlayground sandbox behavior under CSP, checkout flow, and error states.
 - Mobile widths 375 / 390 / 412 and accessibility/keyboard/screen-reader checks.
-- Semantic correctness tests across the 334 engine-output entries; dedicated UI behavior for all 48 dedicated components, especially 12 with generic fallback.
+- Semantic correctness tests across the 346 engine-output entries; dedicated UI behavior for all 48 dedicated components, especially 12 with generic fallback.
 - Verify a clean local Supabase bootstrap against the restored canonical migrations; no migration was executed on the live project during this pass.
 - Safe review of the 44 main-only commits and the divergent PR before any merge decision.
 
