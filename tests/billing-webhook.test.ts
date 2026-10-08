@@ -115,6 +115,39 @@ describe('Stripe webhook security and idempotency', () => {
     expect(mocks.markWebhookProcessed).toHaveBeenCalled();
   });
 
+  it('does not grant unbounded monthly Pro when Stripe omits subscription expiry', async () => {
+    const body = event({
+      data: {
+        object: {
+          id: 'cs_monthly_missing_period',
+          payment_status: 'paid',
+          status: 'complete',
+          customer_details: { email: 'buyer@example.com' },
+        },
+      },
+    });
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      payment_status: 'paid',
+      status: 'complete',
+      mode: 'subscription',
+      customer: 'cus_test',
+      customer_details: { email: 'buyer@example.com' },
+      customer_email: 'buyer@example.com',
+      line_items: { data: [{ price: { id: 'price_monthly' } }] },
+      subscription: null,
+    }), { status: 200 })));
+
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': signed(body, 'stripe-hook-secret') },
+      body,
+    }));
+
+    expect(response.status).toBe(500);
+    expect(mocks.upsertEntitlement).not.toHaveBeenCalled();
+    expect(mocks.markWebhookFailed).toHaveBeenCalledWith('stripe', 'evt_test_1', 'missing_subscription_period');
+  });
+
   it('does not revoke Pro for a partial Stripe refund', async () => {
     const body = event({
       type: 'charge.refunded',
