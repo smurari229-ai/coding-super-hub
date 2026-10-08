@@ -343,3 +343,25 @@ describe('HTML entity decoder edge cases', () => {
     expect(result.output).toBe('& < A 🚀 &#99999999; &#xD800;');
   });
 });
+
+describe('additional practical catalog utilities', () => {
+  it('handles array transformations with deterministic semantics', () => {
+    expect(executeTool(tool('flatten-deep-array', 'Flatten Array'), '[[1,[2]],3]').output).toBe('[\n  1,\n  2,\n  3\n]');
+    expect(JSON.parse(executeTool(tool('chunk-array-utility', 'Chunk Array'), '{"items":[1,2,3,4,5],"size":2}').output)).toEqual([[1,2],[3,4],[5]]);
+    expect(JSON.parse(executeTool(tool('difference-intersection-arrays', 'Array Difference'), '{"a":[1,2,3],"b":[2,3,4]}').output)).toEqual({ difference:[1], intersection:[2,3], bOnly:[4] });
+    expect(JSON.parse(executeTool(tool('group-by-array-object', 'Group Objects'), '{"key":"team","items":[{"team":"A","n":1},{"team":"B","n":2},{"team":"A","n":3}]}').output).A).toHaveLength(2);
+    expect(['a','b']).toContain(executeTool(tool('random-array-item', 'Random Array Item'), '["a","b"]').output);
+  });
+
+  it('generates locale names, code snippets, and algorithm traces', () => {
+    expect(executeTool(tool('currency-code-lookup', 'Currency Code'), 'INR').output).toContain('Indian Rupee');
+    expect(executeTool(tool('country-code-lookup', 'Country Code'), 'IN').output).toContain('India');
+    const go = executeTool(tool('json-to-go-struct', 'JSON to Go'), '{"first_name":"A","active":true}').output;
+    expect(go).toContain('FirstName string');
+    expect(go).toContain('json:"first_name"');
+    expect(executeTool(tool('crontab-syntax-generator', 'Crontab'), '0 9 * * 1-5').output).toContain('0 9 * * 1-5 /path/to/command');
+    expect(executeTool(tool('mock-api-response-maker', 'Mock API Response'), '{"status":201,"body":{"ok":true}}').output).toContain('HTTP/1.1 201');
+    expect(executeTool(tool('sorting-algorithm-visualizer', 'Sort Trace'), '3,1,2').output).toContain('Sorted: 1, 2, 3');
+    expect(executeTool(tool('binary-search-visualizer', 'Binary Search'), '{"array":[1,3,5,7],"target":5}').output).toContain('Found at index 2');
+  });
+});
