@@ -332,3 +332,14 @@ describe('semantic utility batch 24', () => {
     expect(executeTool(tool('format-number-compact', 'Compact Number Formatter'), '1250000 en-US').output).toContain('1.25M');
   });
 });
+
+describe('HTML entity decoder edge cases', () => {
+  it('decodes named entities case-insensitively and preserves invalid numeric code points', () => {
+    const result = executeTool(
+      tool('html-entity-decoder', 'HTML Entity Decoder'),
+      '&AMP; &Lt; &#65; &#x1F680; &#99999999; &#xD800;'
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.output).toBe('& < A 🚀 &#99999999; &#xD800;');
+  });
+});
