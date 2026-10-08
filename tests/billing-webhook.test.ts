@@ -115,6 +115,21 @@ describe('Stripe webhook security and idempotency', () => {
     expect(mocks.markWebhookProcessed).toHaveBeenCalled();
   });
 
+  it('does not revoke Pro for a partial Stripe refund', async () => {
+    const body = event({
+      type: 'charge.refunded',
+      data: { object: { id: 'ch_test', payment_intent: 'pi_test_1', refunded: false, amount: 1000, amount_refunded: 200 } },
+    });
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': signed(body, 'stripe-hook-secret') },
+      body,
+    }));
+    expect(response.status).toBe(200);
+    expect(mocks.updateEntitlementByProviderField).not.toHaveBeenCalled();
+    expect(mocks.markWebhookProcessed).toHaveBeenCalledWith('stripe', 'evt_test_1');
+  });
+
   it('does not process a durable duplicate event', async () => {
     mocks.claimWebhookEvent.mockResolvedValue(false);
     const body = event();
