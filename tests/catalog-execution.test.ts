@@ -3,6 +3,23 @@ import { TOOLS_CATALOG } from '../src/data/tools-catalog';
 import { defaultInput, executeTool } from '../src/lib/tool-engine';
 
 const SPECIAL_INPUTS: Record<string, string> = {
+  'crc32-checksum': '123456789',
+  'csv-delimiter-changer': `name;age\nAlice;20\nBob;30`,
+  'json-diff-keys': `{\"a\":1,\"old\":true}\n---\n{\"a\":\"1\",\"new\":false}`,
+  'json-to-markdown-table': `[{\"name\":\"Alice\",\"age\":20},{\"name\":\"Bob\",\"age\":30}]`,
+  'markdown-table-to-json': `| name | age |\n| --- | --- |\n| Alice | 20 |\n| Bob | 30 |`,
+  'json-to-env': `{\"apiKey\":\"abc def\",\"nested\":{\"port\":3000}}`,
+  'env-to-json': `API_KEY=test\nAPP_URL=https://example.com`,
+  'gps-dms-to-decimal': `40°26'46\"N 79°58'55\"W`,
+  'gps-decimal-to-dms': '40.446 -79.982',
+  'timezone-converter': `2026-10-09T12:00:00Z\nAsia/Kolkata\nAmerica/New_York`,
+  'npm-scripts-generator': 'vite',
+  'pip-requirements-builder': `requests==2.32.0\nhttpx>=0.27`,
+  'dark-mode-css-generator': '#ffffff #111827',
+  'print-stylesheet-generator': `nav\nfooter`,
+  'css-gradient-border': '#4f46e5 #ec4899 3px',
+  'js-debounce-throttle': 'searchInput',
+  'safe-json-parse': 'inputValue',
   'string-joiner': ',\napple\nbanana\ncherry',
   'punycode-converter': 'bücher.de',
   'oauth2-auth-url-builder': '{"authorizationEndpoint":"https://accounts.example.com/oauth2/authorize","clientId":"demo-client","redirectUri":"https://example.com/callback","scope":"openid profile","state":"test-state"}',
