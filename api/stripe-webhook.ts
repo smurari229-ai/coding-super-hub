@@ -131,16 +131,28 @@ async function handler(request: Request): Promise<Response> {
       if (!userId) throw new Error('user_not_found');
 
       const subscription = typeof session?.subscription === 'object' && session.subscription ? session.subscription : null;
+      if (
+        plan === 'monthly' &&
+        (!subscription ||
+          typeof subscription.id !== 'string' ||
+          typeof subscription.current_period_end !== 'number' ||
+          !Number.isFinite(subscription.current_period_end) ||
+          subscription.current_period_end <= 0)
+      ) {
+        // Never create an unbounded monthly Pro entitlement if Stripe did not
+        // return the authoritative subscription period end.
+        throw new Error('missing_subscription_period');
+      }
       await upsertEntitlement({
         user_id: userId,
         provider: 'stripe',
         plan,
         status: 'active',
-        expires_at: plan === 'monthly' && subscription?.current_period_end
-          ? new Date(subscription.current_period_end * 1000).toISOString()
+        expires_at: plan === 'monthly'
+          ? new Date(subscription!.current_period_end * 1000).toISOString()
           : null,
         stripe_customer_id: typeof session.customer === 'string' ? session.customer : null,
-        stripe_subscription_id: plan === 'monthly' ? subscription?.id ?? null : null,
+        stripe_subscription_id: plan === 'monthly' ? subscription!.id : null,
         stripe_session_id: String(object.id),
         stripe_payment_intent_id: typeof session.payment_intent === 'string' ? session.payment_intent : null,
       });
