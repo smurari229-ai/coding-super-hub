@@ -134,12 +134,16 @@ async function handler(request: Request): Promise<Response> {
       });
     } else if (resourceType === 'orders' && eventName === 'order_created') {
       const plan = variantId === monthlyVariant ? 'monthly' : variantId === lifetimeVariant ? 'lifetime' : null;
-      if (plan && attrs.status === 'paid' && attrs.refunded !== true) {
+      // A paid monthly order does not carry the subscription's authoritative end
+      // date. Granting Pro here with expires_at=null could leave monthly Pro active
+      // indefinitely if the subscription event is delayed or never delivered.
+      // Monthly Pro is granted only by the signed subscription webhook below.
+      if (plan === 'lifetime' && attrs.status === 'paid' && attrs.refunded !== true) {
         if (!userId) throw new Error('user_not_found');
         await upsertEntitlement({
           user_id: userId,
           provider: 'lemon-squeezy',
-          plan,
+          plan: 'lifetime',
           status: 'active',
           expires_at: null,
           lemon_order_id: resourceId,
