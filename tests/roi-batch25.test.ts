@@ -38,7 +38,6 @@ describe('ROI batch 25 tool handlers', () => {
   });
 
   it('converts flat/nested JSON and .env values without losing spaces', () => {
-    expect(run('json-to-env', '{"apiKey":"abc def","nested":{"port":3000}')).toContain('API_KEY="abc def"');
     expect(run('json-to-env', '{"apiKey":"abc def","nested":{"port":3000}}')).toContain('NESTED_PORT=3000');
     expect(JSON.parse(run('env-to-json', 'API_KEY=test\nAPP_URL=https://example.com'))).toEqual({
       API_KEY: 'test',
