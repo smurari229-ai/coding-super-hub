@@ -935,7 +935,7 @@ const baseHandlers: Handler[] = [roiBatch8,
   (tool, input) => has(tool, 'random string', 'nanoid', 'cuid', 'token')
     ? randomToken(Math.min(256, Math.max(4, Number(input) || (tool.id === 'nanoid-generator' ? 21 : 24)))) : null,
   (tool, input) => {
-    if (!has(tool, 'lorem')) return null;
+    if (tool.id === 'lorem-ipsum-generator' || !has(tool, 'lorem')) return null;
     const seed = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
     return Array(Math.min(20, Math.max(1, Number(input) || 3))).fill(seed).join(' ');
   },
