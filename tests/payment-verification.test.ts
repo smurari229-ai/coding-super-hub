@@ -105,6 +105,73 @@ describe('payment verification URL handling', () => {
     await expect(response.json()).resolves.toMatchObject({ verified: false });
   });
 
+  it('stores a finite renewal boundary for verified Lemon monthly Pro', async () => {
+    process.env.LEMON_SQUEEZY_API_KEY = 'test-secret';
+    process.env.LEMON_SQUEEZY_STORE_ID = '1';
+    process.env.LEMON_SQUEEZY_MONTHLY_VARIANT_ID = '10';
+    process.env.LEMON_SQUEEZY_LIFETIME_VARIANT_ID = '20';
+    const renewsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        data: { attributes: {
+          store_id: 1, status: 'paid', refunded: false,
+          user_email: 'buyer@example.com', first_order_item: { variant_id: 10 },
+        } },
+      }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        data: [{ id: 'sub_test', attributes: { status: 'active', variant_id: 10, renews_at: renewsAt } }],
+      }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const supabase = await import('../api/_supabase');
+    vi.mocked(supabase.upsertEntitlement).mockClear();
+
+    const request = {
+      method: 'GET',
+      url: '/api/verify-lemon-order?order_id=123',
+      headers: new Headers({ host: 'example.com', 'x-forwarded-proto': 'https' }),
+    } as unknown as Request;
+
+    const response = await lemonHandler(request);
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ verified: true, plan: 'monthly' });
+    expect(supabase.upsertEntitlement).toHaveBeenCalledWith(expect.objectContaining({
+      plan: 'monthly',
+      expires_at: renewsAt,
+      lemon_subscription_id: 'sub_test',
+    }));
+  });
+
+  it('rejects Lemon monthly verification without a finite renewal boundary', async () => {
+    process.env.LEMON_SQUEEZY_API_KEY = 'test-secret';
+    process.env.LEMON_SQUEEZY_STORE_ID = '1';
+    process.env.LEMON_SQUEEZY_MONTHLY_VARIANT_ID = '10';
+    process.env.LEMON_SQUEEZY_LIFETIME_VARIANT_ID = '20';
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        data: { attributes: {
+          store_id: 1, status: 'paid', refunded: false,
+          user_email: 'buyer@example.com', first_order_item: { variant_id: 10 },
+        } },
+      }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        data: [{ id: 'sub_test', attributes: { status: 'active', variant_id: 10 } }],
+      }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const supabase = await import('../api/_supabase');
+    vi.mocked(supabase.upsertEntitlement).mockClear();
+
+    const request = {
+      method: 'GET',
+      url: '/api/verify-lemon-order?order_id=123',
+      headers: new Headers({ host: 'example.com', 'x-forwarded-proto': 'https' }),
+    } as unknown as Request;
+
+    const response = await lemonHandler(request);
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({ verified: false });
+    expect(supabase.upsertEntitlement).not.toHaveBeenCalled();
+  });
+
   it('falls back safely when APP_URL is malformed', async () => {
     process.env.APP_URL = 'not-a-valid-url';
     process.env.STRIPE_SECRET_KEY = 'test-secret';
