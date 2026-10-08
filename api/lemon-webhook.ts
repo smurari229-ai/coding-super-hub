@@ -155,14 +155,22 @@ async function handler(request: Request): Promise<Response> {
 
       const status = String(attrs.status || '');
       const endsAt = typeof attrs.ends_at === 'string' ? attrs.ends_at : null;
+      const renewsAt = typeof attrs.renews_at === 'string' ? attrs.renews_at : null;
+      const trialEndsAt = typeof attrs.trial_ends_at === 'string' ? attrs.trial_ends_at : null;
       const endsInFuture = Boolean(endsAt && Date.parse(endsAt) > Date.now());
 
       let entitlementStatus: 'active' | 'cancelled' | 'expired' = 'expired';
       let expiresAt: string | null = null;
 
       if (['on_trial', 'active'].includes(status) && attrs.cancelled !== true) {
+        const periodEnd = status === 'on_trial' ? trialEndsAt ?? renewsAt : renewsAt;
+        if (!periodEnd || !Number.isFinite(Date.parse(periodEnd)) || Date.parse(periodEnd) <= Date.now()) {
+          // Fail closed: null expiry is treated as unlimited Pro by getEntitlement.
+          throw new Error('missing_subscription_period');
+        }
         entitlementStatus = 'active';
-      } else if (status === 'cancelled' && endsInFuture) {
+        expiresAt = periodEnd;
+      } else if ((status === 'cancelled' || attrs.cancelled === true) && endsInFuture) {
         entitlementStatus = 'cancelled';
         expiresAt = endsAt;
       }
