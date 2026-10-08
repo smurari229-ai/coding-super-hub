@@ -5,13 +5,13 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest verified application/test HEAD: `7b5de20954e52beda4fad4fc721663996841e0d0`; latest status-document commit: `4f2bf41ff4dc9befc9d2bc0d79fefaa13d84ef94`.
+- Latest verified application/test HEAD: `ad3ddcf5009c5b780d539843e79488d374286a30` (CI passed); latest audit branch head: `47b6b77c8275f818d0ccca3e5caf42e7507bc77e`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 - Current compare: **407 commits ahead / 44 behind main** (diverged)
 - PR #4: **OPEN / UNMERGED / mergeable=false**
-- CI for the HTML-entity fix/test: [run 37855052036](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855052036) — **5/5 jobs PASS**, **11 test files / 88 tests PASS**. Status-doc CI: [run 37855080159](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855080159) — **5/5 jobs PASS**.
-- Latest confirmed audit preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/HafooJNneGVBCvzaTDV9KW8ShsXZ), commit `4f2bf41`. The preview returns HTTP 200 with the expected 535-tool app HTML and security headers.
+- Latest verified app/billing CI: [run 37855568997](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855568997) — **5/5 jobs PASS**, **11 test files / 96 tests PASS**. Canonical migration replay tests are newly added; latest run [37855849989](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855849989) is still in progress.
+- Latest confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. Later branch commits are migration/test-only; verify the latest preview again after their deployment finishes.
 - Latest preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML and security headers observed.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
@@ -45,8 +45,9 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Improved representative catalog smoke inputs for Punycode, OAuth URL, PIN, base conversion, random range, HEX-to-RGB, currency/compact formatting, and string joining.
 - Added an explicit assertion that the 535-tool smoke oracle has no unclassified outcomes.
 - Hardened webhook status persistence: processing now throws if Supabase reports a failed status write or updates zero rows; added regression tests for these cases.
-- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests passed in CI.
-- Fixed HTML entity decoding to handle case-insensitive named entities and preserve invalid Unicode numeric entities rather than throwing; regression test added and CI passed (88 total tests).
+- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500.
+- Fixed HTML entity decoding to handle case-insensitive named entities and preserve invalid Unicode numeric entities rather than throwing.
+- Fixed monthly Pro entitlement boundaries across Stripe and Lemon verification/webhook paths: monthly entitlements require a valid provider period end; Lemon monthly order events alone no longer grant unbounded Pro. Regression tests pass in CI (96 total tests).
 - Latest CI run validates these changes on the audit branch only.
 
 ## Supabase / billing
@@ -63,7 +64,7 @@ Live project checked read-only: `psujvwayiqnzkhbhatks` (`ap-south-1`, healthy).
 
 ### Migration reproducibility blocker
 
-The live database migration history contains versions/names not represented by matching canonical migration files in the repository (including `harden_billing_rls`, `remove_unused_entitlement_index`, and `tighten_ai_usage_rls_cleanup_duplicate_indexes`). The checked-in migration filenames use date-only prefixes, while the live history uses timestamp versions. Do **not** run or invent schema migrations blindly; reconcile the exact applied SQL/history and commit a reproducible migration chain before claiming a clean-project bootstrap.
+The live database migration history contains versions/names not represented by matching canonical migration files in the repository (including `harden_billing_rls`, `remove_unused_entitlement_index`, and `tighten_ai_usage_rls_cleanup_duplicate_indexes`). The previously missing timestamped migration files have been restored as idempotent equivalents based on live schema metadata, and a `20260929000000_billing_core_tables.sql` baseline now supports clean-project bootstrap. The baseline is not applied to the live project. These files are reconstructed equivalents, not a byte-for-byte recovery of the original dashboard-applied SQL; review the diff and validate a clean local Supabase bootstrap before applying any migrations to production.
 
 ## Vercel environment configuration
 
@@ -79,6 +80,7 @@ This means real AI and billing flows cannot be declared configured from current 
 - Browser-level smoke for tool execution, `?tool=` deep links, Markdown rendering, CodePlayground sandbox behavior under CSP, checkout flow, and error states.
 - Mobile widths 375 / 390 / 412 and accessibility/keyboard/screen-reader checks.
 - Semantic correctness tests across the 334 engine-output entries; dedicated UI behavior for all 48 dedicated components, especially 12 with generic fallback.
+- Verify a clean local Supabase bootstrap against the restored canonical migrations; no migration was executed on the live project during this pass.
 - Safe review of the 44 main-only commits and the divergent PR before any merge decision.
 
 ## Release gate
