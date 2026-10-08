@@ -2363,8 +2363,8 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
     }
 
     if (tool.id === 'leet-speak-generator') {
-      const map: Record<string, string> = { a: '4', e: '3', i: '1', o: '0', s: '5', t: '7', g: '6', b: '8' };
-      return { output: input.replace(/[aeiostgb]/gi, (ch) => map[ch.toLowerCase()] ?? ch) };
+      const map: Record<string, string> = { a: '4', e: '3', i: '1', o: '0', s: '5', g: '6', b: '8' };
+      return { output: input.replace(/[aeiosgb]/gi, (ch) => map[ch.toLowerCase()] ?? ch) };
     }
 
     if (tool.id === 'upside-down-text') {
