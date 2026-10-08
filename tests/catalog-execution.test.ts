@@ -142,6 +142,18 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'clamp-number-math': '150 0 100',
   'rgb-to-hex-code': '255 0 128',
   'signed-url-builder-spec': '{"url":"https://example.com/file.bin?download=1","secret":"test-secret","expiresAt":1893456000}',
+  'flatten-deep-array': '[[1,[2]],3]',
+  'chunk-array-utility': '{"items":[1,2,3,4,5],"size":2}',
+  'difference-intersection-arrays': '{"a":[1,2,3],"b":[2,3,4]}',
+  'group-by-array-object': '{"key":"team","items":[{"team":"A"},{"team":"B"}]}',
+  'random-array-item': '["a","b"]',
+  'currency-code-lookup': 'INR',
+  'country-code-lookup': 'IN',
+  'json-to-go-struct': '{"first_name":"A","active":true}',
+  'crontab-syntax-generator': '0 9 * * 1-5',
+  'mock-api-response-maker': '{"status":201,"body":{"ok":true}}',
+  'sorting-algorithm-visualizer': '3,1,2',
+  'binary-search-visualizer': '{"array":[1,3,5,7],"target":5}',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
