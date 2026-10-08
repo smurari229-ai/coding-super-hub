@@ -71,6 +71,37 @@ describe('Lemon webhook retry safety', () => {
     expect(mocks.markWebhookFailed).toHaveBeenCalledWith('lemon-squeezy', expect.any(String), 'user_not_found');
   });
 
+  it('does not grant indefinite monthly Pro from an order event without subscription expiry', async () => {
+    mocks.findUserIdByEmail.mockResolvedValue('user-1');
+    const body = JSON.stringify({
+      meta: { event_name: 'order_created' },
+      data: {
+        type: 'orders',
+        id: 'order_monthly_123',
+        attributes: {
+          store_id: 1,
+          status: 'paid',
+          refunded: false,
+          variant_id: 10,
+          user_email: 'buyer@example.com',
+        },
+      },
+    });
+
+    const response = await lemonWebhook(new Request('https://example.com/api/lemon-webhook', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-signature': signed(body, 'lemon-hook-secret'),
+      },
+      body,
+    }));
+
+    expect(response.status).toBe(200);
+    expect(mocks.upsertEntitlement).not.toHaveBeenCalled();
+    expect(mocks.markWebhookProcessed).toHaveBeenCalledWith('lemon-squeezy', expect.any(String));
+  });
+
   it('returns non-200 and records failure when a subscription has no matching account', async () => {
     const body = JSON.stringify({
       meta: { event_name: 'subscription_created' },
