@@ -1216,7 +1216,7 @@ const roiBatch5: Handler = (tool, input) => {
     case 'csv-duplicate-remover': {const seen=new Set<string>();return parseCsv(input).filter(row=>{const k=JSON.stringify(row);if(seen.has(k))return false;seen.add(k);return true}).map(row=>row.join(',')).join('\n');}
     case 'excel-date-converter': {const serial=nums[0];if(!Number.isFinite(serial))throw new Error('Enter an Excel serial date.');const d=new Date(Date.UTC(1899,11,30)+serial*86400000);return d.toISOString();}
     case 'regex-cheat-sheet': return 'Anchors: ^ start, $ end\nClasses: \\d digit, \\w word, \\s whitespace\nQuantifiers: * zero+, + one+, ? optional, {n,m} range\nGroups: (...) capture, (?:...) non-capture\nLookaround: (?=...) lookahead, (?!...) negative lookahead';
-    case 'escape-sql-string': return input.replace(/\\/g,'\\\\').replace(/'/g,"''");
+    case 'escape-sql-string': return input.replace(/\\/g,'\\\').replace(/'/g,"''");
     case 'text-obfuscator': return Array.from(input).map(ch=>'&#'+ch.codePointAt(0)+';').join('');
     case 'html-to-markdown': return input.replace(/<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi,(_,level,text)=>'#'.repeat(Number(level))+' '+text+'\n').replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi,'**$1**').replace(/<em[^>]*>([\s\S]*?)<\/em>/gi,'*$1*').replace(/<br\s*\/?>(?=.)/gi,'\n').replace(/<[^>]+>/g,'').trim();
     default:return null;
@@ -2298,7 +2298,7 @@ const roiBatch25: Handler = (tool, input) => {
     case 'gps-dms-to-decimal': {
       const pattern = /(-?\d{1,3})\s*°?\s*(\d{1,2})\s*['′]?\s*(\d{1,2}(?:\.\d+)?)?\s*["″]?\s*([NSEW])/gi;
       const matches = Array.from(input.matchAll(pattern));
-      if (!matches.length) throw new Error('Enter DMS coordinates such as 40°26\\'46"N 79°58\\'55"W.');
+      if (!matches.length) throw new Error('Enter DMS coordinates such as 40°26\'46"N 79°58\'55"W.');
       return matches.map(match => {
         const degrees = Number(match[1]), minutes = Number(match[2]), seconds = Number(match[3] || 0);
         const hemisphere = match[4].toUpperCase();
@@ -2392,7 +2392,7 @@ const roiBatch25: Handler = (tool, input) => {
       return 'export function debounce<T extends (...args: any[]) => void>(fn: T, delay = 250) {\n  let timer: ReturnType<typeof setTimeout>;\n  return (...args: Parameters<T>) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), delay);\n  };\n}\n\nexport function throttle<T extends (...args: any[]) => void>(fn: T, delay = 250) {\n  let last = 0;\n  return (...args: Parameters<T>) => {\n    const now = Date.now();\n    if (now - last >= delay) { last = now; fn(...args); }\n  };\n}\n\n// Example: const run = debounce(' + name + ', 300);';
     }
     case 'safe-json-parse': {
-      const variable = input.trim().match(/[A-Za-z_$][\w$]*/)?.[0] ?? 'input';
+      const variable = 'inputValue';
       return 'export function safeJsonParse<T>(text: string, fallback: T): T {\n  try { return JSON.parse(text) as T; }\n  catch { return fallback; }\n}\n\nconst result = safeJsonParse(' + variable + ', {});';
     }
     default:
