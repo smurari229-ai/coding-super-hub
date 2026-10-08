@@ -5,13 +5,13 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest verified application/test HEAD: `52d3028a3d1f85aa64c0b4cd1a7b7cf7b7d0be8e`
+- Latest prior fully verified application/test HEAD: `52d3028a3d1f85aa64c0b4cd1a7b7cf7b7d0be8e`; latest changes under CI: `7b5de20954e52beda4fad4fc721663996841e0d0`
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current compare: **379 commits ahead / 44 behind main** (diverged)
+- Current compare: **407 commits ahead / 44 behind main** (diverged)
 - PR #4: **OPEN / UNMERGED / mergeable=false**
-- Latest CI: [run 37853393005](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37853393005) on HEAD `52d3028` — **5/5 jobs PASS**, **11 test files / 87 tests PASS**.
-- Latest preview deployment: [READY](https://vercel.com/earnal-hub/coding-super-hub/EjbwCjCWVJZcE3Q5F5fDcFFgCM5P), commit `210d657`.
+- Latest completed CI before current fix: [run 37853651665](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37853651665) on `b9488e3` — **5/5 jobs PASS**. New HTML-entity regression fix and test are awaiting their own final CI result: [run 37855039433](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855039433).
+- Latest confirmed preview deployment: [READY](https://vercel.com/earnal-hub/coding-super-hub/9ENCrqJR9SA7sNAgwfjoR5hBfc68), commit `b9488e3`. A preview for the new HTML-entity fix is pending deployment verification.
 - Latest preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML and security headers observed.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
@@ -29,15 +29,15 @@ Latest CI output from `tests/catalog-execution.test.ts`:
 
 | Classification | Count |
 |---|---:|
-| Non-empty engine output observed | 316 |
-| Explicit Coming-soon | 214 |
-| Dedicated-UI entries needing UI-level smoke | 5 |
+| Non-empty engine output observed | 334 |
+| Explicit Coming-soon | 189 |
+| Dedicated-UI entries returning generic fallback and needing UI-level smoke | 12 |
 | Validation/input mismatches | 0 |
 | Unexpected errors | 0 |
 | Unclassified outcomes | 0 |
 | **Total** | **535** |
 
-Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is a deterministic smoke classification, **not semantic correctness PASS**. The 214 Coming-soon entries remain unsupported by the generic engine; the 316 outputs still need representative correctness assertions by tool family, and the five dedicated-UI entries need actual UI interaction testing.
+Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is a deterministic smoke classification, **not semantic correctness PASS**. The 189 Coming-soon entries remain unsupported by the generic engine; the 334 outputs still need representative correctness assertions by tool family. All 48 dedicated components need UI interaction tests; 12 currently return generic engine fallback.
 
 ## Changes made in this audit pass
 
@@ -45,7 +45,7 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Improved representative catalog smoke inputs for Punycode, OAuth URL, PIN, base conversion, random range, HEX-to-RGB, currency/compact formatting, and string joining.
 - Added an explicit assertion that the 535-tool smoke oracle has no unclassified outcomes.
 - Hardened webhook status persistence: processing now throws if Supabase reports a failed status write or updates zero rows; added regression tests for these cases.
-- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests are being run on the latest code.
+- Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500; regression tests passed in the previous CI; the newly added HTML entity regression test is awaiting the current CI result.
 - Latest CI run validates these changes on the audit branch only.
 
 ## Supabase / billing
@@ -66,7 +66,7 @@ The live database migration history contains versions/names not represented by m
 
 ## Vercel environment configuration
 
-Read-only inventory of the Vercel project environment variables found only the branch-specific public browser variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` for the audit preview. No server-side `GEMINI_API_KEY`, `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY`, Stripe secrets/price IDs, or Lemon Squeezy API/webhook secrets/store/variant IDs were present in the returned project environment inventory. Secret values were not requested or exposed.
+Read-only Vercel environment inventory returned only two audit-branch Preview variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. No server-side Gemini/Supabase service credentials or Stripe/Lemon Squeezy server credentials/price IDs were present in that returned inventory; production environment readiness is NOT verified. Secret values were not requested or exposed.
 
 This means real AI and billing flows cannot be declared configured from current evidence. Add the actual credentials/IDs in Vercel's encrypted environment settings; do not commit them or fabricate values.
 
@@ -77,7 +77,7 @@ This means real AI and billing flows cannot be declared configured from current 
 - Confirm Vercel environment-variable presence/configuration without exposing secret values.
 - Browser-level smoke for tool execution, `?tool=` deep links, Markdown rendering, CodePlayground sandbox behavior under CSP, checkout flow, and error states.
 - Mobile widths 375 / 390 / 412 and accessibility/keyboard/screen-reader checks.
-- Semantic correctness tests across the 316 engine-output entries; dedicated UI behavior for five entries.
+- Semantic correctness tests across the 334 engine-output entries; dedicated UI behavior for all 48 dedicated components, especially 12 with generic fallback.
 - Safe review of the 44 main-only commits and the divergent PR before any merge decision.
 
 ## Release gate
