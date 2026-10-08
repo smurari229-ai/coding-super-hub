@@ -51,23 +51,38 @@ async function handler(req: Request) {
 
   const contentLength = Number(getRequestHeader(req, 'content-length') || 0);
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_LENGTH) {
-    return send( 413, { error: 'AI request is too large' });
+    return send(413, { error: 'AI request is too large' });
   }
 
   const ip = getClientIp(req);
   if (rateLimited(ip)) {
-    return send( 429, { error: 'Too many AI requests. Please wait before trying again.' });
+    return send(429, { error: 'Too many AI requests. Please wait before trying again.' });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return send( 503, { error: 'AI service is not configured on the server.' });
+  if (!apiKey) return send(503, { error: 'AI service is not configured on the server.' });
 
-  const user = await getAuthenticatedUser(req);
-  if (!user?.id) return send( 401, { error: 'Sign in is required before using AI Copilot.' });
+  let user;
+  try {
+    user = await getAuthenticatedUser(req);
+  } catch {
+    return send(503, { error: 'Authentication service is temporarily unavailable.' });
+  }
+  if (!user?.id) return send(401, { error: 'Sign in is required before using AI Copilot.' });
+
+  let rawBody: string;
+  try {
+    rawBody = await req.text();
+  } catch {
+    return send(400, { error: 'Invalid request body' });
+  }
+  if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_LENGTH) {
+    return send(413, { error: 'AI request is too large' });
+  }
 
   let body: any;
   try {
-    body = await req.json();
+    body = JSON.parse(rawBody);
   } catch {
     return send(400, { error: 'Invalid request body' });
   }
@@ -77,15 +92,15 @@ async function handler(req: Request) {
   const instruction = typeof body.instruction === 'string' ? body.instruction : '';
   const customPrompt = typeof body.customPrompt === 'string' ? body.customPrompt : '';
 
-  if (!code.trim()) return send( 400, { error: 'Code input is required' });
-  if (code.length > MAX_CODE_LENGTH) return send( 413, { error: 'Code input exceeds the 20,000 character limit' });
-  if (instruction.length > MAX_INSTRUCTION_LENGTH || customPrompt.length > MAX_INSTRUCTION_LENGTH) return send( 413, { error: 'Instruction input is too large' });
+  if (!code.trim()) return send(400, { error: 'Code input is required' });
+  if (code.length > MAX_CODE_LENGTH) return send(413, { error: 'Code input exceeds the 20,000 character limit' });
+  if (instruction.length > MAX_INSTRUCTION_LENGTH || customPrompt.length > MAX_INSTRUCTION_LENGTH) return send(413, { error: 'Instruction input is too large' });
 
   let entitlement = null;
   try {
     entitlement = await getEntitlement(user.id);
   } catch {
-    return send( 503, { error: 'Billing authorization is temporarily unavailable.' });
+    return send(503, { error: 'Billing authorization is temporarily unavailable.' });
   }
 
   const isPro = Boolean(entitlement);
@@ -100,11 +115,11 @@ async function handler(req: Request) {
         p_limit: FREE_DAILY_LIMIT,
       }));
     } catch {
-      return send( 503, { error: 'AI quota service is temporarily unavailable.' });
+      return send(503, { error: 'AI quota service is temporarily unavailable.' });
     }
 
     if (!quotaReserved) {
-      return send( 429, { error: 'Free AI limit reached (10 successful calls today). Upgrade to Pro for expanded Copilot access.' });
+      return send(429, { error: 'Free AI limit reached (10 successful calls today). Upgrade to Pro for expanded Copilot access.' });
     }
   }
 
@@ -130,14 +145,14 @@ async function handler(req: Request) {
     const boundedText = text.length > MAX_RESPONSE_LENGTH
       ? text.slice(0, MAX_RESPONSE_LENGTH) + '\n\n[Response truncated at the 12,000 character safety limit.]'
       : text;
-    return send( 200, { text: boundedText, plan: isPro ? 'pro' : 'free' });
+    return send(200, { text: boundedText, plan: isPro ? 'pro' : 'free' });
   } catch {
     if (quotaReserved) {
       try {
         await supabaseRpc('release_ai_quota', { p_user_id: user.id, p_usage_date: usageDate });
       } catch {}
     }
-    return send( 502, { error: 'AI provider request failed' });
+    return send(502, { error: 'AI provider request failed' });
   }
 }
 
