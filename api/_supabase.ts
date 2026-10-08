@@ -165,16 +165,24 @@ export async function claimWebhookEvent(provider: 'stripe' | 'lemon-squeezy', ev
 
 export async function markWebhookProcessed(provider: 'stripe' | 'lemon-squeezy', eventId: string) {
   const params = new URLSearchParams({ provider: 'eq.' + provider, event_id: 'eq.' + eventId });
-  await supabaseRest('/billing_webhook_events?' + params.toString(), {
+  const response = await supabaseRest('/billing_webhook_events?' + params.toString(), {
     method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
     body: JSON.stringify({ status: 'processed', processed_at: new Date().toISOString(), error_code: null }),
   });
+  if (!response.ok) throw new Error('Could not mark webhook event as processed.');
+  const rows = await response.json().catch(() => null);
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error('Webhook event was not updated as processed.');
 }
 
 export async function markWebhookFailed(provider: 'stripe' | 'lemon-squeezy', eventId: string, errorCode: string) {
   const params = new URLSearchParams({ provider: 'eq.' + provider, event_id: 'eq.' + eventId });
-  await supabaseRest('/billing_webhook_events?' + params.toString(), {
+  const response = await supabaseRest('/billing_webhook_events?' + params.toString(), {
     method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
     body: JSON.stringify({ status: 'failed', error_code: errorCode.slice(0, 200) }),
   });
+  if (!response.ok) throw new Error('Could not mark webhook event as failed.');
+  const rows = await response.json().catch(() => null);
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error('Webhook event was not updated as failed.');
 }
