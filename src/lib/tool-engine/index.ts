@@ -933,7 +933,7 @@ const baseHandlers: Handler[] = [roiBatch8,
   (tool, input) => has(tool, 'uuid')
     ? Array.from({ length: Math.min(100, Math.max(1, Number(input) || 1)) }, uuid).join('\n') : null,
   (tool, input) => has(tool, 'random string', 'nanoid', 'cuid', 'token')
-    ? randomToken(Math.min(256, Math.max(4, Number(input) || 24))) : null,
+    ? randomToken(Math.min(256, Math.max(4, Number(input) || (tool.id === 'nanoid-generator' ? 21 : 24)))) : null,
   (tool, input) => {
     if (!has(tool, 'lorem')) return null;
     const seed = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
@@ -2050,7 +2050,7 @@ const roiBatch22: Handler = (tool, input) => {
     case 'contrast-checker': {
       const colors = input.match(/#[0-9a-f]{3,6}/gi) ?? [];
       if (colors.length < 2) throw new Error('Enter two HEX colors, e.g. #000000 #ffffff.');
-      return contrastRatio(colors[0], colors[1]);
+      return contrastRatio(colors[0]!, colors[1]!);
     }
     case 'css-box-shadow-generator': {
       const values = input.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
