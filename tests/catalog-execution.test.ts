@@ -3,6 +3,14 @@ import { TOOLS_CATALOG } from '../src/data/tools-catalog';
 import { defaultInput, executeTool } from '../src/lib/tool-engine';
 
 const SPECIAL_INPUTS: Record<string, string> = {
+  'punycode-converter': 'bücher.de',
+  'oauth2-auth-url-builder': '{"authorizationEndpoint":"https://accounts.example.com/oauth2/authorize","clientId":"demo-client","redirectUri":"https://example.com/callback","scope":"openid profile","state":"test-state"}',
+  'random-pin-generator': '6',
+  'number-base-converter': 'FF 16 10',
+  'random-number-range': '1 100',
+  'hex-to-rgb-code': '#FF8800',
+  'format-currency-intl': '1234.5 INR en-IN',
+  'format-number-compact': '1250000 en-US',
   'hex-to-string': '48 65 6c 6c 6f',
   'binary-to-text': '01001000 01100101 01101100 01101100 01101111',
   'url-parser-inspector': 'https://example.com/search?q=hello',
