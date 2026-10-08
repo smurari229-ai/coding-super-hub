@@ -5,10 +5,10 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest verified application/test HEAD: `ad3ddcf5009c5b780d539843e79488d374286a30` (CI passed); latest audit branch head: `6261f771123e928e3efd7784149e4f625fb9304d`.
+- Latest verified application/billing code head: `ad3ddcf5009c5b780d539843e79488d374286a30` (CI passed); consult the live branch/PR for the current documentation-only head.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current compare: **436 commits ahead / 44 behind main** (diverged; re-check before any merge decision)
+- Current compare: **diverged / 44 commits behind main**; the ahead count changes with audit-only commits.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
 - Latest app/billing CI: [run 37855568997](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855568997) — **5/5 jobs PASS**, **11 test files / 96 tests PASS**. Latest canonical migration CI: [run 37855849989](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37855849989) — **5/5 jobs PASS**, **12 test files / 99 tests PASS**.
 - Latest confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. Later branch commits are migration/test-only; verify the latest preview again after their deployment finishes.
