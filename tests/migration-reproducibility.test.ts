@@ -8,7 +8,7 @@ const migrations = readdirSync(migrationDir).filter(name => name.endsWith('.sql'
 const readMigration = (name: string) => readFileSync(join(migrationDir, name), 'utf8');
 
 describe('Supabase migration reproducibility', () => {
-  it('keeps checked-in migration versions aligned with the live migration history', () => {
+  it('keeps the canonical migration replay order deterministic', () => {
     expect(migrations).toEqual([
       '20260929000000_billing_core_tables.sql',
       '20260930201921_harden_billing_rls.sql',
