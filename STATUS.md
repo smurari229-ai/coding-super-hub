@@ -11,7 +11,7 @@
 - Current compare: **diverged / 44 commits behind main**; the ahead count changes with audit-only commits.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
 - Latest full CI after utility/catalog changes: [run 37856312051](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37856312051) — **5/5 jobs PASS**, **12 test files / 101 tests PASS**.
-- Last confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. The latest 12-handler utility batch has passed GitHub CI but a matching Vercel preview deployment is not yet verified.
+- Last confirmed app-code preview: [READY](https://vercel.com/earnal-hub/coding-super-hub/96Dg6LhCcix4xrePhW4dAsgEDDVd), commit `2e0842d`. It returns HTTP 200 with the expected 535-tool app HTML and security headers. The latest 12-handler utility batch has passed GitHub CI but a matching Vercel preview deployment is not yet verified. A new preview deployment request was blocked by Vercel's daily deployment API quota (402; retry after 24 hours); no production promotion was attempted.
 - Last confirmed preview HTTP smoke: **200 OK**, expected `Coding Super Hub — 535 Developer Tools & AI Coding Assistant` HTML, JS/CSS assets, deep-link HTML fallback, CSP and baseline security headers observed. These checks predate the latest utility batch.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
