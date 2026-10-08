@@ -183,7 +183,8 @@ describe('535-tool catalog execution smoke oracle', () => {
 
     const output = rows.filter(row => row.output).length;
     const comingSoon = rows.filter(row => row.comingSoon).length;
-    const dedicatedUi = rows.filter(row => row.dedicatedUi).length;
+    const dedicatedUiFallback = rows.filter(row => row.dedicatedUi).length;
+    const dedicatedComponentIds = TOOLS_CATALOG.filter(tool => Boolean(tool.dedicatedComponent)).map(tool => tool.id);
     const validation = rows.filter(row => row.validation).length;
     const unexpectedErrors = rows.filter(row => row.unexpectedError).length;
     const unclassified = rows.filter(row => row.unclassified).length;
@@ -194,7 +195,9 @@ describe('535-tool catalog execution smoke oracle', () => {
       outputObserved: output,
       comingSoon,
       validationOrInputMismatch: validation,
-      dedicatedUi,
+      dedicatedUiFallback,
+      dedicatedComponentCount: dedicatedComponentIds.length,
+      dedicatedComponentIds,
       unexpectedErrors,
       unclassified,
       semanticPassNotClaimed: true,
@@ -204,7 +207,9 @@ describe('535-tool catalog execution smoke oracle', () => {
       comingSoonIds: rows.filter(row => row.comingSoon).map(row => row.id)
     }));
 
+    expect(validation).toBe(0);
     expect(unexpectedErrors).toBe(0);
     expect(unclassified).toBe(0);
+    expect(dedicatedComponentIds).toHaveLength(48);
   });
 });
