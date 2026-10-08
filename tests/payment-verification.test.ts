@@ -80,6 +80,31 @@ describe('payment verification URL handling', () => {
     await expect(response.json()).resolves.toEqual({ verified: true, plan: 'monthly' });
   });
 
+  it('fails closed when Stripe monthly verification has no subscription period', async () => {
+    process.env.STRIPE_SECRET_KEY = 'test-secret';
+    process.env.STRIPE_MONTHLY_PRICE_ID = 'price_monthly';
+    process.env.STRIPE_LIFETIME_PRICE_ID = 'price_lifetime';
+
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      payment_status: 'paid',
+      status: 'complete',
+      mode: 'subscription',
+      customer_details: { email: 'buyer@example.com' },
+      subscription: { id: 'sub_test', status: 'active' },
+      line_items: { data: [{ price: { id: 'price_monthly' } }] },
+    }), { status: 200 })));
+
+    const request = {
+      method: 'GET',
+      url: '/api/verify-stripe-session?session_id=cs_missing_period',
+      headers: new Headers({ host: 'example.com', 'x-forwarded-proto': 'https' }),
+    } as unknown as Request;
+
+    const response = await stripeHandler(request);
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({ verified: false });
+  });
+
   it('falls back safely when APP_URL is malformed', async () => {
     process.env.APP_URL = 'not-a-valid-url';
     process.env.STRIPE_SECRET_KEY = 'test-secret';
