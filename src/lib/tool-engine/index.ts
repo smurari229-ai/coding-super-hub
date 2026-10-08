@@ -72,16 +72,25 @@ export const encodeHtml = (value: string) => value.replace(/[&<>"']/g, char => (
 
 export const decodeHtml = (value: string) => value.replace(
   /&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|#39);/gi,
-  (_, code: string) => {
-    if (code === 'amp') return '&';
-    if (code === 'lt') return '<';
-    if (code === 'gt') return '>';
-    if (code === 'quot') return '"';
-    if (code === 'apos' || code === '#39') return "'";
-    const number = code.toLowerCase().startsWith('#x')
-      ? parseInt(code.slice(2), 16)
-      : parseInt(code.slice(1), 10);
-    return Number.isFinite(number) ? String.fromCodePoint(number) : _;
+  (entity: string, code: string) => {
+    const normalized = code.toLowerCase();
+    if (normalized === 'amp') return '&';
+    if (normalized === 'lt') return '<';
+    if (normalized === 'gt') return '>';
+    if (normalized === 'quot') return '"';
+    if (normalized === 'apos' || normalized === '#39') return "'";
+    const number = normalized.startsWith('#x')
+      ? parseInt(normalized.slice(2), 16)
+      : parseInt(normalized.slice(1), 10);
+    // Preserve malformed/out-of-range numeric entities instead of throwing
+    // RangeError from String.fromCodePoint on untrusted tool input.
+    if (
+      !Number.isInteger(number) ||
+      number < 0 ||
+      number > 0x10ffff ||
+      (number >= 0xd800 && number <= 0xdfff)
+    ) return entity;
+    return String.fromCodePoint(number);
   }
 );
 
