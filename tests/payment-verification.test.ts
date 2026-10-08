@@ -197,4 +197,26 @@ describe('Lemon Squeezy webhook signature handling', () => {
       event: 'order_created',
     });
   });
+  it('returns a retryable 500 even if failed-event status persistence also fails', async () => {
+    configuredWebhookEnv();
+    const supabase = await import('../api/_supabase');
+    vi.mocked(supabase.upsertEntitlement).mockRejectedValueOnce(new Error('database write failed'));
+    vi.mocked(supabase.markWebhookFailed).mockRejectedValueOnce(new Error('database unavailable'));
+    const body = JSON.stringify({
+      meta: { event_name: 'order_created' },
+      data: {
+        type: 'orders',
+        id: '123',
+        attributes: { store_id: 1, variant_id: 20, user_email: 'buyer@example.com', status: 'paid' },
+      },
+    });
+
+    const response = await lemonWebhook(signedRequest(body));
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toMatchObject({
+      received: false,
+      error: 'Webhook processing failed; retry is safe.',
+    });
+  });
+
 });
