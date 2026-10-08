@@ -112,4 +112,20 @@ describe('Stripe webhook security and idempotency', () => {
     await expect(response.json()).resolves.toMatchObject({ duplicate: true });
     expect(mocks.upsertEntitlement).not.toHaveBeenCalled();
   });
+  it('returns a retryable 500 even if failed-event status persistence also fails', async () => {
+    mocks.markWebhookFailed.mockRejectedValue(new Error('database unavailable'));
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('provider unavailable', { status: 503 })));
+    const body = event();
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': signed(body, 'stripe-hook-secret') },
+      body,
+    }));
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toMatchObject({
+      received: false,
+      error: 'Stripe webhook processing failed; retry is safe.',
+    });
+  });
+
 });
