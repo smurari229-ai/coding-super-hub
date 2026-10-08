@@ -182,7 +182,12 @@ async function handler(request: Request): Promise<Response> {
     await markWebhookProcessed('stripe', eventId);
     return json({ received: true, processed: true, event: eventType });
   } catch (error) {
-    await markWebhookFailed('stripe', eventId, error instanceof Error ? error.message : 'processing_failed');
+    try {
+      await markWebhookFailed('stripe', eventId, error instanceof Error ? error.message : 'processing_failed');
+    } catch {
+      // Keep the provider response retryable even if status persistence is unavailable.
+      // Stale "processing" claims are recovered by claimWebhookEvent after the timeout.
+    }
     return json({ received: false, error: 'Stripe webhook processing failed; retry is safe.' }, 500);
   }
 }
