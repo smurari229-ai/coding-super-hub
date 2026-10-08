@@ -148,6 +148,32 @@ describe('Stripe webhook security and idempotency', () => {
     expect(mocks.markWebhookFailed).toHaveBeenCalledWith('stripe', 'evt_test_1', 'missing_subscription_period');
   });
 
+  it('fails closed on active Stripe subscription events without a billing period', async () => {
+    const body = event({
+      type: 'customer.subscription.updated',
+      data: { object: {
+        id: 'sub_missing_period',
+        customer: 'cus_test',
+        status: 'active',
+        items: { data: [{ price: { id: 'price_monthly' } }] },
+      } },
+    });
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      id: 'cus_test',
+      email: 'buyer@example.com',
+    }), { status: 200 })));
+
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': signed(body, 'stripe-hook-secret') },
+      body,
+    }));
+
+    expect(response.status).toBe(500);
+    expect(mocks.upsertEntitlement).not.toHaveBeenCalled();
+    expect(mocks.markWebhookFailed).toHaveBeenCalledWith('stripe', 'evt_test_1', 'missing_subscription_period');
+  });
+
   it('does not revoke Pro for a partial Stripe refund', async () => {
     const body = event({
       type: 'charge.refunded',
