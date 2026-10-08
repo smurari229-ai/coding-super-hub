@@ -161,6 +161,8 @@ async function handler(request: Request): Promise<Response> {
             status?: string;
             variant_id?: number;
             ends_at?: string | null;
+            renews_at?: string | null;
+            trial_ends_at?: string | null;
           };
         }>;
       };
@@ -171,6 +173,13 @@ async function handler(request: Request): Promise<Response> {
       const subscriptionStatus = subscription?.status;
       const subscriptionVariant = String(subscription?.variant_id ?? '');
       const cancelledEndsAt = subscription?.ends_at ? Date.parse(subscription.ends_at) : Number.NaN;
+      const periodEndValue = subscriptionStatus === 'cancelled'
+        ? subscription?.ends_at
+        : subscriptionStatus === 'on_trial'
+          ? subscription?.trial_ends_at ?? subscription?.renews_at
+          : subscription?.renews_at;
+      const periodEndMs = typeof periodEndValue === 'string' ? Date.parse(periodEndValue) : Number.NaN;
+      const periodEndValid = Number.isFinite(periodEndMs) && periodEndMs > Date.now();
       const cancelledStillValid =
         subscriptionStatus !== 'cancelled' ||
         (Number.isFinite(cancelledEndsAt) && cancelledEndsAt > Date.now());
@@ -178,10 +187,11 @@ async function handler(request: Request): Promise<Response> {
       const subscriptionValid =
         subscriptionVariant === monthlyVariant &&
         ['on_trial', 'active', 'cancelled'].includes(subscriptionStatus ?? '') &&
-        cancelledStillValid;
+        cancelledStillValid &&
+        periodEndValid;
 
       if (!subscriptionValid) {
-        return json({ verified: false, error: 'Monthly Pro subscription is no longer active.' }, 403);
+        return json({ verified: false, error: 'Monthly Pro subscription is no longer active or has no valid billing period.' }, 403);
       }
     }
 
@@ -190,7 +200,13 @@ async function handler(request: Request): Promise<Response> {
       provider: 'lemon-squeezy',
       plan: expectedPlan,
       status: 'active',
-      expires_at: expectedPlan === 'monthly' && subscriptionAttrs?.status === 'cancelled' ? subscriptionAttrs?.ends_at ?? null : null,
+      expires_at: expectedPlan === 'monthly'
+        ? (subscriptionAttrs?.status === 'cancelled'
+            ? subscriptionAttrs?.ends_at
+            : subscriptionAttrs?.status === 'on_trial'
+              ? subscriptionAttrs?.trial_ends_at ?? subscriptionAttrs?.renews_at
+              : subscriptionAttrs?.renews_at) ?? null
+        : null,
       lemon_order_id: orderId,
       lemon_subscription_id: subscriptionId || null,
     });
