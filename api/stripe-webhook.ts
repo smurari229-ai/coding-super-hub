@@ -22,18 +22,22 @@ function providerRequest(init: RequestInit = {}): RequestInit {
 }
 
 function verifySignature(rawBody: string, header: string, secret: string): boolean {
-  const parts = Object.fromEntries(header.split(',').map(part => {
-    const [key, value] = part.split('=', 2);
-    return [key, value];
-  }));
-  const timestamp = Number(parts.t);
-  const signature = parts.v1 || '';
-  if (!Number.isFinite(timestamp) || !signature) return false;
+  const parts = header.split(',').map(part => {
+    const separator = part.indexOf('=');
+    return separator < 0
+      ? [part.trim(), '']
+      : [part.slice(0, separator).trim(), part.slice(separator + 1).trim()];
+  });
+  const timestamp = Number(parts.find(([key]) => key === 't')?.[1]);
+  const signatures = parts.filter(([key, value]) => key === 'v1' && value).map(([, value]) => value);
+  if (!Number.isFinite(timestamp) || signatures.length === 0) return false;
   if (Math.abs(Date.now() / 1000 - timestamp) > 300) return false;
   const expected = crypto.createHmac('sha256', secret).update(String(timestamp) + '.' + rawBody, 'utf8').digest('hex');
-  const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(signature, 'utf8');
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  return signatures.some(signature => {
+    const receivedBuffer = Buffer.from(signature, 'utf8');
+    return expectedBuffer.length === receivedBuffer.length && crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+  });
 }
 
 async function stripeFetch(path: string, secret: string) {
