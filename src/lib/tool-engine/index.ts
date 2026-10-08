@@ -2011,12 +2011,17 @@ const roiBatch21: Handler = (tool, input) => {
     case 'oauth2-auth-url-builder': {
       let data: { authorizationEndpoint?: string; clientId?: string; redirectUri?: string; scope?: string; state?: string };
       try { data = JSON.parse(input) as typeof data; } catch { throw new Error('Input must be JSON with authorizationEndpoint, clientId, and redirectUri.'); }
-      if (!data.authorizationEndpoint || !data.clientId || !data.redirectUri) throw new Error('authorizationEndpoint, clientId, and redirectUri are required.');
+      const authorizationEndpoint = typeof data.authorizationEndpoint === 'string' ? data.authorizationEndpoint.trim() : '';
+      const clientId = typeof data.clientId === 'string' ? data.clientId.trim() : '';
+      const redirectUri = typeof data.redirectUri === 'string' ? data.redirectUri.trim() : '';
+      if (!authorizationEndpoint || !clientId || !redirectUri) {
+        throw new Error('authorizationEndpoint, clientId, and redirectUri are required.');
+      }
       let url: URL;
-      try { url = new URL(data.authorizationEndpoint); } catch { throw new Error('authorizationEndpoint must be an absolute URL.'); }
+      try { url = new URL(authorizationEndpoint); } catch { throw new Error('authorizationEndpoint must be an absolute URL.'); }
       url.searchParams.set('response_type', 'code');
-      url.searchParams.set('client_id', data.clientId);
-      url.searchParams.set('redirect_uri', data.redirectUri);
+      url.searchParams.set('client_id', clientId);
+      url.searchParams.set('redirect_uri', redirectUri);
       url.searchParams.set('scope', data.scope || 'openid');
       if (data.state) url.searchParams.set('state', data.state);
       return url.toString();
@@ -2157,6 +2162,69 @@ const roiBatch24: Handler = (tool, input) => {
       const value = Number(valueRaw);
       if (!Number.isFinite(value)) throw new Error('Enter a valid number, e.g. 1250000 en-US.');
       return new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+    }
+    default:
+      return null;
+  }
+};
+
+const releaseHardeningBatch: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'url-encoder-decoder': {
+      const lines = input.split(/\r?\n/);
+      const mode = (lines[0] || '').trim().toLowerCase();
+      const explicitMode = ['encode', 'encodeuri', 'encodeuricomponent', 'decode', 'decodeuri', 'decodeuricomponent'].includes(mode);
+      const value = explicitMode ? lines.slice(1).join('\n') : input;
+      if (mode.startsWith('decode')) {
+        try { return decodeURIComponent(value); } catch { throw new Error('Enter valid percent-encoded URL text.'); }
+      }
+      return encodeURIComponent(value);
+    }
+    case 'sha1-hash':
+      return sha1Hex(input);
+    case 'md5-hash':
+      return md5Hex(input);
+    case 'regex-tester': {
+      const [patternLine, ...textLines] = input.split(/\r?\n/);
+      if (!patternLine) throw new Error('Enter a regex pattern on the first line, followed by text to test.');
+      try {
+        const pattern = new RegExp(patternLine, 'g');
+        const matches = [...textLines.join('\n').matchAll(pattern)].map(match => match[0]);
+        return matches.length ? matches.join('\n') : 'No matches.';
+      } catch {
+        throw new Error('Invalid regular expression.');
+      }
+    }
+    case 'ascii-art-banner': {
+      const glyphs: Record<string, string[]> = {
+        A:['010','101','111','101','101'], B:['110','101','110','101','110'],
+        C:['011','100','100','100','011'], D:['110','101','101','101','110'],
+        E:['111','100','110','100','111'], F:['111','100','110','100','100'],
+        G:['011','100','101','101','011'], H:['101','101','111','101','101'],
+        I:['111','010','010','010','111'], J:['001','001','001','101','010'],
+        K:['101','101','110','101','101'], L:['100','100','100','100','111'],
+        M:['101','111','111','101','101'], N:['101','111','111','111','101'],
+        O:['111','101','101','101','111'], P:['110','101','110','100','100'],
+        Q:['111','101','101','111','001'], R:['110','101','110','101','101'],
+        S:['011','100','010','001','110'], T:['111','010','010','010','010'],
+        U:['101','101','101','101','111'], V:['101','101','101','101','010'],
+        W:['101','101','111','111','101'], X:['101','101','010','101','101'],
+        Y:['101','101','010','010','010'], Z:['111','001','010','100','111'],
+        '0':['111','101','101','101','111'], '1':['010','110','010','010','111'],
+        '2':['110','001','111','100','111'], '3':['110','001','111','001','110'],
+        '4':['101','101','111','001','001'], '5':['111','100','110','001','110'],
+        '6':['011','100','110','101','010'], '7':['111','001','010','010','010'],
+        '8':['010','101','010','101','010'], '9':['010','101','011','001','110'],
+        ' ':['000','000','000','000','000'], '?':['110','001','010','000','010'],
+        '!':['010','010','010','000','010'], '.':['000','000','000','000','010'],
+        '-':['000','000','111','000','000'], '_':['000','000','000','000','111'],
+      };
+      const chars = [...input.trim().toUpperCase()];
+      if (!chars.length) throw new Error('Enter text to turn into an ASCII banner.');
+      const rows = Array.from({ length: 5 }, (_, row) => chars.map(char =>
+        (glyphs[char] ?? glyphs['?'])[row].replace(/1/g, '█').replace(/0/g, ' ')
+      ).join(' '));
+      return rows.join('\n');
     }
     default:
       return null;
