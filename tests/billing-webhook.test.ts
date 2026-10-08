@@ -60,6 +60,21 @@ describe('Stripe webhook security and idempotency', () => {
     expect(mocks.claimWebhookEvent).not.toHaveBeenCalled();
   });
 
+  it('accepts a valid Stripe v1 signature when another v1 signature is also present', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('provider unavailable', { status: 503 })));
+    const body = event();
+    const validHeader = signed(body, 'stripe-hook-secret');
+    const headerWithMultipleV1 = validHeader + ',v1=' + '0'.repeat(64);
+    const response = await stripeWebhook(new Request('https://example.com/api/stripe-webhook', {
+      method: 'POST',
+      headers: { 'stripe-signature': headerWithMultipleV1 },
+      body,
+    }));
+    // Signature validation passed; the mocked provider lookup then failed safely.
+    expect(response.status).toBe(500);
+    expect(mocks.claimWebhookEvent).toHaveBeenCalledWith('stripe', 'evt_test_1');
+  });
+
   it('persists a verified lifetime checkout entitlement', async () => {
     const body = event({
       data: {
