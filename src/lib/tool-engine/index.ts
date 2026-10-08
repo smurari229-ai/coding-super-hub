@@ -2339,10 +2339,10 @@ const roiBatch25: Handler = (tool, input) => {
       }).join('\n');
     }
     case 'npm-scripts-generator': {
-      const manager = input.trim().toLowerCase() || 'vite';
+      const manager = input.trim().toLowerCase() === 'next' ? 'next' : 'vite';
       const scripts: Record<string, string> = {
-        dev: manager === 'next' ? 'next dev' : manager === 'vite' ? 'vite' : 'npm run dev',
-        build: manager === 'next' ? 'next build' : manager === 'vite' ? 'tsc -b && vite build' : 'npm run build',
+        dev: manager === 'next' ? 'next dev' : 'vite',
+        build: manager === 'next' ? 'next build' : 'tsc -b && vite build',
         test: 'vitest run',
         lint: 'eslint .',
         typecheck: 'tsc --noEmit'
@@ -2389,11 +2389,11 @@ const roiBatch25: Handler = (tool, input) => {
     }
     case 'js-debounce-throttle': {
       const name = input.trim().match(/[A-Za-z_$][\w$]*/)?.[0] ?? 'callback';
-      return 'export function debounce<T extends (...args: any[]) => void>(fn: T, delay = 250) {\\n  let timer: ReturnType<typeof setTimeout>;\\n  return (...args: Parameters<T>) => {\\n    clearTimeout(timer);\\n    timer = setTimeout(() => fn(...args), delay);\\n  };\\n}\\n\\nexport function throttle<T extends (...args: any[]) => void>(fn: T, delay = 250) {\\n  let last = 0;\\n  return (...args: Parameters<T>) => {\\n    const now = Date.now();\\n    if (now - last >= delay) { last = now; fn(...args); }\\n  };\\n}\\n\\n// Example: const run = debounce(' + name + ', 300);';
+      return 'export function debounce<T extends (...args: any[]) => void>(fn: T, delay = 250) {\n  let timer: ReturnType<typeof setTimeout>;\n  return (...args: Parameters<T>) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), delay);\n  };\n}\n\nexport function throttle<T extends (...args: any[]) => void>(fn: T, delay = 250) {\n  let last = 0;\n  return (...args: Parameters<T>) => {\n    const now = Date.now();\n    if (now - last >= delay) { last = now; fn(...args); }\n  };\n}\n\n// Example: const run = debounce(' + name + ', 300);';
     }
     case 'safe-json-parse': {
       const variable = input.trim().match(/[A-Za-z_$][\w$]*/)?.[0] ?? 'input';
-      return 'export function safeJsonParse<T>(text: string, fallback: T): T {\\n  try { return JSON.parse(text) as T; }\\n  catch { return fallback; }\\n}\\n\\nconst result = safeJsonParse(' + variable + ', {});';
+      return 'export function safeJsonParse<T>(text: string, fallback: T): T {\n  try { return JSON.parse(text) as T; }\n  catch { return fallback; }\n}\n\nconst result = safeJsonParse(' + variable + ', {});';
     }
     default:
       return null;
