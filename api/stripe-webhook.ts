@@ -174,8 +174,10 @@ async function handler(request: Request): Promise<Response> {
         stripe_subscription_id: String(subscription.id),
       });
     } else if (eventType === 'charge.refunded') {
+      // Stripe emits charge.refunded for partial refunds too. Revoke Pro only
+      // when the Charge confirms the full amount has been refunded.
       const paymentIntent = typeof object?.payment_intent === 'string' ? object.payment_intent : '';
-      if (paymentIntent) {
+      if (object?.refunded === true && paymentIntent) {
         await updateEntitlementByProviderField('stripe_payment_intent_id', paymentIntent, {
           status: 'refunded',
           expires_at: new Date().toISOString(),
