@@ -145,13 +145,16 @@ async function handler(request: Request): Promise<Response> {
           : null;
       const subscriptionStatus = subscription?.status;
       const periodEnd = Number(subscription?.current_period_end || 0);
-      const cancelledButUnexpired =
-        subscriptionStatus === 'canceled' && periodEnd > Math.floor(Date.now() / 1000);
+      const subscriptionId = typeof subscription?.id === 'string' ? subscription.id : '';
+      const hasValidPeriod = Number.isFinite(periodEnd) && periodEnd > Math.floor(Date.now() / 1000);
+      const cancelledButUnexpired = subscriptionStatus === 'canceled' && hasValidPeriod;
       if (
         payload.mode !== 'subscription' ||
+        !subscriptionId ||
+        !hasValidPeriod ||
         (!['active', 'trialing'].includes(subscriptionStatus ?? '') && !cancelledButUnexpired)
       ) {
-        return json({ verified: false, error: 'Stripe Pro subscription is no longer active.' }, 403);
+        return json({ verified: false, error: 'Stripe Pro subscription is no longer active or has no valid billing period.' }, 403);
       }
     } else if (payload.mode !== 'payment') {
       return json({ verified: false, error: 'Stripe lifetime Pro checkout must use one-time payment mode.' }, 403);
@@ -166,12 +169,9 @@ async function handler(request: Request): Promise<Response> {
         plan === 'monthly' && subscription?.status === 'canceled'
           ? 'cancelled'
           : 'active',
-      expires_at:
-        plan === 'monthly' && subscription?.current_period_end
-          ? new Date(subscription.current_period_end * 1000).toISOString()
-          : null,
+      expires_at: plan === 'monthly' ? new Date(subscription!.current_period_end * 1000).toISOString() : null,
       stripe_session_id: sessionId,
-      stripe_subscription_id: plan === 'monthly' ? subscription?.id ?? null : null,
+      stripe_subscription_id: plan === 'monthly' ? subscription!.id : null,
       stripe_payment_intent_id: typeof payload.payment_intent === 'string' ? payload.payment_intent : null,
     });
 
