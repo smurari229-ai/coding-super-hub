@@ -156,6 +156,7 @@ describe('535-tool catalog execution smoke oracle', () => {
         dedicatedUi,
         validation,
         unexpectedError: Boolean(error && !output && !comingSoon && !dedicatedUi && !validation),
+        unclassified: !output && !comingSoon && !dedicatedUi && !validation && !Boolean(error),
         error
       };
     });
@@ -165,6 +166,7 @@ describe('535-tool catalog execution smoke oracle', () => {
     const dedicatedUi = rows.filter(row => row.dedicatedUi).length;
     const validation = rows.filter(row => row.validation).length;
     const unexpectedErrors = rows.filter(row => row.unexpectedError).length;
+    const unclassified = rows.filter(row => row.unclassified).length;
 
     console.log(JSON.stringify({
       catalog: rows.length,
@@ -174,9 +176,11 @@ describe('535-tool catalog execution smoke oracle', () => {
       validationOrInputMismatch: validation,
       dedicatedUi,
       unexpectedErrors,
+      unclassified,
       semanticPassNotClaimed: true,
       unexpectedErrorIds: rows.filter(row => row.unexpectedError).map(row => row.id),
-      validationIds: rows.filter(row => row.validation).map(row => row.id)
+      validationIds: rows.filter(row => row.validation).map(row => row.id),
+      unclassifiedIds: rows.filter(row => row.unclassified).map(row => row.id)
     }));
 
     expect(unexpectedErrors).toBe(0);
