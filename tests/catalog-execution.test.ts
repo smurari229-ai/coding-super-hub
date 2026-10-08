@@ -146,9 +146,11 @@ describe('535-tool catalog execution smoke oracle', () => {
       const result = executeTool(tool, input);
       const error = result.error ?? '';
       const output = Boolean(result.output && result.output.trim());
-      const comingSoon = !output && /Coming soon/i.test(error);
-      const dedicatedUi = !output && Boolean(tool.dedicatedComponent) && !comingSoon;
-      const validation = !output && !dedicatedUi && /Enter |Invalid |Malformed |Input must|needs a|must use|must be|outside the safe|not found|does not exist/i.test(error);
+      // Dedicated React tools are UI smoke candidates even when the generic engine
+      // correctly returns its fallback message for that catalog entry.
+      const dedicatedUi = !output && Boolean(tool.dedicatedComponent);
+      const comingSoon = !output && !dedicatedUi && /Coming soon/i.test(error);
+      const validation = !output && !dedicatedUi && !comingSoon && /Enter |Invalid |Malformed |Input must|needs a|must use|must be|outside the safe|not found|does not exist/i.test(error);
       return {
         id: tool.id,
         actionType: tool.actionType,
