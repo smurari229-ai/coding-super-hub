@@ -2220,7 +2220,7 @@ const utilityBatch27: Handler = (tool, input) => {
         schema.offers = { '@type': 'Offer', price, priceCurrency: currency, availability: 'https://schema.org/' + availability, ...(obj.url ? { url: obj.url } : {}) };
       }
       const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
-      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+      return '<script type="application/ld+json">\n' + json + '\n</script>';
     }
     case 'schema-org-breadcrumb': {
       let data: unknown;
@@ -2230,11 +2230,12 @@ const utilityBatch27: Handler = (tool, input) => {
       const list = items.map((item, index) => {
         if (!item || typeof item !== 'object' || typeof (item as { name?: unknown }).name !== 'string' || !(item as { name: string }).name.trim()) throw new Error('Breadcrumb item ' + (index + 1) + ' must have a non-empty name.');
         const entry = item as { name: string; item?: unknown };
-        if (entry.item !== undefined && (typeof entry.item !== 'string' || !/^https?:\\/\\//i.test(entry.item))) throw new Error('Breadcrumb item URLs must start with http:// or https://.');
+        const isUrl = (value: unknown) => { if (typeof value !== 'string') return false; try { const url = new URL(value); return url.protocol === 'https:' || url.protocol === 'http:'; } catch { return false; } };
+        if (entry.item !== undefined && !isUrl(entry.item)) throw new Error('Breadcrumb item URLs must be absolute HTTP(S) URLs.');
         return { '@type': 'ListItem', position: index + 1, name: entry.name.trim(), ...(entry.item ? { item: entry.item } : {}) };
       });
       const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: list }, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
-      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+      return '<script type="application/ld+json">\n' + json + '\n</script>';
     }
     case 'schema-org-json-ld-org': {
       let data: unknown;
