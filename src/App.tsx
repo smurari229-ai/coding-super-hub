@@ -413,6 +413,8 @@ export default function App() {
                             toggleFavorite(tool.id);
                           }}
                           className="text-slate-500 hover:text-amber-400 p-0.5"
+                          aria-label={isFav ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
+                          title={isFav ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
                         >
                           <Star className={`w-3.5 h-3.5 ${isFav ? 'text-amber-400 fill-amber-400' : ''}`} />
                         </button>
