@@ -384,7 +384,7 @@ describe('practical text, date and HTTP utilities', () => {
     const result = executeTool(tool('workday-business-days', 'Business Days'), '2026-10-05\n2026-10-09\n2026-10-07');
     expect(result.output).toContain('Weekdays in range (inclusive): 5');
     expect(result.output).toContain('Business days excluding listed holidays: 4');
-    expect(executeTool(tool('workday-business-days', 'Business Days'), '1900-01-01\\n2101-01-01').error).toContain('100 years or less');
+    expect(executeTool(tool('workday-business-days', 'Business Days'), '1900-01-01\n2101-01-01').error).toContain('100 years or less');
   });
 
   it('inspects raw HTTP headers and reports missing security headers', () => {
