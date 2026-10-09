@@ -2179,6 +2179,50 @@ const roiBatch24: Handler = (tool, input) => {
 
 const utilityBatch27: Handler = (tool, input) => {
   switch (tool.id) {
+    case 'binary-floating-point-ieee': {
+      const value = Number(input.trim());
+      if (!input.trim() || !Number.isFinite(value)) throw new Error('Enter a finite number to inspect as IEEE 754 single precision.');
+      const buffer = new ArrayBuffer(4), view = new DataView(buffer);
+      view.setFloat32(0, value, false);
+      const bits = view.getUint32(0, false), binary = bits.toString(2).padStart(32, '0');
+      const sign = bits >>> 31, exponentBits = (bits >>> 23) & 0xff, fractionBits = bits & 0x7fffff;
+      const exponent = exponentBits === 0 ? -126 : exponentBits === 255 ? null : exponentBits - 127;
+      return JSON.stringify({ input: value, roundedFloat32: view.getFloat32(0, false), hex: '0x' + bits.toString(16).toUpperCase().padStart(8, '0'), binary, signBit: sign, exponentBits: binary.slice(1, 9), exponent: exponentBits === 255 ? (fractionBits ? 'NaN/exceptional' : 'infinity') : exponent, mantissaBits: binary.slice(9), fractionBits, classification: exponentBits === 255 ? (fractionBits ? 'NaN' : 'infinity') : exponentBits === 0 ? (fractionBits ? 'subnormal' : 'zero') : 'normal' }, null, 2);
+    }
+    case 'bitwise-not-inverter': {
+      const [numberText, widthText = '32'] = input.split(/\r?\n/).map(part => part.trim());
+      const value = Number(numberText), width = Number(widthText);
+      if (!Number.isInteger(value) || ![8, 16, 32].includes(width)) throw new Error('Enter an integer and a bit width of 8, 16, or 32 on separate lines.');
+      const mask = width === 32 ? 0xffffffff : (2 ** width) - 1;
+      const source = value & mask, inverted = (~source) & mask;
+      return JSON.stringify({ input: value, width, inputBinary: source.toString(2).padStart(width, '0'), invertedValue: inverted, invertedBinary: inverted.toString(2).padStart(width, '0'), invertedHex: '0x' + inverted.toString(16).toUpperCase().padStart(width / 4, '0') }, null, 2);
+    }
+    case 'schema-org-json-ld-org': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with a required name and optional url, logo, and sameAs array.'); }
+      if (!data || typeof data !== 'object' || Array.isArray(data) || typeof (data as { name?: unknown }).name !== 'string' || !(data as { name: string }).name.trim()) throw new Error('Organization JSON must include a non-empty name.');
+      const obj = data as { name: string; url?: string; logo?: string; sameAs?: unknown };
+      const isUrl = (value: string) => { try { const url = new URL(value); return url.protocol === 'https:' || url.protocol === 'http:'; } catch { return false; } };
+      if (obj.url && !isUrl(obj.url)) throw new Error('Organization url must be an absolute HTTP(S) URL.');
+      if (obj.logo && !isUrl(obj.logo)) throw new Error('Organization logo must be an absolute HTTP(S) URL.');
+      if (obj.sameAs !== undefined && (!Array.isArray(obj.sameAs) || obj.sameAs.some(url => typeof url !== 'string' || !isUrl(url)))) throw new Error('sameAs must be an array of absolute HTTP(S) URLs.');
+      const schema = { '@context': 'https://schema.org', '@type': 'Organization', name: obj.name.trim(), ...(obj.url ? { url: obj.url } : {}), ...(obj.logo ? { logo: obj.logo } : {}), ...(obj.sameAs ? { sameAs: obj.sameAs } : {}) };
+      const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
+      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+    }
+    case 'schema-org-article': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with headline, author, and datePublished; url and image are optional.'); }
+      if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Article input must be a JSON object.');
+      const obj = data as { headline?: unknown; author?: unknown; datePublished?: unknown; url?: unknown; image?: unknown };
+      if (typeof obj.headline !== 'string' || !obj.headline.trim() || typeof obj.author !== 'string' || !obj.author.trim() || typeof obj.datePublished !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(obj.datePublished)) throw new Error('Provide non-empty headline, author, and datePublished in YYYY-MM-DD format.');
+      const isUrl = (value: unknown) => { if (typeof value !== 'string') return false; try { const url = new URL(value); return url.protocol === 'https:' || url.protocol === 'http:'; } catch { return false; } };
+      if (obj.url && !isUrl(obj.url)) throw new Error('Article url must be an absolute HTTP(S) URL.');
+      if (obj.image && !isUrl(obj.image)) throw new Error('Article image must be an absolute HTTP(S) URL.');
+      const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: obj.headline.trim(), author: { '@type': 'Person', name: obj.author.trim() }, datePublished: obj.datePublished, ...(obj.url ? { url: obj.url } : {}), ...(obj.image ? { image: obj.image } : {}) };
+      const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
+      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+    }
     case 'hex-to-hsl-rgb': {
       const value = input.trim();
       let r: number, g: number, b: number;
