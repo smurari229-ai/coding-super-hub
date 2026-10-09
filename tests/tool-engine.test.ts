@@ -455,8 +455,8 @@ describe('IEEE 754 and structured-data utilities', () => {
   });
 
   it('inverts bits at explicit widths without signed 32-bit overflow', () => {
-    expect(JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\\n8').output).invertedBinary).toBe('11111111');
-    const result = JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\\n32').output);
+    expect(JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\n8').output).invertedBinary).toBe('11111111');
+    const result = JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\n32').output);
     expect(result.invertedValue).toBe(4294967295);
     expect(result.invertedHex).toBe('0xFFFFFFFF');
   });
