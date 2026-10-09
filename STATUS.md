@@ -75,7 +75,7 @@ The live database migration history contains versions/names not represented by m
 
 ## Vercel environment configuration
 
-Read-only Vercel environment inventory returned only two audit-branch Preview variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. No server-side Gemini/Supabase service credentials or Stripe/Lemon Squeezy server credentials/price IDs were present in that returned inventory; production environment readiness is NOT verified. Secret values were not requested or exposed.
+Read-only Vercel environment inventory returned only two audit-branch Preview variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; the API response reported `hiddenProductionEnvCount: 0`. No server-side Gemini/Supabase service credentials or Stripe/Lemon Squeezy server credentials/price IDs were present in that inventory. Production environment readiness is NOT verified. Secret values were not requested or exposed.
 
 This means real AI and billing flows cannot be declared configured from current evidence. Add the actual credentials/IDs in Vercel's encrypted environment settings; do not commit them or fabricate values.
 
