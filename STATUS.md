@@ -5,13 +5,13 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest audit branch head at this recheck: `3f7b20380862b1401efb2ace2958e012872fbd63` (mobile overflow and icon-button accessibility fixes).
+- Latest application/security code head: `3f7b20380862b1401efb2ace2958e012872fbd63` (mobile overflow and icon-button accessibility fixes). Latest branch head is documentation-only commit `ec95879733af498113ae627bc68e1ddc9f2bdd0d`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current compare: **513 commits ahead / 44 commits behind main; diverged**. PR #4 is `mergeable=false`; GitHub currently reports 80 changed files, 9,663 additions and 686 deletions.
+- Current compare: **518 commits ahead / 44 commits behind main; diverged**. PR #4 is `mergeable=false`; GitHub currently reports 80 changed files, 9,663 additions and 686 deletions.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
 - Latest prior GitHub Actions CI: [run 37887618100](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37887618100) — **5/5 jobs PASS**, previously 12 test files / 121 tests. Independently re-ran on `3bed3bb3ac4e5569bad562bec018f69bf28843af` in a clean Vercel sandbox: frozen install PASS, TypeScript lint PASS, **12 test files / 124 tests PASS**, production build PASS. Build emits a >500 kB JS chunk warning and Vite config-loader warning.
-- Vercel preview deployment for current audit head `3f7b20380862b1401efb2ace2958e012872fbd63` is reported READY. Using a temporary protected-preview access link, checked app HTML title, JS asset HTTP 200, CSS asset HTTP 200, CSP, HSTS, Permissions-Policy, Referrer-Policy and X-Content-Type-Options. Temporary share access was used only for smoke verification. No production promotion was attempted.
+- Vercel preview for application/security code head `3f7b20380862b1401efb2ace2958e012872fbd63` is READY; the later branch-head commit only updates this status document. Using a temporary protected-preview access link, checked app HTML title, JS asset HTTP 200, CSS asset HTTP 200, CSP, HSTS, Permissions-Policy, Referrer-Policy and X-Content-Type-Options. Temporary share access was used only for smoke verification. No production promotion was attempted.
 - Latest protected-preview browser smoke: app HTML and primary JS/CSS assets returned 200; widths 375/390/412 and 1280 have no horizontal overflow; no CSP violations or page errors were observed; `?tool=json-formatter` loaded; JSON formatter action worked; Pro modal opened; search dialog worked for UUID query. Initial page and open search dialog had 0 unnamed buttons after adding accessible names to icon-only actions. This is targeted smoke, not a full WCAG/screen-reader audit.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
