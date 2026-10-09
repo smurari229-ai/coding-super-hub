@@ -49,6 +49,18 @@ describe('tool engine pure transforms', () => {
     expect(executeTool(tool('md5-hash', 'MD5 Hash'), 'abc').output).toBe('900150983cd24fb0d6963f7d28e17f72');
   });
 
+  it('generates fresh UUIDs and NanoIDs rather than input-derived identifiers', () => {
+    const uuidA = executeTool(tool('uuid-generator', 'UUID Generator'), 'same-seed').output;
+    const uuidB = executeTool(tool('uuid-generator', 'UUID Generator'), 'same-seed').output;
+    expect(uuidA).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(uuidB).not.toBe(uuidA);
+
+    const nanoA = executeTool(tool('nanoid-generator', 'NanoID Generator'), 'same-seed').output;
+    const nanoB = executeTool(tool('nanoid-generator', 'NanoID Generator'), 'same-seed').output;
+    expect(nanoA).toHaveLength(21);
+    expect(nanoB).not.toBe(nanoA);
+  });
+
   it('returns honest unsupported status', () => {
     const result = executeTool(tool('future-tool', 'Future Tool'), 'abc');
     expect(result.output).toBe('');
