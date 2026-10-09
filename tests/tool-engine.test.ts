@@ -59,6 +59,11 @@ describe('tool engine pure transforms', () => {
     const nanoB = executeTool(tool('nanoid-generator', 'NanoID Generator'), 'same-seed').output;
     expect(nanoA).toHaveLength(21);
     expect(nanoB).not.toBe(nanoA);
+
+    const randomA = executeTool(tool('random-string-generator', 'Random String Generator'), '16').output;
+    const randomB = executeTool(tool('random-string-generator', 'Random String Generator'), '16').output;
+    expect(randomA).toMatch(/^[A-Za-z0-9]{16}$/);
+    expect(randomB).not.toBe(randomA);
   });
 
   it('returns honest unsupported status', () => {
