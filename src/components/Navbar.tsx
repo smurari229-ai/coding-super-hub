@@ -87,6 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile search button */}
           <button
             onClick={onOpenSearch}
+            aria-label="Search developer tools"
             className="sm:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
           >
             <Search className="w-4 h-4" />
