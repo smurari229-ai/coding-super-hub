@@ -2209,7 +2209,7 @@ const utilityBatch27: Handler = (tool, input) => {
       if (obj.sameAs !== undefined && (!Array.isArray(obj.sameAs) || obj.sameAs.some(url => typeof url !== 'string' || !isUrl(url)))) throw new Error('sameAs must be an array of absolute HTTP(S) URLs.');
       const schema = { '@context': 'https://schema.org', '@type': 'Organization', name: obj.name.trim(), ...(obj.url ? { url: obj.url } : {}), ...(obj.logo ? { logo: obj.logo } : {}), ...(obj.sameAs ? { sameAs: obj.sameAs } : {}) };
       const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
-      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+      return '<script type="application/ld+json">\n' + json + '\n</script>';
     }
     case 'schema-org-article': {
       let data: unknown;
@@ -2222,7 +2222,7 @@ const utilityBatch27: Handler = (tool, input) => {
       if (obj.image && !isUrl(obj.image)) throw new Error('Article image must be an absolute HTTP(S) URL.');
       const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: obj.headline.trim(), author: { '@type': 'Person', name: obj.author.trim() }, datePublished: obj.datePublished, ...(obj.url ? { url: obj.url } : {}), ...(obj.image ? { image: obj.image } : {}) };
       const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
-      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+      return '<script type="application/ld+json">\n' + json + '\n</script>';
     }
     case 'hex-to-hsl-rgb': {
       const value = input.trim();
