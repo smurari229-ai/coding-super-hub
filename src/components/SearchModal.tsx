@@ -86,6 +86,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           {query && (
             <button
               onClick={() => setQuery('')}
+              aria-label="Clear search query"
               className="text-slate-500 hover:text-slate-300 p-1"
             >
               <X className="w-4 h-4" />
@@ -141,6 +142,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         e.stopPropagation();
                         onToggleFavorite(tool.id);
                       }}
+                      aria-label={isFav ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
                       className="p-1 rounded hover:bg-slate-800 text-slate-500 hover:text-amber-400 transition-colors"
                       title={isFav ? 'Remove favorite' : 'Add favorite'}
                     >
