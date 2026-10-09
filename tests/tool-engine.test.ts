@@ -376,18 +376,18 @@ describe('practical text, date and HTTP utilities', () => {
 
   it('classifies user-agent text and calculates exact age using calendar dates', () => {
     expect(JSON.parse(executeTool(tool('is-mobile-browser-check', 'Mobile Browser Check'), 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile').output).classification).toBe('mobile');
-    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2000-01-15\\n2026-10-09').output).toContain('26 years, 7 months, 24 days');
-    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2026-02-30\\n2026-10-09').error).toContain('real calendar date');
+    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2000-01-15\n2026-10-09').output).toContain('26 years, 7 months, 24 days');
+    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2026-02-30\n2026-10-09').error).toContain('real calendar date');
   });
 
   it('counts weekdays and holidays inclusively', () => {
-    const result = executeTool(tool('workday-business-days', 'Business Days'), '2026-10-05\\n2026-10-09\\n2026-10-07');
+    const result = executeTool(tool('workday-business-days', 'Business Days'), '2026-10-05\n2026-10-09\n2026-10-07');
     expect(result.output).toContain('Weekdays in range (inclusive): 5');
     expect(result.output).toContain('Business days excluding listed holidays: 4');
   });
 
   it('inspects raw HTTP headers and reports missing security headers', () => {
-    const result = JSON.parse(executeTool(tool('http-headers-inspector', 'HTTP Headers Inspector'), 'HTTP/1.1 200 OK\\nContent-Type: text/html\\nX-Content-Type-Options: nosniff').output);
+    const result = JSON.parse(executeTool(tool('http-headers-inspector', 'HTTP Headers Inspector'), 'HTTP/1.1 200 OK\nContent-Type: text/html\nX-Content-Type-Options: nosniff').output);
     expect(result.statusCode).toBe(200);
     expect(result.securityHeaders['x-content-type-options'].present).toBe(true);
     expect(result.securityHeaders['content-security-policy'].present).toBe(false);
@@ -397,7 +397,7 @@ describe('practical text, date and HTTP utilities', () => {
     const sms = JSON.parse(executeTool(tool('character-counter-sms', 'SMS Character Counter'), 'Hello^').output);
     expect(sms.encoding).toBe('GSM-7');
     expect(sms.messageUnits).toBe(7);
-    const svg = executeTool(tool('svg-favicon-generator', 'SVG Favicon Generator'), '<\\n#112233\\n#ffffff').output;
+    const svg = executeTool(tool('svg-favicon-generator', 'SVG Favicon Generator'), '<\n#112233\n#ffffff').output;
     expect(svg).toContain('&lt;');
     expect(svg).toContain('fill="#112233"');
     expect(svg).not.toContain('<text x="32" y="44" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="#112233"><</text>');
