@@ -445,3 +445,34 @@ describe('additional catalog converters and generators', () => {
     expect(executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\nAda,"unfinished').error).toContain('unclosed quoted');
   });
 });
+describe('IEEE 754 and structured-data utilities', () => {
+  it('decodes IEEE 754 float32 sign, exponent, and mantissa', () => {
+    const result = JSON.parse(executeTool(tool('binary-floating-point-ieee', 'IEEE 754'), '1').output);
+    expect(result.hex).toBe('0x3F800000');
+    expect(result.signBit).toBe(0);
+    expect(result.exponent).toBe(0);
+    expect(result.classification).toBe('normal');
+  });
+
+  it('inverts bits at explicit widths without signed 32-bit overflow', () => {
+    expect(JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\\n8').output).invertedBinary).toBe('11111111');
+    const result = JSON.parse(executeTool(tool('bitwise-not-inverter', 'Bitwise NOT'), '0\\n32').output);
+    expect(result.invertedValue).toBe(4294967295);
+    expect(result.invertedHex).toBe('0xFFFFFFFF');
+  });
+
+  it('builds safe Organization JSON-LD and validates external URLs', () => {
+    const result = executeTool(tool('schema-org-json-ld-org', 'Organization Schema'), '{"name":"Example","url":"https://example.com","sameAs":["https://social.example.com"]}').output;
+    expect(result).toContain('"@type": "Organization"');
+    expect(executeTool(tool('schema-org-json-ld-org', 'Organization Schema'), '{"name":"Example","url":"javascript:alert(1)"}').error).toContain('HTTP(S)');
+    const hostile = executeTool(tool('schema-org-json-ld-org', 'Organization Schema'), '{"name":"</script><script>alert(1)</script>"}').output;
+    expect(hostile).not.toContain('</script><script>alert(1)');
+    expect(hostile).toContain('\\u003c/script>');
+  });
+
+  it('builds Article JSON-LD and rejects invalid dates', () => {
+    const result = executeTool(tool('schema-org-article', 'Article Schema'), '{"headline":"News","author":"A. Writer","datePublished":"2026-10-09"}').output;
+    expect(result).toContain('"@type": "Article"');
+    expect(executeTool(tool('schema-org-article', 'Article Schema'), '{"headline":"News","author":"A","datePublished":"yesterday"}').error).toContain('YYYY-MM-DD');
+  });
+});
