@@ -15,6 +15,16 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate release tag
+        env:
+          TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release tag. Use vMAJOR.MINOR.PATCH, optionally with a prerelease suffix."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
 
@@ -39,13 +49,16 @@ jobs:
           bun run build
 
       - name: Package build artifact
-        run: tar -czf "coding-super-hub-${{ inputs.tag }}.tar.gz" dist
+        env:
+          TAG: ${{ inputs.tag }}
+        run: tar -czf "coding-super-hub-$TAG.tar.gz" dist
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
         run: |
-          gh release create "${{ inputs.tag }}" "coding-super-hub-${{ inputs.tag }}.tar.gz" \
-            --target "${{ github.sha }}" \
-            --title "${{ inputs.tag }}" \
+          gh release create "$TAG" "coding-super-hub-$TAG.tar.gz" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
             --generate-notes
