@@ -2258,9 +2258,6 @@ const utilityBatch27: Handler = (tool, input) => {
       ).join('\n');
       return '<?xml version="1.0" encoding="UTF-8"?>\n<rows>\n' + xml + '\n</rows>';
     }
-    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
-      return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
-    }
     case 'escape-regex-string': {
       const slash = String.fromCharCode(92);
       const metacharacters = new Set(['.', '*', '+', '?', '^', String.fromCharCode(36), String.fromCharCode(123), String.fromCharCode(125), '(', ')', '|', '[', ']', slash]);
