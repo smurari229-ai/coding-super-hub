@@ -2231,6 +2231,9 @@ const utilityBatch27: Handler = (tool, input) => {
       };
       const start = parseDate(startText ?? ''), end = parseDate(endText ?? '');
       if (start > end) throw new Error('Start date must be on or before end date.');
+      if (end.getTime() - start.getTime() > 36_600 * 86400000) {
+        throw new Error('Date range must be 100 years or less.');
+      }
       const holidays = new Set(holidayLines.map(date => parseDate(date).toISOString().slice(0, 10)));
       let weekdays = 0, holidaysCount = 0;
       for (let day = start.getTime(); day <= end.getTime(); day += 86400000) {
