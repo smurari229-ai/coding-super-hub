@@ -3060,10 +3060,20 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
     if (tool.id === 'random-string-generator') {
       const length = Math.min(128, Math.max(1, Number.parseInt(input.trim(), 10) || 16));
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let seed = 0;
-      for (const ch of input) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
+      const cryptoApi = globalThis.crypto;
+      if (!cryptoApi?.getRandomValues) {
+        return { output: '', error: 'Secure random generation is unavailable in this environment.' };
+      }
+      // Rejection sampling avoids modulo bias for the 62-character alphabet.
+      const limit = 256 - (256 % alphabet.length);
       let out = '';
-      for (let i = 0; i < length; i++) { seed = Math.imul(seed ^ (i + 1), 16777619); out += alphabet[(seed >>> 0) % alphabet.length]; }
+      while (out.length < length) {
+        const bytes = cryptoApi.getRandomValues(new Uint8Array(Math.min(256, (length - out.length) * 2)));
+        for (const byte of bytes) {
+          if (byte < limit) out += alphabet[byte % alphabet.length];
+          if (out.length === length) break;
+        }
+      }
       return { output: out };
     }
 
