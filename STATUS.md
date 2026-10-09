@@ -5,12 +5,12 @@
 - Repository: `smurari229-ai/coding-super-hub`
 - Stack: React 19 + TypeScript + Vite 8
 - Audit branch: `phase1-a-to-z-release-audit-2026-09-28`
-- Latest application/tool-engine code and passing test head: `4239290aea49efb8b0b891a3f8f16ee6c313b83b`.
+- Latest application/tool-engine code and passing test head: `8683358e200e3d43cdb0ba323d36890754d65849`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
 - Current compare: **485 commits ahead / 44 commits behind main; diverged** (GitHub PR reports 484 commits in the PR range; compare and PR commit metrics use different ranges). PR #4 is `mergeable=false` with 79 changed files, approximately 9,420 additions and 681 deletions.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
-- Latest full CI: [run 37887023430](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37887023430) — **5/5 jobs PASS**, **12 test files / 117 tests PASS**.
+- Latest full CI: [run 37887376941](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37887376941) — **5/5 jobs PASS**, **12 test files / 119 tests PASS**.
 - Latest successful preview before the newest five-handler batch is [READY](https://vercel.com/earnal-hub/coding-super-hub/yeL41T233PYn5QFLb1wfr3ETFccd), commit `defef993a97b4b2011a36bebc4809ebbe5685610`; HTML/assets/manifest/deep-link/CSP smoke passed on that older code head. A fresh preview for fully CI-passing head `cd24e3a300e74f6c15a68561a9df9c832f9577b0` was blocked by Vercel's deployment API daily quota (402, retry after 24 hours). No production promotion was attempted.
 - Last successful preview HTTP smoke: **200 OK**** for app HTML, JS, CSS, manifest, and `?tool=json-formatter` fallback; expected app title and security headers observed. This predates the newest five-handler batch.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
@@ -35,8 +35,8 @@ Latest CI output from `tests/catalog-execution.test.ts`:
 
 | Classification | Count |
 |---|---:|
-| Non-empty engine output observed | 362 |
-| Explicit Coming-soon | 161 |
+| Non-empty engine output observed | 364 |
+| Explicit Coming-soon | 159 |
 | Dedicated-UI entries returning generic fallback and needing UI-level smoke | 12 |
 | Validation/input mismatches | 0 |
 | Unexpected errors | 0 |
@@ -54,8 +54,8 @@ Identity assertions pass: 535 entries, 535 unique IDs, 535 unique names. This is
 - Hardened both Stripe and Lemon webhook catch paths so a failure to persist the failed-event status still returns a retryable HTTP 500.
 - Fixed HTML entity decoding to handle case-insensitive named entities and preserve invalid Unicode numeric entities rather than throwing.
 - Fixed monthly Pro entitlement boundaries across Stripe and Lemon verification/webhook paths: monthly entitlements require a valid provider period end; Lemon monthly order events alone no longer grant unbounded Pro.
-- Implemented 29 additional deterministic utility handlers (array flatten/chunk/group/set operations, random array pick, ISO currency/country lookup, JSON-to-Go, cron, mock API response, sorting trace, and binary-search trace) with representative catalog inputs and focused regression tests. Latest completed CI on the feature/test head: **5/5 jobs PASS, 12 test files / 101 tests PASS**; catalog smoke now observes 346 outputs, 177 explicit Coming-soon, 0 input mismatches, 0 unexpected errors, and 0 unclassified outcomes.
-- Latest CI run validates these changes on the audit branch only. Additional handlers cover regex escaping, passphrase generation, user-agent classification, exact age, bounded business-day counting, HTTP security-header inspection, SMS segment counting, safe SVG favicon output, HEX/RGB/HSL conversion, two's-complement conversion, fluid spacing CSS, FAQ/Organization/Article JSON-LD, CSV-to-XML, IEEE 754 float inspection, and bitwise inversion. JSON-LD output escapes `<` to prevent script-element breakout; CSS property names are validated. Latest passing catalog smoke observes 362 non-empty outputs and 161 explicit Coming-soon entries; this is still not a semantic correctness pass.
+- Implemented 31 additional deterministic utility handlers (array flatten/chunk/group/set operations, random array pick, ISO currency/country lookup, JSON-to-Go, cron, mock API response, sorting trace, and binary-search trace) with representative catalog inputs and focused regression tests. Latest completed CI on the feature/test head: **5/5 jobs PASS, 12 test files / 101 tests PASS**; catalog smoke now observes 346 outputs, 177 explicit Coming-soon, 0 input mismatches, 0 unexpected errors, and 0 unclassified outcomes.
+- Latest CI run validates these changes on the audit branch only. Additional handlers cover regex escaping, passphrase generation, user-agent classification, exact age, bounded business-day counting, HTTP security-header inspection, SMS segment counting, safe SVG favicon output, HEX/RGB/HSL conversion, two's-complement conversion, fluid spacing CSS, FAQ/Organization/Article/Product/Breadcrumb JSON-LD, CSV-to-XML, IEEE 754 float inspection, and bitwise inversion. JSON-LD output escapes `<` to prevent script-element breakout; CSS property names and external URLs are validated. Latest passing catalog smoke observes 364 non-empty outputs and 159 explicit Coming-soon entries; this is still not a semantic correctness pass.
 
 ## Supabase / billing
 
