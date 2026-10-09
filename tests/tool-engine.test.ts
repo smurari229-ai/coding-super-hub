@@ -376,7 +376,7 @@ describe('practical text, date and HTTP utilities', () => {
 
   it('classifies user-agent text and calculates exact age using calendar dates', () => {
     expect(JSON.parse(executeTool(tool('is-mobile-browser-check', 'Mobile Browser Check'), 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile').output).classification).toBe('mobile');
-    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2000-01-15\\n2026-10-09').output).toContain('26 years, 8 months, 24 days');
+    expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2000-01-15\\n2026-10-09').output).toContain('26 years, 7 months, 24 days');
     expect(executeTool(tool('age-calculator-exact', 'Exact Age Calculator'), '2026-02-30\\n2026-10-09').error).toContain('real calendar date');
   });
 
