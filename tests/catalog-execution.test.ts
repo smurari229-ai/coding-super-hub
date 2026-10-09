@@ -171,6 +171,8 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'bitwise-not-inverter': '0\n32',
   'schema-org-json-ld-org': '{"name":"Example","url":"https://example.com","sameAs":["https://social.example.com"]}',
   'schema-org-article': '{"headline":"News","author":"A. Writer","datePublished":"2026-10-09"}',
+  'schema-org-product': '{"name":"Widget","price":12.5,"priceCurrency":"USD","availability":"InStock"}',
+  'schema-org-breadcrumb': '[{"name":"Home","item":"https://example.com"},{"name":"Tools"}]',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
