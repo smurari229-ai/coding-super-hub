@@ -2216,7 +2216,7 @@ const utilityBatch27: Handler = (tool, input) => {
       try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with headline, author, and datePublished; url and image are optional.'); }
       if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Article input must be a JSON object.');
       const obj = data as { headline?: unknown; author?: unknown; datePublished?: unknown; url?: unknown; image?: unknown };
-      if (typeof obj.headline !== 'string' || !obj.headline.trim() || typeof obj.author !== 'string' || !obj.author.trim() || typeof obj.datePublished !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(obj.datePublished)) throw new Error('Provide non-empty headline, author, and datePublished in YYYY-MM-DD format.');
+      if (typeof obj.headline !== 'string' || !obj.headline.trim() || typeof obj.author !== 'string' || !obj.author.trim() || typeof obj.datePublished !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(obj.datePublished)) throw new Error('Provide non-empty headline, author, and datePublished in YYYY-MM-DD format.');
       const isUrl = (value: unknown) => { if (typeof value !== 'string') return false; try { const url = new URL(value); return url.protocol === 'https:' || url.protocol === 'http:'; } catch { return false; } };
       if (obj.url && !isUrl(obj.url)) throw new Error('Article url must be an absolute HTTP(S) URL.');
       if (obj.image && !isUrl(obj.image)) throw new Error('Article image must be an absolute HTTP(S) URL.');
