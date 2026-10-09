@@ -37,11 +37,20 @@ export const UuidGeneratorTool: React.FC = () => {
     return `${part1}-${part2}-${part3}-${part4}-${part5}`;
   };
 
-  // NanoID generator
+  // NanoID generator. Rejection sampling avoids modulo bias when the alphabet
+  // length does not divide 256 evenly.
   const genNanoId = (len: number = 21): string => {
     const chars = 'useandom-26T1983_40STOpfontrkLzF-GHIJKLMNOVWXAbcdefghijklmnopqrstuvwxyZ';
-    const randomBytes = crypto.getRandomValues(new Uint8Array(len));
-    return Array.from(randomBytes).map(b => chars[b % chars.length]).join('');
+    const limit = 256 - (256 % chars.length);
+    let result = '';
+    while (result.length < len) {
+      const randomBytes = crypto.getRandomValues(new Uint8Array(Math.min(256, (len - result.length) * 2)));
+      for (const byte of randomBytes) {
+        if (byte < limit) result += chars[byte % chars.length];
+        if (result.length === len) break;
+      }
+    }
+    return result;
   };
 
   const generate = () => {
