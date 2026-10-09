@@ -167,6 +167,10 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'fluid-space-calculator': '16\n32\n320\n1440\npadding',
   'schema-org-json-ld-faq': '[{"question":"What is this?","answer":"A tool."}]',
   'csv-to-xml': 'name,notes\nAda,"hello, <world>"',
+  'binary-floating-point-ieee': '1',
+  'bitwise-not-inverter': '0\n32',
+  'schema-org-json-ld-org': '{"name":"Example","url":"https://example.com","sameAs":["https://social.example.com"]}',
+  'schema-org-article': '{"headline":"News","author":"A. Writer","datePublished":"2026-10-09"}',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
