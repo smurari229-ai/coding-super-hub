@@ -21,6 +21,13 @@ describe('deployment security headers', () => {
     expect(csp).not.toContain('https://*.supabase.co');
   });
 
+  it('allows the observed Lemon Squeezy checkout script without a broad script wildcard', () => {
+    const csp = headerValue('Content-Security-Policy');
+    expect(csp).toContain('https://app.lemonsqueezy.com');
+    expect(csp).toContain('https://assets.lemonsqueezy.com');
+    expect(csp).not.toContain('https://*.lemonsqueezy.com');
+  });
+
   it('keeps key baseline browser security directives enabled', () => {
     const csp = headerValue('Content-Security-Policy');
     expect(csp).toContain("object-src 'none'");
