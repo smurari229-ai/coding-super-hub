@@ -118,4 +118,15 @@ describe('Supabase server helper safety', () => {
     await expect(markWebhookProcessed('stripe', 'evt_missing')).rejects.toThrow(/webhook event was not updated/i);
   });
 
+  it('fails closed when a provider refund reference matches no entitlement', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('[]', { status: 200 })));
+    const { updateEntitlementByProviderField } = await import('../api/_supabase');
+    await expect(
+      updateEntitlementByProviderField('lemon_order_id', 'order_missing', {
+        status: 'refunded',
+        expires_at: new Date().toISOString(),
+      })
+    ).rejects.toThrow(/no pro entitlement matched/i);
+  });
+
 });
