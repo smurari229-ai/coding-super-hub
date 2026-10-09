@@ -8,12 +8,18 @@
 - Latest application/tool-engine code and passing test head: `4239290aea49efb8b0b891a3f8f16ee6c313b83b`.
 - Main SHA: `89b26c6bf3c55d689d54bdb22f768bf00c3e1693`
 - Merge base: `a33af47ab4c451fe44bf9680fa17ecee3fb2f390`
-- Current compare: **diverged / 44 commits behind main**; the ahead count changes with audit-only commits.
+- Current compare: **475 commits ahead / 44 commits behind main; diverged** (GitHub PR reports 484 commits in the PR range; compare and PR commit metrics use different ranges). PR #4 is `mergeable=false` with 79 changed files, approximately 9,414 additions and 681 deletions.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
 - Latest full CI: [run 37887023430](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37887023430) — **5/5 jobs PASS**, **12 test files / 117 tests PASS**.
 - Latest successful preview before the newest five-handler batch is [READY](https://vercel.com/earnal-hub/coding-super-hub/yeL41T233PYn5QFLb1wfr3ETFccd), commit `defef993a97b4b2011a36bebc4809ebbe5685610`; HTML/assets/manifest/deep-link/CSP smoke passed on that older code head. A fresh preview for fully CI-passing head `cd24e3a300e74f6c15a68561a9df9c832f9577b0` was blocked by Vercel's deployment API daily quota (402, retry after 24 hours). No production promotion was attempted.
 - Last successful preview HTTP smoke: **200 OK**** for app HTML, JS, CSS, manifest, and `?tool=json-formatter` fallback; expected app title and security headers observed. This predates the newest five-handler batch.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
+
+## Main-vs-audit branch compatibility review
+
+- Read the 44 commits reachable from `main` but not the audit branch. Their commit messages cover Pro entitlements, AI usage limits, affiliate configuration, Stripe/Lemon Squeezy verification and webhooks, and monetization UI; the compare shows 15 affected files in these overlapping areas.
+- Confirmed `main`'s `index.html` title is **Coding Super Hub Explorer** and its `package.json` name is `react-example`; it has no `test` script. The audit branch's package is named `coding-super-hub`, declares 535 tools, and has Vitest coverage. This is a real app/root divergence, not merely a stale production alias.
+- Therefore, blindly merging PR #4 or promoting the audit preview would risk replacing the current production app and losing/replacing main-only monetization work. No merge, rebase, or production promotion was attempted. A safe release needs an explicit integration plan to reconcile the two app roots and port/review the 44 main-only changes.
 
 ## Safeguards
 
