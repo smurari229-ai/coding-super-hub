@@ -26,6 +26,23 @@ describe('Supabase server helper safety', () => {
     expect(captured?.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('fails closed for active monthly entitlements with missing or invalid expiry', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify([
+      { provider: 'stripe', plan: 'monthly', status: 'active', expires_at: null },
+      { provider: 'lemon-squeezy', plan: 'monthly', status: 'active', expires_at: 'not-a-date' },
+    ]), { status: 200 })));
+    const { getEntitlement } = await import('../api/_supabase');
+    await expect(getEntitlement('user-1')).resolves.toBeNull();
+  });
+
+  it('allows a lifetime entitlement with no expiry', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify([
+      { provider: 'stripe', plan: 'lifetime', status: 'active', expires_at: null },
+    ]), { status: 200 })));
+    const { getEntitlement } = await import('../api/_supabase');
+    await expect(getEntitlement('user-1')).resolves.toMatchObject({ plan: 'lifetime', status: 'active' });
+  });
+
   it('recovers a stale processing webhook before retrying it', async () => {
     const calls: Array<{ url: string; method: string; body: string }> = [];
     vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
