@@ -2213,6 +2213,7 @@ const utilityBatch27: Handler = (tool, input) => {
     case 'fluid-space-calculator': {
       const [minSizeText, maxSizeText, minViewportText = '320', maxViewportText = '1440', property = 'padding'] = input.split(/\r?\n/).map(part => part.trim());
       const minSize = Number(minSizeText), maxSize = Number(maxSizeText), minViewport = Number(minViewportText), maxViewport = Number(maxViewportText);
+      if (!/^[a-z-]+$/.test(property || 'padding')) throw new Error('Use a valid CSS property name such as padding, margin, or gap.');
       if (![minSize, maxSize, minViewport, maxViewport].every(Number.isFinite) || minSize < 0 || maxSize < minSize || minViewport <= 0 || maxViewport <= minViewport) {
         throw new Error('Enter min size, max size, min viewport, max viewport, and optional CSS property on separate lines. Sizes must be non-negative and viewport max must exceed viewport min.');
       }
