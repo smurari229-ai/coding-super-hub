@@ -476,3 +476,19 @@ describe('IEEE 754 and structured-data utilities', () => {
     expect(executeTool(tool('schema-org-article', 'Article Schema'), '{"headline":"News","author":"A","datePublished":"yesterday"}').error).toContain('YYYY-MM-DD');
   });
 });
+describe('Product and breadcrumb structured-data builders', () => {
+  it('builds Product JSON-LD with a validated offer', () => {
+    const result = executeTool(tool('schema-org-product', 'Product Schema'), '{"name":"Widget","price":12.5,"priceCurrency":"USD","availability":"InStock"}').output;
+    expect(result).toContain('"@type": "Product"');
+    expect(result).toContain('"priceCurrency": "USD"');
+    expect(result).toContain('https://schema.org/InStock');
+    expect(executeTool(tool('schema-org-product', 'Product Schema'), '{"name":"Widget","price":-1,"priceCurrency":"USD"}').error).toContain('non-negative');
+  });
+
+  it('builds ordered BreadcrumbList JSON-LD and validates links', () => {
+    const result = executeTool(tool('schema-org-breadcrumb', 'Breadcrumb Schema'), '[{"name":"Home","item":"https://example.com"},{"name":"Tools"}]').output;
+    expect(result).toContain('"@type": "BreadcrumbList"');
+    expect(result).toContain('"position": 2');
+    expect(executeTool(tool('schema-org-breadcrumb', 'Breadcrumb Schema'), '[{"name":"Home","item":"javascript:alert(1)"}]').error).toContain('HTTP(S)');
+  });
+});
