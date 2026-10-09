@@ -414,17 +414,17 @@ describe('additional catalog converters and generators', () => {
   });
 
   it('calculates signed two-complement binary within width limits', () => {
-    const result = JSON.parse(executeTool(tool('twos-complement-calc', 'Two Complement'), '-5\\n8').output);
+    const result = JSON.parse(executeTool(tool('twos-complement-calc', 'Two Complement'), '-5\n8').output);
     expect(result.binary).toBe('11111011');
     expect(result.hex).toBe('0xFB');
-    expect(executeTool(tool('twos-complement-calc', 'Two Complement'), '200\\n8').error).toContain('must be between');
+    expect(executeTool(tool('twos-complement-calc', 'Two Complement'), '200\n8').error).toContain('must be between');
   });
 
   it('generates responsive fluid spacing CSS', () => {
-    const result = executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '16\\n32\\n320\\n1440\\npadding').output;
+    const result = executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '16\n32\n320\n1440\npadding').output;
     expect(result).toContain('clamp(16px,');
     expect(result).toContain('padding:');
-    expect(executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '32\\n16\\n1440\\n320').error).toContain('non-negative');
+    expect(executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '32\n16\n1440\n320').error).toContain('non-negative');
   });
 
   it('builds FAQ JSON-LD from validated question/answer pairs', () => {
@@ -435,9 +435,9 @@ describe('additional catalog converters and generators', () => {
   });
 
   it('converts CSV rows to escaped XML and handles quoted commas', () => {
-    const result = executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\\nAda,"hello, <world>"').output;
+    const result = executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\nAda,"hello, <world>"').output;
     expect(result).toContain('<name>Ada</name>');
     expect(result).toContain('<notes>hello, &lt;world&gt;</notes>');
-    expect(executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\\nAda,"unfinished').error).toContain('unclosed quoted');
+    expect(executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\nAda,"unfinished').error).toContain('unclosed quoted');
   });
 });
