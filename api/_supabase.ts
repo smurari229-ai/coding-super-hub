@@ -77,8 +77,15 @@ export async function getEntitlement(userId: string) {
   if (!response.ok || !Array.isArray(rows)) return null;
   const now = Date.now();
   return rows.find((row: any) => {
-    if (row.status === 'active') return !row.expires_at || Date.parse(row.expires_at) > now;
-    if (row.status === 'cancelled') return Boolean(row.expires_at) && Date.parse(row.expires_at) > now;
+    const expiry = typeof row.expires_at === 'string' ? Date.parse(row.expires_at) : Number.NaN;
+    const hasFutureExpiry = Number.isFinite(expiry) && expiry > now;
+    if (row.status === 'active') {
+      // Monthly subscriptions must always have a finite provider-sourced period
+      // end. Null expiry remains valid only for a lifetime entitlement.
+      if (row.plan === 'monthly') return hasFutureExpiry;
+      return !row.expires_at || hasFutureExpiry;
+    }
+    if (row.status === 'cancelled') return hasFutureExpiry;
     return false;
   }) ?? null;
 }
