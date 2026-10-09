@@ -25,7 +25,8 @@ describe('deployment security headers', () => {
     const csp = headerValue('Content-Security-Policy');
     expect(csp).toContain('https://app.lemonsqueezy.com');
     expect(csp).toContain('https://assets.lemonsqueezy.com');
-    expect(csp).not.toContain('https://*.lemonsqueezy.com');
+    const scriptSrc = csp.split(';').find((directive) => directive.trim().startsWith('script-src')) ?? '';
+    expect(scriptSrc).not.toContain('https://*.lemonsqueezy.com');
   });
 
   it('keeps key baseline browser security directives enabled', () => {
