@@ -2248,8 +2248,17 @@ const utilityBatch27: Handler = (tool, input) => {
       if (cell.length || row.length) { row.push(cell); rows.push(row); }
       if (rows.length < 2) throw new Error('Provide a CSV header row and at least one data row.');
       const escapeXml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-      const headers = rows[0].map((header, index) => header.trim() || 'col' + (index + 1));
-      const xml = rows.slice(1).filter(values => values.some(value => value.length)).map(values => '  <row>\\n' + headers.map((header, index) => '    <' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>' + escapeXml(values[index] ?? '') + '</' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
+      const safeName = (header: string, index: number) => {
+        const cleaned = header.trim().replace(/[^A-Za-z0-9_.-]/g, '_') || 'col' + (index + 1);
+        return /^[A-Za-z_]/.test(cleaned) ? cleaned : '_' + cleaned;
+      };
+      const headers = rows[0].map(safeName);
+      const xml = rows.slice(1).filter(values => values.some(value => value.length)).map(values =>
+        '  <row>\\n' + headers.map((header, index) => '    <' + header + '>' + escapeXml(values[index] ?? '') + '</' + header + '>').join('\\n') + '\\n  </row>'
+      ).join('\\n');
+      return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
+    }
+    case 'escape-regex-string': {') + '>' + escapeXml(values[index] ?? '') + '</' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
       return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
     }
     case 'escape-regex-string': {
