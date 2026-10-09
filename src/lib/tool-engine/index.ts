@@ -2723,6 +2723,7 @@ const releaseHardeningBatch: Handler = (tool, input) => {
 };
 
 const handlers: Handler[] = [
+  utilityBatch27,
   utilityBatch26,
   roiBatch25,
   releaseHardeningBatch,
