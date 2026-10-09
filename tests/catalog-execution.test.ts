@@ -166,7 +166,7 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'twos-complement-calc': '-5\n8',
   'fluid-space-calculator': '16\n32\n320\n1440\npadding',
   'schema-org-json-ld-faq': '[{"question":"What is this?","answer":"A tool."}]',
-  'csv-to-xml': 'name,notes\nAda,"hello, <world>"',,
+  'csv-to-xml': 'name,notes\nAda,"hello, <world>"',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
