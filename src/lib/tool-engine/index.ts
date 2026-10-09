@@ -2179,6 +2179,79 @@ const roiBatch24: Handler = (tool, input) => {
 
 const utilityBatch27: Handler = (tool, input) => {
   switch (tool.id) {
+    case 'hex-to-hsl-rgb': {
+      const value = input.trim();
+      let r: number, g: number, b: number;
+      const hex = value.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+      if (hex) {
+        let digits = hex[1];
+        if (digits.length === 3) digits = Array.from(digits, char => char + char).join('');
+        r = Number.parseInt(digits.slice(0, 2), 16); g = Number.parseInt(digits.slice(2, 4), 16); b = Number.parseInt(digits.slice(4, 6), 16);
+      } else {
+        const rgb = value.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i);
+        if (!rgb) throw new Error('Enter a HEX color (#RGB or #RRGGBB) or an rgb()/rgba() color.');
+        r = Number(rgb[1]); g = Number(rgb[2]); b = Number(rgb[3]);
+        if ([r, g, b].some(channel => channel > 255)) throw new Error('RGB channels must be between 0 and 255.');
+      }
+      const rn = r / 255, gn = g / 255, bn = b / 255, max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn), delta = max - min;
+      let h = 0;
+      if (delta) h = max === rn ? 60 * (((gn - bn) / delta) % 6) : max === gn ? 60 * ((bn - rn) / delta + 2) : 60 * ((rn - gn) / delta + 4);
+      if (h < 0) h += 360;
+      const l = (max + min) / 2, saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+      const percent = (n: number) => Math.round(n * 10000) / 100;
+      return JSON.stringify({ hex: '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('').toUpperCase(), rgb: 'rgb(' + r + ', ' + g + ', ' + b + ')', hsl: 'hsl(' + Math.round(h) + ', ' + percent(saturation) + '%, ' + percent(l) + '%)', channels: { r, g, b } }, null, 2);
+    }
+    case 'twos-complement-calc': {
+      const [numberText, widthText = '8'] = input.split(/\r?\n/).map(part => part.trim());
+      const value = Number(numberText), width = Number(widthText);
+      if (!Number.isInteger(value) || ![8, 16, 32].includes(width)) throw new Error('Enter an integer on line 1 and bit width 8, 16, or 32 on line 2.');
+      const min = -(2 ** (width - 1)), max = 2 ** (width - 1) - 1;
+      if (value < min || value > max) throw new Error('Value must be between ' + min + ' and ' + max + ' for signed ' + width + '-bit representation.');
+      const unsigned = value < 0 ? 2 ** width + value : value;
+      return JSON.stringify({ value, width, signedRange: { min, max }, binary: unsigned.toString(2).padStart(width, '0'), hex: '0x' + unsigned.toString(16).toUpperCase().padStart(width / 4, '0'), unsignedValue: unsigned }, null, 2);
+    }
+    case 'fluid-space-calculator': {
+      const [minSizeText, maxSizeText, minViewportText = '320', maxViewportText = '1440', property = 'padding'] = input.split(/\r?\n/).map(part => part.trim());
+      const minSize = Number(minSizeText), maxSize = Number(maxSizeText), minViewport = Number(minViewportText), maxViewport = Number(maxViewportText);
+      if (![minSize, maxSize, minViewport, maxViewport].every(Number.isFinite) || minSize < 0 || maxSize < minSize || minViewport <= 0 || maxViewport <= minViewport) {
+        throw new Error('Enter min size, max size, min viewport, max viewport, and optional CSS property on separate lines. Sizes must be non-negative and viewport max must exceed viewport min.');
+      }
+      const slope = (maxSize - minSize) / (maxViewport - minViewport) * 100;
+      const intercept = minSize - slope * minViewport / 100;
+      const css = 'clamp(' + minSize + 'px, ' + Math.round(intercept * 100) / 100 + 'px + ' + Math.round(slope * 100) / 100 + 'vw, ' + maxSize + 'px)';
+      return '/* Fluid ' + (property || 'padding') + ': ' + minSize + 'px at ' + minViewport + 'px viewport to ' + maxSize + 'px at ' + maxViewport + 'px viewport */\n' + (property || 'padding') + ': ' + css + ';';
+    }
+    case 'schema-org-json-ld-faq': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter a JSON array of FAQ items: [{"question":"...","answer":"..."}].'); }
+      if (!Array.isArray(data) || data.length < 1 || data.length > 100) throw new Error('Provide 1 to 100 FAQ items in a JSON array.');
+      const mainEntity = data.map((item, index) => {
+        if (!item || typeof item !== 'object' || typeof (item as { question?: unknown }).question !== 'string' || typeof (item as { answer?: unknown }).answer !== 'string' || !(item as { question: string }).question.trim() || !(item as { answer: string }).answer.trim()) throw new Error('FAQ item ' + (index + 1) + ' must have non-empty question and answer strings.');
+        return { '@type': 'Question', name: (item as { question: string }).question.trim(), acceptedAnswer: { '@type': 'Answer', text: (item as { answer: string }).answer.trim() } };
+      });
+      return '<script type="application/ld+json">\n' + JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity }, null, 2) + '\n</script>';
+    }
+    case 'csv-to-xml': {
+      const rows: string[][] = [];
+      let row: string[] = [], cell = '', quoted = false;
+      for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        if (char === '"' && quoted && input[i + 1] === '"') { cell += '"'; i++; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === ',' && !quoted) { row.push(cell); cell = ''; }
+        else if ((char === '\\n' || char === '\\r') && !quoted) {
+          if (char === '\\r' && input[i + 1] === '\\n') i++;
+          row.push(cell); rows.push(row); row = []; cell = '';
+        } else cell += char;
+      }
+      if (quoted) throw new Error('CSV contains an unclosed quoted field.');
+      if (cell.length || row.length) { row.push(cell); rows.push(row); }
+      if (rows.length < 2) throw new Error('Provide a CSV header row and at least one data row.');
+      const escapeXml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+      const headers = rows[0].map((header, index) => header.trim() || 'col' + (index + 1));
+      const xml = rows.slice(1).filter(values => values.some(value => value.length)).map(values => '  <row>\\n' + headers.map((header, index) => '    <' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>' + escapeXml(values[index] ?? '') + '</' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
+      return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
+    }
     case 'escape-regex-string': {
       const slash = String.fromCharCode(92);
       const metacharacters = new Set(['.', '*', '+', '?', '^', String.fromCharCode(36), String.fromCharCode(123), String.fromCharCode(125), '(', ')', '|', '[', ']', slash]);
