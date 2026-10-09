@@ -3031,15 +3031,23 @@ export function executeTool(tool: ToolItem, input: string): ToolEngineResult {
     }
 
     if (tool.id === 'uuid-generator' || tool.id === 'nanoid-generator') {
-      const source = input.trim() || 'coding-super-hub';
-      let hash = 2166136261;
-      for (const ch of source) hash = Math.imul(hash ^ ch.charCodeAt(0), 16777619);
-      const hex = (hash >>> 0).toString(16).padStart(8, '0');
-      if (tool.id === 'uuid-generator') return { output: `00000000-0000-4000-8000-${hex.padStart(12, '0')}` };
-      const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      let n = hash >>> 0, out = '';
-      for (let i = 0; i < 21; i++) { out += alphabet[n % alphabet.length]; n = Math.floor(n / alphabet.length) || ((n ^ (i + 1) * 2654435761) >>> 0); }
-      return { output: out };
+      // Never use input-derived pseudo-random values for identifiers: UUIDs and NanoIDs
+      // must be unpredictable and different across repeated calls.
+      const cryptoApi = globalThis.crypto;
+      if (!cryptoApi?.getRandomValues) {
+        return { output: '', error: 'Secure random generation is unavailable in this environment.' };
+      }
+      if (tool.id === 'uuid-generator') {
+        if (typeof cryptoApi.randomUUID === 'function') return { output: cryptoApi.randomUUID() };
+        const bytes = cryptoApi.getRandomValues(new Uint8Array(16));
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+        return { output: `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}` };
+      }
+      const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-';
+      const bytes = cryptoApi.getRandomValues(new Uint8Array(21));
+      return { output: Array.from(bytes, byte => alphabet[byte & 63]).join('') };
     }
 
     if (tool.id === 'lorem-ipsum-generator') {
