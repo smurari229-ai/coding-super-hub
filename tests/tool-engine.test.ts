@@ -494,10 +494,10 @@ describe('Product and breadcrumb structured-data builders', () => {
 });
 describe('geospatial utilities', () => {
   it('encodes and decodes standard geohash cells', () => {
-    const encoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'encode\\n37.7749\\n-122.4194\\n8').output);
+    const encoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'encode\n37.7749\n-122.4194\n8').output);
     expect(encoded.geohash).toHaveLength(8);
     expect(encoded.geohash).toMatch(/^[0123456789bcdefghjkmnpqrstuvwxyz]+$/);
-    const decoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'decode\\n' + encoded.geohash).output);
+    const decoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'decode\n' + encoded.geohash).output);
     expect(decoded.latitudeBounds[0]).toBeLessThan(37.7749);
     expect(decoded.latitudeBounds[1]).toBeGreaterThan(37.7749);
     expect(decoded.longitudeBounds[0]).toBeLessThan(-122.4194);
