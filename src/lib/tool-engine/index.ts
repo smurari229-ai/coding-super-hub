@@ -2177,6 +2177,113 @@ const roiBatch24: Handler = (tool, input) => {
   }
 };
 
+const utilityBatch27: Handler = (tool, input) => {
+  switch (tool.id) {
+    case 'escape-regex-string':
+      return input.replace(/[.*+?^${}()|[\]\\]/g, '\\const utilityBatch26: Handler = (tool, input) => {');
+    case 'passphrase-generator': {
+      const count = Number.parseInt(input.trim(), 10) || 4;
+      if (!Number.isInteger(count) || count < 3 || count > 12) throw new Error('Enter a word count from 3 to 12.');
+      const wordList = 'amber apple atlas autumn bamboo beacon berry birch breeze canyon cedar cherry cobalt comet coral cosmos cricket crystal delta dragon dune eagle ember falcon fern field flame forest galaxy garden glacier harbor hazel island ivory juniper kiwi lagoon lantern lemon lilac lunar maple meadow meteor mint mist moon moss nectar ocean olive orchid otter panda pebble pepper pine planet plum quartz rabbit raven river robin rocket saffron sage salmon shadow silver sky solar sparrow spirit spruce star stone storm summit sunset thyme tiger timber tulip valley velvet violet willow winter wolf yarrow zephyr'.split(' ');
+      const bytes = new Uint32Array(count);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, byte => wordList[byte % wordList.length]).join('-');
+    }
+    case 'is-mobile-browser-check': {
+      const ua = input.trim();
+      if (!ua) throw new Error('Paste a browser User-Agent string to inspect.');
+      const mobile = /Android|iPhone|iPod|Mobile|Windows Phone|BlackBerry|IEMobile/i.test(ua);
+      const tablet = /iPad|Tablet|Kindle|Silk/i.test(ua);
+      return JSON.stringify({ classification: tablet ? 'tablet-or-large-mobile' : mobile ? 'mobile' : 'desktop-or-unknown', mobile, tablet, userAgent: ua }, null, 2);
+    }
+    case 'age-calculator-exact': {
+      const [birthText, asOfText = new Date().toISOString().slice(0, 10)] = input.split(/\r?\n/).map(part => part.trim());
+      const parseDate = (text: string) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) throw new Error('Use YYYY-MM-DD for both dates.');
+        const date = new Date(text + 'T00:00:00.000Z');
+        if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== text) throw new Error('Enter a real calendar date.');
+        return date;
+      };
+      const birth = parseDate(birthText), asOf = parseDate(asOfText);
+      if (birth > asOf) throw new Error('Birth date cannot be after the calculation date.');
+      let years = asOf.getUTCFullYear() - birth.getUTCFullYear();
+      let months = asOf.getUTCMonth() - birth.getUTCMonth();
+      let days = asOf.getUTCDate() - birth.getUTCDate();
+      if (days < 0) {
+        months -= 1;
+        const previousMonth = new Date(Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth(), 0));
+        days += previousMonth.getUTCDate();
+      }
+      if (months < 0) { years -= 1; months += 12; }
+      const totalDays = Math.floor((asOf.getTime() - birth.getTime()) / 86400000);
+      return years + ' years, ' + months + ' months, ' + days + ' days\nTotal days: ' + totalDays;
+    }
+    case 'workday-business-days': {
+      const [startText, endText, ...holidayLines] = input.split(/\r?\n/).map(part => part.trim()).filter(Boolean);
+      const parseDate = (text: string) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) throw new Error('Enter start and end dates as YYYY-MM-DD, with optional holiday dates on following lines.');
+        const date = new Date(text + 'T00:00:00.000Z');
+        if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== text) throw new Error('Enter real calendar dates.');
+        return date;
+      };
+      const start = parseDate(startText ?? ''), end = parseDate(endText ?? '');
+      if (start > end) throw new Error('Start date must be on or before end date.');
+      const holidays = new Set(holidayLines.map(date => parseDate(date).toISOString().slice(0, 10)));
+      let weekdays = 0, holidaysCount = 0;
+      for (let day = start.getTime(); day <= end.getTime(); day += 86400000) {
+        const date = new Date(day), key = date.toISOString().slice(0, 10), weekday = date.getUTCDay();
+        if (weekday !== 0 && weekday !== 6) {
+          weekdays += 1;
+          if (holidays.has(key)) holidaysCount += 1;
+        }
+      }
+      return 'Weekdays in range (inclusive): ' + weekdays + '\nListed holidays on weekdays: ' + holidaysCount + '\nBusiness days excluding listed holidays: ' + (weekdays - holidaysCount);
+    }
+    case 'http-headers-inspector': {
+      const lines = input.split(/\r?\n/);
+      const status = lines[0]?.match(/^HTTP\/\S+\s+(\d{3})/i)?.[1] ?? null;
+      const headers = new Map<string, string>();
+      for (const line of lines.slice(status ? 1 : 0)) {
+        if (!line.trim()) continue;
+        const index = line.indexOf(':');
+        if (index < 1) throw new Error('Use raw HTTP headers, one Name: value per line, optionally preceded by an HTTP status line.');
+        const name = line.slice(0, index).trim().toLowerCase();
+        const value = line.slice(index + 1).trim();
+        headers.set(name, headers.has(name) ? headers.get(name) + ', ' + value : value);
+      }
+      const checks = ['content-security-policy', 'strict-transport-security', 'x-content-type-options', 'referrer-policy', 'permissions-policy'];
+      return JSON.stringify({ statusCode: status ? Number(status) : undefined, headerCount: headers.size, headers: Object.fromEntries(headers), securityHeaders: Object.fromEntries(checks.map(name => [name, { present: headers.has(name), value: headers.get(name) ?? null }])) }, null, 2);
+    }
+    case 'character-counter-sms': {
+      const text = input;
+      const gsmBasic = new Set(Array.from("@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà"));
+      const gsmExtension = new Set(Array.from('^{}\\\\[~]|€'));
+      let gsmUnits = 0;
+      let gsm = true;
+      for (const char of text) {
+        if (gsmBasic.has(char)) gsmUnits += 1;
+        else if (gsmExtension.has(char)) gsmUnits += 2;
+        else { gsm = false; break; }
+      }
+      const units = gsm ? gsmUnits : Array.from(text).reduce((sum, char) => sum + (char.codePointAt(0)! > 0xffff ? 2 : 1), 0);
+      const singleLimit = gsm ? 160 : 70, multipartLimit = gsm ? 153 : 67;
+      const segments = units === 0 ? 0 : units <= singleLimit ? 1 : Math.ceil(units / multipartLimit);
+      return JSON.stringify({ characters: Array.from(text).length, encoding: gsm ? 'GSM-7' : 'Unicode (UCS-2/UTF-16)', messageUnits: units, segments, singleMessageLimit: singleLimit, multipartSegmentLimit: multipartLimit, note: gsm ? 'GSM extension characters count as two septets.' : 'Unicode messages use a smaller per-segment limit; emoji and some symbols may use surrogate pairs.' }, null, 2);
+    }
+    case 'svg-favicon-generator': {
+      const [label = 'C', color = '#4f46e5', background = '#ffffff'] = input.split(/\r?\n/);
+      const safeColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value.trim()) ? value.trim() : null;
+      const fg = safeColor(color), bg = safeColor(background);
+      if (!fg || !bg) throw new Error('Use one character on line 1, foreground #RRGGBB on line 2, and background #RRGGBB on line 3.');
+      const char = [...label.trim()][0] ?? 'C';
+      const escaped = char.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Favicon"><rect width="64" height="64" rx="12" fill="' + bg + '"/><text x="32" y="44" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="' + fg + '">' + escaped + '</text></svg>';
+    }
+    default:
+      return null;
+  }
+};
+
 const utilityBatch26: Handler = (tool, input) => {
   switch (tool.id) {
     case 'flatten-deep-array': {
