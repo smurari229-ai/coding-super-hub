@@ -154,6 +154,14 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'mock-api-response-maker': '{"status":201,"body":{"ok":true}}',
   'sorting-algorithm-visualizer': '3,1,2',
   'binary-search-visualizer': '{"array":[1,3,5,7],"target":5}',
+  'escape-regex-string': 'a+b[c]\\\\d',
+  'passphrase-generator': '5',
+  'is-mobile-browser-check': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Mobile',
+  'age-calculator-exact': '2000-01-15\\n2026-10-09',
+  'workday-business-days': '2026-10-05\\n2026-10-09\\n2026-10-07',
+  'http-headers-inspector': 'HTTP/1.1 200 OK\\nContent-Type: text/html\\nX-Content-Type-Options: nosniff',
+  'character-counter-sms': 'Hello^',
+  'svg-favicon-generator': '<\\n#112233\\n#ffffff',
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
