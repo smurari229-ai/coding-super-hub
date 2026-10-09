@@ -2194,7 +2194,8 @@ const utilityBatch27: Handler = (tool, input) => {
       const value = Number(numberText), width = Number(widthText);
       if (!Number.isInteger(value) || ![8, 16, 32].includes(width)) throw new Error('Enter an integer and a bit width of 8, 16, or 32 on separate lines.');
       const mask = width === 32 ? 0xffffffff : (2 ** width) - 1;
-      const source = value & mask, inverted = (~source) & mask;
+      const source = width === 32 ? value >>> 0 : value & mask;
+      const inverted = width === 32 ? (~source) >>> 0 : (~source) & mask;
       return JSON.stringify({ input: value, width, inputBinary: source.toString(2).padStart(width, '0'), invertedValue: inverted, invertedBinary: inverted.toString(2).padStart(width, '0'), invertedHex: '0x' + inverted.toString(16).toUpperCase().padStart(width / 4, '0') }, null, 2);
     }
     case 'schema-org-json-ld-org': {
