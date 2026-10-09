@@ -2180,8 +2180,9 @@ const roiBatch24: Handler = (tool, input) => {
 const utilityBatch27: Handler = (tool, input) => {
   switch (tool.id) {
     case 'escape-regex-string': {
-      const metacharacters = new Set(Array.from('.*+?^${}()|[]\\\\'));
-      return Array.from(input, char => metacharacters.has(char) ? '\\\\' + char : char).join('');
+      const slash = String.fromCharCode(92);
+      const metacharacters = new Set(['.', '*', '+', '?', '^', String.fromCharCode(36), String.fromCharCode(123), String.fromCharCode(125), '(', ')', '|', '[', ']', slash]);
+      return Array.from(input, char => metacharacters.has(char) ? slash + char : char).join('');
     }
     case 'passphrase-generator': {
       const count = Number.parseInt(input.trim(), 10) || 4;
