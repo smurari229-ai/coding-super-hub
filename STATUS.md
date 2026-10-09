@@ -11,8 +11,8 @@
 - Current compare: **485 commits ahead / 44 commits behind main; diverged** (GitHub PR reports 484 commits in the PR range; compare and PR commit metrics use different ranges). PR #4 is `mergeable=false` with 79 changed files, approximately 9,420 additions and 681 deletions.
 - PR #4: **OPEN / UNMERGED / mergeable=false**
 - Latest full CI: [run 37887618100](https://github.com/smurari229-ai/coding-super-hub/actions/runs/37887618100) — **5/5 jobs PASS**, **12 test files / 121 tests PASS**.
-- Latest successful preview before the newest five-handler batch is [READY](https://vercel.com/earnal-hub/coding-super-hub/yeL41T233PYn5QFLb1wfr3ETFccd), commit `defef993a97b4b2011a36bebc4809ebbe5685610`; HTML/assets/manifest/deep-link/CSP smoke passed on that older code head. A fresh preview for fully CI-passing head `cd24e3a300e74f6c15a68561a9df9c832f9577b0` was blocked by Vercel's deployment API daily quota (402, retry after 24 hours). No production promotion was attempted.
-- Last successful preview HTTP smoke: **200 OK**** for app HTML, JS, CSS, manifest, and `?tool=json-formatter` fallback; expected app title and security headers observed. This predates the newest five-handler batch.
+- Latest successful preview before the newest utility additions is [READY](https://vercel.com/earnal-hub/coding-super-hub/yeL41T233PYn5QFLb1wfr3ETFccd), commit `defef993a97b4b2011a36bebc4809ebbe5685610`; HTML/assets/manifest/deep-link/CSP smoke passed on that older code head. A fresh preview for fully CI-passing head `ac6fcc1b3c91e0e2abc860e9430ab4a7e7f0d5b1` was blocked by Vercel's deployment API daily quota (402, retry after 24 hours). No production promotion was attempted.
+- Last successful preview HTTP smoke: **200 OK**** for app HTML, JS, CSS, manifest, and `?tool=json-formatter` fallback; expected app title and security headers observed. This predates the latest utility additions.
 - Public production `https://coding-super-hub.vercel.app`: HTTP 200, but it still serves **Coding Super Hub Explorer**, not the 535-tools app. Production has not been promoted by this audit.
 
 ## Main-vs-audit branch compatibility review
