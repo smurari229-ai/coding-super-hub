@@ -122,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Sponsor / Heart */}
           <button
             onClick={onOpenSponsor}
-            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-400 transition-colors"
+            className="hidden sm:flex p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-400 transition-colors"
             title="Support Creator"
           >
             <Heart className="w-4 h-4" />
