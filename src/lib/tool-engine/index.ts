@@ -2229,7 +2229,8 @@ const utilityBatch27: Handler = (tool, input) => {
         if (!item || typeof item !== 'object' || typeof (item as { question?: unknown }).question !== 'string' || typeof (item as { answer?: unknown }).answer !== 'string' || !(item as { question: string }).question.trim() || !(item as { answer: string }).answer.trim()) throw new Error('FAQ item ' + (index + 1) + ' must have non-empty question and answer strings.');
         return { '@type': 'Question', name: (item as { question: string }).question.trim(), acceptedAnswer: { '@type': 'Answer', text: (item as { answer: string }).answer.trim() } };
       });
-      return '<script type="application/ld+json">\n' + JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity }, null, 2) + '\n</script>';
+      const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity }, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
+      return '<script type="application/ld+json">\n' + jsonLd + '\n</script>';
     }
     case 'csv-to-xml': {
       const rows: string[][] = [];
