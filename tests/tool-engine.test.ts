@@ -492,3 +492,23 @@ describe('Product and breadcrumb structured-data builders', () => {
     expect(executeTool(tool('schema-org-breadcrumb', 'Breadcrumb Schema'), '[{"name":"Home","item":"javascript:alert(1)"}]').error).toContain('HTTP(S)');
   });
 });
+describe('geospatial utilities', () => {
+  it('encodes and decodes standard geohash cells', () => {
+    const encoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'encode\\n37.7749\\n-122.4194\\n8').output);
+    expect(encoded.geohash).toHaveLength(8);
+    expect(encoded.geohash).toMatch(/^[0123456789bcdefghjkmnpqrstuvwxyz]+$/);
+    const decoded = JSON.parse(executeTool(tool('geohash-encoder-decoder', 'Geohash'), 'decode\\n' + encoded.geohash).output);
+    expect(decoded.latitudeBounds[0]).toBeLessThan(37.7749);
+    expect(decoded.latitudeBounds[1]).toBeGreaterThan(37.7749);
+    expect(decoded.longitudeBounds[0]).toBeLessThan(-122.4194);
+    expect(decoded.longitudeBounds[1]).toBeGreaterThan(-122.4194);
+  });
+
+  it('validates GeoJSON Point and closed Polygon rings', () => {
+    const point = JSON.parse(executeTool(tool('geojson-validator-basic', 'GeoJSON Validator'), '{"type":"Feature","geometry":{"type":"Point","coordinates":[-122.4,37.7]},"properties":{}}').output);
+    expect(point.valid).toBe(true);
+    const polygon = JSON.parse(executeTool(tool('geojson-validator-basic', 'GeoJSON Validator'), '{"type":"Polygon","coordinates":[[[0,0],[1,0],[1,1],[0,1]]]}').output);
+    expect(polygon.valid).toBe(false);
+    expect(polygon.errors[0]).toContain('end at its starting coordinate');
+  });
+});
