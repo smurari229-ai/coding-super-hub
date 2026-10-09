@@ -2239,8 +2239,8 @@ const utilityBatch27: Handler = (tool, input) => {
         if (char === '"' && quoted && input[i + 1] === '"') { cell += '"'; i++; }
         else if (char === '"') quoted = !quoted;
         else if (char === ',' && !quoted) { row.push(cell); cell = ''; }
-        else if ((char === '\\n' || char === '\\r') && !quoted) {
-          if (char === '\\r' && input[i + 1] === '\\n') i++;
+        else if ((char === '\n' || char === '\r') && !quoted) {
+          if (char === '\r' && input[i + 1] === '\n') i++;
           row.push(cell); rows.push(row); row = []; cell = '';
         } else cell += char;
       }
@@ -2254,9 +2254,9 @@ const utilityBatch27: Handler = (tool, input) => {
       };
       const headers = rows[0].map(safeName);
       const xml = rows.slice(1).filter(values => values.some(value => value.length)).map(values =>
-        '  <row>\\n' + headers.map((header, index) => '    <' + header + '>' + escapeXml(values[index] ?? '') + '</' + header + '>').join('\\n') + '\\n  </row>'
-      ).join('\\n');
-      return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
+        '  <row>\n' + headers.map((header, index) => '    <' + header + '>' + escapeXml(values[index] ?? '') + '</' + header + '>').join('\n') + '\n  </row>'
+      ).join('\n');
+      return '<?xml version="1.0" encoding="UTF-8"?>\n<rows>\n' + xml + '\n</rows>';
     }
     case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
       return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
