@@ -162,6 +162,11 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'http-headers-inspector': 'HTTP/1.1 200 OK\nContent-Type: text/html\nX-Content-Type-Options: nosniff',
   'character-counter-sms': 'Hello^',
   'svg-favicon-generator': '<\n#112233\n#ffffff',
+  'hex-to-hsl-rgb': '#ff0000',
+  'twos-complement-calc': '-5\n8',
+  'fluid-space-calculator': '16\n32\n320\n1440\npadding',
+  'schema-org-json-ld-faq': '[{"question":"What is this?","answer":"A tool."}]',
+  'csv-to-xml': 'name,notes\nAda,"hello, <world>"',,
 };
 
 const auditInputFor = (tool: (typeof TOOLS_CATALOG)[number]) =>
