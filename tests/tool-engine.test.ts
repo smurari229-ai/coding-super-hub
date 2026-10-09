@@ -404,3 +404,40 @@ describe('practical text, date and HTTP utilities', () => {
     expect(svg).not.toContain('<text x="32" y="44" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="#112233"><</text>');
   });
 });
+describe('additional catalog converters and generators', () => {
+  it('converts HEX colors and validates RGB channels', () => {
+    const color = JSON.parse(executeTool(tool('hex-to-hsl-rgb', 'Color Converter'), '#ff0000').output);
+    expect(color.hex).toBe('#FF0000');
+    expect(color.rgb).toBe('rgb(255, 0, 0)');
+    expect(color.hsl).toBe('hsl(0, 100%, 50%)');
+    expect(executeTool(tool('hex-to-hsl-rgb', 'Color Converter'), 'rgb(300,0,0)').error).toContain('between 0 and 255');
+  });
+
+  it('calculates signed two-complement binary within width limits', () => {
+    const result = JSON.parse(executeTool(tool('twos-complement-calc', 'Two Complement'), '-5\\n8').output);
+    expect(result.binary).toBe('11111011');
+    expect(result.hex).toBe('0xFB');
+    expect(executeTool(tool('twos-complement-calc', 'Two Complement'), '200\\n8').error).toContain('must be between');
+  });
+
+  it('generates responsive fluid spacing CSS', () => {
+    const result = executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '16\\n32\\n320\\n1440\\npadding').output;
+    expect(result).toContain('clamp(16px,');
+    expect(result).toContain('padding:');
+    expect(executeTool(tool('fluid-space-calculator', 'Fluid Spacing'), '32\\n16\\n1440\\n320').error).toContain('non-negative');
+  });
+
+  it('builds FAQ JSON-LD from validated question/answer pairs', () => {
+    const result = executeTool(tool('schema-org-json-ld-faq', 'FAQ Schema'), '[{"question":"What is this?","answer":"A tool."}]').output;
+    expect(result).toContain('"@type": "FAQPage"');
+    expect(result).toContain('"name": "What is this?"');
+    expect(executeTool(tool('schema-org-json-ld-faq', 'FAQ Schema'), '[{"question":"","answer":"A"}]').error).toContain('non-empty');
+  });
+
+  it('converts CSV rows to escaped XML and handles quoted commas', () => {
+    const result = executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\\nAda,"hello, <world>"').output;
+    expect(result).toContain('<name>Ada</name>');
+    expect(result).toContain('<notes>hello, &lt;world&gt;</notes>');
+    expect(executeTool(tool('csv-to-xml', 'CSV to XML'), 'name,notes\\nAda,"unfinished').error).toContain('unclosed quoted');
+  });
+});
