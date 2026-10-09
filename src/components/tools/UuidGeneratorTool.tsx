@@ -39,7 +39,11 @@ export const UuidGeneratorTool: React.FC = () => {
 
   // NanoID generator. Rejection sampling avoids modulo bias when the alphabet
   // length does not divide 256 evenly.
-  const genNanoId = (len: number = 21): string => {
+  const genNanoId = (requestedLength: number = 21): string => {
+    // Enforce the UI's documented range even when callers bypass native input constraints.
+    const len = Number.isFinite(requestedLength)
+      ? Math.min(64, Math.max(8, Math.trunc(requestedLength)))
+      : 21;
     const chars = 'useandom-26T1983_40STOpfontrkLzF-GHIJKLMNOVWXAbcdefghijklmnopqrstuvwxyZ';
     const limit = 256 - (256 % chars.length);
     let result = '';
@@ -169,7 +173,10 @@ export const UuidGeneratorTool: React.FC = () => {
                 min={8}
                 max={64}
                 value={nanoidLength}
-                onChange={(e) => setNanoidLength(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  setNanoidLength(Number.isFinite(value) ? Math.min(64, Math.max(8, Math.trunc(value))) : 21);
+                }}
                 className="w-16 bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-white text-xs focus:outline-none"
               />
             </div>
