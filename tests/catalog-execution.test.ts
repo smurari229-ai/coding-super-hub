@@ -173,7 +173,7 @@ const SPECIAL_INPUTS: Record<string, string> = {
   'schema-org-article': '{"headline":"News","author":"A. Writer","datePublished":"2026-10-09"}',
   'schema-org-product': '{"name":"Widget","price":12.5,"priceCurrency":"USD","availability":"InStock"}',
   'schema-org-breadcrumb': '[{"name":"Home","item":"https://example.com"},{"name":"Tools"}]',
-  'geohash-encoder-decoder': 'encode\\n37.7749\\n-122.4194\\n8',
+  'geohash-encoder-decoder': 'encode\n37.7749\n-122.4194\n8',
   'geojson-validator-basic': '{"type":"Feature","geometry":{"type":"Point","coordinates":[-122.4,37.7]},"properties":{}}',
 };
 
