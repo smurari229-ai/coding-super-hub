@@ -2258,7 +2258,7 @@ const utilityBatch27: Handler = (tool, input) => {
       ).join('\\n');
       return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
     }
-    case 'escape-regex-string': {') + '>' + escapeXml(values[index] ?? '') + '</' + header.replace(/[^A-Za-z0-9_.-]/g, '_').replace(/^[^A-Za-z_]/, '_    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
+    case 'escape-regex-string': {') + '>').join('\\n') + '\\n  </row>').join('\\n');
       return '<?xml version="1.0" encoding="UTF-8"?>\\n<rows>\\n' + xml + '\\n</rows>';
     }
     case 'escape-regex-string': {
