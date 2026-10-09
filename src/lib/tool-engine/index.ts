@@ -2179,8 +2179,10 @@ const roiBatch24: Handler = (tool, input) => {
 
 const utilityBatch27: Handler = (tool, input) => {
   switch (tool.id) {
-    case 'escape-regex-string':
-      return input.replace(/[.*+?^${}()|[\]\\]/g, '\\const utilityBatch26: Handler = (tool, input) => {');
+    case 'escape-regex-string': {
+      const metacharacters = new Set(Array.from('.*+?^${}()|[]\\\\'));
+      return Array.from(input, char => metacharacters.has(char) ? '\\\\' + char : char).join('');
+    }
     case 'passphrase-generator': {
       const count = Number.parseInt(input.trim(), 10) || 4;
       if (!Number.isInteger(count) || count < 3 || count > 12) throw new Error('Enter a word count from 3 to 12.');
