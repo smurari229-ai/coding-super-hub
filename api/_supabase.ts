@@ -112,7 +112,10 @@ export async function updateEntitlementByProviderField(field: string, value: str
   });
   const data = await response.json().catch(() => null);
   if (!response.ok) throw new Error('Could not update Pro entitlement.');
-  return Array.isArray(data) ? data[0] : data;
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error('No Pro entitlement matched the provider reference.');
+  }
+  return data[0];
 }
 
 export async function findUserIdByEmail(email: string): Promise<string | null> {
