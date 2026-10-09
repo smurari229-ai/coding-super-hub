@@ -2198,6 +2198,44 @@ const utilityBatch27: Handler = (tool, input) => {
       const inverted = width === 32 ? (~source) >>> 0 : (~source) & mask;
       return JSON.stringify({ input: value, width, inputBinary: source.toString(2).padStart(width, '0'), invertedValue: inverted, invertedBinary: inverted.toString(2).padStart(width, '0'), invertedHex: '0x' + inverted.toString(16).toUpperCase().padStart(width / 4, '0') }, null, 2);
     }
+    case 'schema-org-product': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with a required name and optional description, image, sku, brand, and offer.'); }
+      if (!data || typeof data !== 'object' || Array.isArray(data) || typeof (data as { name?: unknown }).name !== 'string' || !(data as { name: string }).name.trim()) throw new Error('Product JSON must include a non-empty name.');
+      const obj = data as { name: string; description?: unknown; image?: unknown; sku?: unknown; brand?: unknown; price?: unknown; priceCurrency?: unknown; availability?: unknown; url?: unknown };
+      const isUrl = (value: unknown) => { if (typeof value !== 'string') return false; try { const url = new URL(value); return url.protocol === 'https:' || url.protocol === 'http:'; } catch { return false; } };
+      if (obj.image && !isUrl(obj.image)) throw new Error('Product image must be an absolute HTTP(S) URL.');
+      if (obj.url && !isUrl(obj.url)) throw new Error('Product url must be an absolute HTTP(S) URL.');
+      const schema: Record<string, unknown> = { '@context': 'https://schema.org', '@type': 'Product', name: obj.name.trim() };
+      if (typeof obj.description === 'string' && obj.description.trim()) schema.description = obj.description.trim();
+      if (obj.image) schema.image = obj.image;
+      if (typeof obj.sku === 'string' && obj.sku.trim()) schema.sku = obj.sku.trim();
+      if (typeof obj.brand === 'string' && obj.brand.trim()) schema.brand = { '@type': 'Brand', name: obj.brand.trim() };
+      if (obj.url) schema.url = obj.url;
+      if (obj.price !== undefined) {
+        const price = Number(obj.price), currency = typeof obj.priceCurrency === 'string' ? obj.priceCurrency.toUpperCase() : '';
+        if (!Number.isFinite(price) || price < 0 || !/^[A-Z]{3}$/.test(currency)) throw new Error('If price is provided, use a non-negative price and a three-letter ISO currency code.');
+        const availability = typeof obj.availability === 'string' ? obj.availability : 'InStock';
+        if (!['InStock', 'OutOfStock', 'PreOrder', 'BackOrder'].includes(availability)) throw new Error('Availability must be InStock, OutOfStock, PreOrder, or BackOrder.');
+        schema.offers = { '@type': 'Offer', price, priceCurrency: currency, availability: 'https://schema.org/' + availability, ...(obj.url ? { url: obj.url } : {}) };
+      }
+      const json = JSON.stringify(schema, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
+      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+    }
+    case 'schema-org-breadcrumb': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter JSON array of breadcrumb items with name and optional item URL.'); }
+      const items = Array.isArray(data) ? data : data && typeof data === 'object' ? (data as { items?: unknown }).items : null;
+      if (!Array.isArray(items) || items.length < 1 || items.length > 50) throw new Error('Provide 1 to 50 breadcrumb items.');
+      const list = items.map((item, index) => {
+        if (!item || typeof item !== 'object' || typeof (item as { name?: unknown }).name !== 'string' || !(item as { name: string }).name.trim()) throw new Error('Breadcrumb item ' + (index + 1) + ' must have a non-empty name.');
+        const entry = item as { name: string; item?: unknown };
+        if (entry.item !== undefined && (typeof entry.item !== 'string' || !/^https?:\\/\\//i.test(entry.item))) throw new Error('Breadcrumb item URLs must start with http:// or https://.');
+        return { '@type': 'ListItem', position: index + 1, name: entry.name.trim(), ...(entry.item ? { item: entry.item } : {}) };
+      });
+      const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: list }, null, 2).replace(/</g, String.fromCharCode(92) + 'u003c');
+      return '<script type="application/ld+json">\\n' + json + '\\n</script>';
+    }
     case 'schema-org-json-ld-org': {
       let data: unknown;
       try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with a required name and optional url, logo, and sameAs array.'); }
