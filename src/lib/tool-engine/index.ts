@@ -2198,6 +2198,87 @@ const utilityBatch27: Handler = (tool, input) => {
       const inverted = width === 32 ? (~source) >>> 0 : (~source) & mask;
       return JSON.stringify({ input: value, width, inputBinary: source.toString(2).padStart(width, '0'), invertedValue: inverted, invertedBinary: inverted.toString(2).padStart(width, '0'), invertedHex: '0x' + inverted.toString(16).toUpperCase().padStart(width / 4, '0') }, null, 2);
     }
+    case 'geohash-encoder-decoder': {
+      const [modeRaw, first = '', second = '', precisionText = '8'] = input.split(/\r?\n/).map(part => part.trim());
+      const mode = modeRaw.toLowerCase();
+      const alphabet = '0123456789bcdefghjkmnpqrstuvwxyz';
+      if (mode === 'encode') {
+        const lat = Number(first), lon = Number(second), precision = Number(precisionText);
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) throw new Error('Encode mode expects latitude (-90..90) and longitude (-180..180) on lines 2 and 3.');
+        if (!Number.isInteger(precision) || precision < 1 || precision > 12) throw new Error('Geohash precision must be an integer from 1 to 12.');
+        let latMin = -90, latMax = 90, lonMin = -180, lonMax = 180, even = true, bits = 0, value = 0, hash = '';
+        while (hash.length < precision) {
+          const mid = even ? (lonMin + lonMax) / 2 : (latMin + latMax) / 2;
+          const coordinate = even ? lon : lat;
+          const upper = coordinate >= mid;
+          value = (value << 1) | (upper ? 1 : 0);
+          if (even) { if (upper) lonMin = mid; else lonMax = mid; }
+          else { if (upper) latMin = mid; else latMax = mid; }
+          even = !even;
+          bits++;
+          if (bits === 5) { hash += alphabet[value]; bits = 0; value = 0; }
+        }
+        return JSON.stringify({ mode, latitude: lat, longitude: lon, precision, geohash: hash }, null, 2);
+      }
+      if (mode === 'decode') {
+        const hash = first.toLowerCase();
+        if (!hash || hash.length > 12 || Array.from(hash).some(char => !alphabet.includes(char))) throw new Error('Decode mode expects a 1–12 character standard geohash on line 2.');
+        let latMin = -90, latMax = 90, lonMin = -180, lonMax = 180, even = true;
+        for (const char of hash) {
+          let value = alphabet.indexOf(char);
+          for (let bit = 4; bit >= 0; bit--) {
+            const upper = (value & (1 << bit)) !== 0;
+            if (even) { const mid = (lonMin + lonMax) / 2; if (upper) lonMin = mid; else lonMax = mid; }
+            else { const mid = (latMin + latMax) / 2; if (upper) latMin = mid; else latMax = mid; }
+            even = !even;
+          }
+        }
+        return JSON.stringify({ mode, geohash: hash, latitudeBounds: [latMin, latMax], longitudeBounds: [lonMin, lonMax], center: { latitude: (latMin + latMax) / 2, longitude: (lonMin + lonMax) / 2 } }, null, 2);
+      }
+      throw new Error('First line must be encode or decode. Encode: encode\\nlatitude\\nlongitude\\nprecision. Decode: decode\\ngeohash.');
+    }
+    case 'geojson-validator-basic': {
+      let data: unknown;
+      try { data = JSON.parse(input); } catch { throw new Error('Enter valid GeoJSON JSON.'); }
+      const errors: string[] = [];
+      const isPosition = (value: unknown): value is number[] => Array.isArray(value) && value.length >= 2 && value.every(n => typeof n === 'number' && Number.isFinite(n));
+      const validateRing = (ring: unknown, path: string) => {
+        if (!Array.isArray(ring) || ring.length < 4 || !ring.every(isPosition)) { errors.push(path + ' must be a closed linear ring with at least four coordinate positions.'); return; }
+        const first = ring[0], last = ring[ring.length - 1];
+        if (first[0] !== last[0] || first[1] !== last[1]) errors.push(path + ' must end at its starting coordinate.');
+      };
+      const validateGeometry = (geometry: unknown, path: string) => {
+        if (!geometry || typeof geometry !== 'object' || Array.isArray(geometry)) { errors.push(path + ' must be a geometry object.'); return; }
+        const g = geometry as { type?: unknown; coordinates?: unknown; geometries?: unknown };
+        if (g.type === 'Point') { if (!isPosition(g.coordinates)) errors.push(path + '.coordinates must be a numeric position.'); }
+        else if (g.type === 'Polygon') {
+          if (!Array.isArray(g.coordinates) || !g.coordinates.length) errors.push(path + '.coordinates must contain at least one ring.');
+          else g.coordinates.forEach((ring, i) => validateRing(ring, path + '.coordinates[' + i + ']'));
+        } else if (g.type === 'MultiPolygon') {
+          if (!Array.isArray(g.coordinates) || !g.coordinates.length) errors.push(path + '.coordinates must contain polygons.');
+          else g.coordinates.forEach((polygon, p) => {
+            if (!Array.isArray(polygon) || !polygon.length) errors.push(path + '.coordinates[' + p + '] must contain rings.');
+            else polygon.forEach((ring, r) => validateRing(ring, path + '.coordinates[' + p + '][' + r + ']'));
+          });
+        } else if (g.type === 'GeometryCollection') {
+          if (!Array.isArray(g.geometries)) errors.push(path + '.geometries must be an array.');
+          else g.geometries.forEach((item, i) => validateGeometry(item, path + '.geometries[' + i + ']'));
+        } else errors.push(path + '.type is unsupported; use Point, Polygon, MultiPolygon, or GeometryCollection.');
+      };
+      if (!data || typeof data !== 'object' || Array.isArray(data)) errors.push('Root must be a GeoJSON object.');
+      else {
+        const root = data as { type?: unknown; features?: unknown; geometry?: unknown };
+        if (root.type === 'FeatureCollection') {
+          if (!Array.isArray(root.features)) errors.push('FeatureCollection.features must be an array.');
+          else root.features.forEach((feature, i) => {
+            if (!feature || typeof feature !== 'object' || (feature as { type?: unknown }).type !== 'Feature') errors.push('features[' + i + '] must be a Feature.');
+            else validateGeometry((feature as { geometry?: unknown }).geometry, 'features[' + i + '].geometry');
+          });
+        } else if (root.type === 'Feature') validateGeometry(root.geometry, 'geometry');
+        else validateGeometry(data, 'geometry');
+      }
+      return JSON.stringify({ valid: errors.length === 0, errorCount: errors.length, errors, checkedTypes: ['Point', 'Polygon', 'MultiPolygon', 'GeometryCollection', 'Feature', 'FeatureCollection'] }, null, 2);
+    }
     case 'schema-org-product': {
       let data: unknown;
       try { data = JSON.parse(input); } catch { throw new Error('Enter JSON with a required name and optional description, image, sku, brand, and offer.'); }
