@@ -432,6 +432,10 @@ describe('additional catalog converters and generators', () => {
     expect(result).toContain('"@type": "FAQPage"');
     expect(result).toContain('"name": "What is this?"');
     expect(executeTool(tool('schema-org-json-ld-faq', 'FAQ Schema'), '[{"question":"","answer":"A"}]').error).toContain('non-empty');
+    const hostile = executeTool(tool('schema-org-json-ld-faq', 'FAQ Schema'), '[{"question":"Q","answer":"</script><script>alert(1)</script>"}]').output;
+    expect(hostile).not.toContain('</script><script>alert(1)');
+    expect(hostile).toContain('\\u003c/script>');
+
   });
 
   it('converts CSV rows to escaped XML and handles quoted commas', () => {
